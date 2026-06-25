@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -17,9 +18,9 @@ export default function Footer() {
         <div className="flex flex-col gap-3">
           <h4 className="font-bold text-[#2E2215] text-sm">Services</h4>
           <ul className="space-y-2 text-xs sm:text-sm">
-            <li><a href="#services" className="hover:text-foreground transition-colors">Photography</a></li>
-            <li><a href="#services" className="hover:text-foreground transition-colors">Videography</a></li>
-            <li><a href="#services" className="hover:text-foreground transition-colors">Live Music</a></li>
+            <li><Link href="/#services" className="hover:text-foreground transition-colors">Photography</Link></li>
+            <li><Link href="/#services" className="hover:text-foreground transition-colors">Videography</Link></li>
+            <li><Link href="/#services" className="hover:text-foreground transition-colors">Live Music</Link></li>
           </ul>
         </div>
 
@@ -27,7 +28,7 @@ export default function Footer() {
         <div className="flex flex-col gap-3">
           <h4 className="font-bold text-[#2E2215] text-sm">Company</h4>
           <ul className="space-y-2 text-xs sm:text-sm">
-            <li><a href="#about" className="hover:text-foreground transition-colors">About Us</a></li>
+            <li><Link href="/about" className="hover:text-foreground transition-colors">About Us</Link></li>
             <li><a href="#contact" className="hover:text-foreground transition-colors">Contact</a></li>
           </ul>
         </div>
