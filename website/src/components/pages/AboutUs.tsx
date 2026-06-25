@@ -52,6 +52,7 @@ const platformHighlights = [
 ];
 
 export default function AboutUs() {
+  console.log("Rendering AboutUs component");
   return (
     <section id="about" className="w-full bg-[#FAF0E6] py-12 sm:py-16 border-y border-border/40 scroll-mt-16">
       <div className="max-w-[1400px] mx-auto px-3 min-[360px]:px-4 sm:px-6 lg:px-8">
