@@ -19,15 +19,18 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
-          <a href="#services" className="relative text-foreground py-2 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary">
+          <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors py-2">
+            About Us
+          </Link>
+          <Link href="/#services" className="relative text-foreground py-2 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary">
             Services
-          </a>
-          <a href="#history" className="text-muted-foreground hover:text-foreground transition-colors py-2">
+          </Link>
+          <Link href="/#history" className="text-muted-foreground hover:text-foreground transition-colors py-2">
             History
-          </a>
-          <a href="#support" className="text-muted-foreground hover:text-foreground transition-colors py-2">
+          </Link>
+          <Link href="/#support" className="text-muted-foreground hover:text-foreground transition-colors py-2">
             Support
-          </a>
+          </Link>
         </nav>
 
         {/* Right side: Login & Register */}
@@ -58,27 +61,34 @@ export default function Navbar() {
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-3 animate-in fade-in slide-in-from-top-4 duration-200">
-          <a
-            href="#services"
+          <Link
+            href="/about"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 rounded-md text-foreground hover:bg-muted text-sm font-medium"
+          >
+            About Us
+          </Link>
+          <Link
+            href="/#services"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-md bg-muted text-primary text-sm font-medium"
           >
             Services
-          </a>
-          <a
-            href="#history"
+          </Link>
+          <Link
+            href="/#history"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-md text-foreground hover:bg-muted text-sm font-medium"
           >
             History
-          </a>
-          <a
-            href="#support"
+          </Link>
+          <Link
+            href="/#support"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-md text-foreground hover:bg-muted text-sm font-medium"
           >
             Support
-          </a>
+          </Link>
           <div className="pt-2 border-t border-border flex flex-col gap-2">
             <Button asChild size="sm" className="w-full justify-center py-1 h-7 text-white bg-primary hover:bg-primary/95 text-xs font-semibold shadow-sm cursor-pointer" onClick={() => setMobileMenuOpen(false)}>
               <Link href="/join-us">Join Us</Link>
