@@ -4,7 +4,7 @@
 
 :root {
   --font-geist-sans: Arial, Helvetica, sans-serif;
-  --font-geist-mono: "Courier New", Courier, monospace;
+  --font-geist-mono: "Macan",  Helvetica Neue, Helvetica, Arial, sans-serif;
   --background: #FDFBF7;
   --foreground: #2E2215;
   --card: #FDFBF7;
@@ -90,8 +90,8 @@
   body {
     @apply bg-background text-foreground;
   }
-  html {
-    @apply font-sans;
+  html, body, button, select, input, textarea, .font-sans {
+    font-family: Macan, "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   }
 }
 

@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Smartphone, Loader2 } from "lucide-react";
 import Turnstile from "react-turnstile";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import LoginSkeleton from "@/components/skeleton/LoginSkeleton";
@@ -55,6 +56,27 @@ export default function LoginPage() {
       return;
     }
 
+    // Check if the mobile number is registered inside localStorage
+    const saved = localStorage.getItem("feag_onboarding_data");
+    let registeredMobile = "";
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        registeredMobile = parsed.mobile || "";
+      } catch (e) {
+        // Fallback
+      }
+    }
+
+    if (watchedMobile !== registeredMobile) {
+      toast.error("This mobile number is not registered. Please join us first.");
+      setError("mobile", {
+        type: "manual",
+        message: "Mobile number is not registered",
+      });
+      return;
+    }
+
     if (!turnstileToken) {
       toast.error("Please solve the Turnstile security challenge first");
       return;
@@ -99,6 +121,28 @@ export default function LoginPage() {
     setIsVerifyingOtp(true);
     setTimeout(() => {
       setIsVerifyingOtp(false);
+
+      // Re-verify registration data
+      const saved = localStorage.getItem("feag_onboarding_data");
+      let registeredMobile = "";
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          registeredMobile = parsed.mobile || "";
+        } catch (e) {
+          // Fallback
+        }
+      }
+
+      if (watchedMobile !== registeredMobile) {
+        toast.error("This mobile number is not registered. Please sign up first.");
+        setError("mobile", {
+          type: "manual",
+          message: "Mobile number is not registered",
+        });
+        return;
+      }
+
       if (watchedOtp === "123456") {
         toast.success("Welcome back to FEAG!");
         setTimeout(() => {
@@ -117,6 +161,27 @@ export default function LoginPage() {
 
     setTimeout(() => {
       setIsGoogleSigningIn(false);
+
+      // Verify Google email against registration records
+      const saved = localStorage.getItem("feag_onboarding_data");
+      let registeredEmail = "";
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          registeredEmail = parsed.email || "";
+        } catch (e) {
+          // Fallback
+        }
+      }
+
+      // Mock Google profile returns "john.doe@example.com"
+      const mockGoogleEmail = "john.doe@example.com";
+
+      if (registeredEmail !== mockGoogleEmail) {
+        toast.error("This Google account is not registered. Please sign up first.", { id: "google-login" });
+        return;
+      }
+
       toast.success("Successfully authenticated with Google!", { id: "google-login" });
       setTimeout(() => {
         window.location.href = "/";
@@ -318,6 +383,18 @@ export default function LoginPage() {
             </button>
           </>
         )}
+
+        <div className="text-center mt-2 border-t border-border/30 pt-4">
+          <p className="text-xs text-muted-foreground font-medium">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/join-us"
+              className="font-bold text-primary hover:text-primary/90 hover:underline transition-colors"
+            >
+              Join Us
+            </Link>
+          </p>
+        </div>
 
       </div>
     </main>

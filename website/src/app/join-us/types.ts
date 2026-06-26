@@ -4,6 +4,7 @@ export interface FormValues {
   mobile: string;
   otp: string;
   name: string;
+  email: string;
   role: "creator" | "customer" | "";
   category?: string;
   pincode: string;
@@ -26,9 +27,16 @@ export interface StepProps {
 
 export interface Step1Props extends StepProps {
   onOtpVerified: () => void;
+  showSocialLogin?: boolean;
+  onGoogleLogin?: (name: string, email: string) => void;
+  signUpMethod?: "mobile" | "google" | null;
 }
 
-export type Step2Props = Pick<StepProps, "control" | "errors">;
+export interface Step2Props {
+  control: Control<FormValues>;
+  errors: FieldErrors<FormValues>;
+  isEmailEditable?: boolean;
+}
 
 export type Step3Props = Pick<StepProps, "control" | "errors" | "setValue" | "clearErrors">;
 
