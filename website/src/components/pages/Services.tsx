@@ -1,5 +1,6 @@
 import React from "react";
 import { Camera, Video, Music, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function Services() {
   return (
@@ -23,8 +24,9 @@ export default function Services() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         
         {/* Photographer Card */}
-        <div 
-          className="h-[200px] sm:h-[220px] rounded-2xl p-6 flex flex-col justify-end relative overflow-hidden group shadow-lg border border-white/5 cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+        <Link 
+          href="/services/photographer"
+          className="h-[200px] sm:h-[220px] rounded-2xl p-6 flex flex-col justify-end relative overflow-hidden group shadow-lg border border-white/5 cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block decoration-none"
           style={{
             background: "url('/hero_camera.png') center/cover no-repeat, radial-gradient(circle at 30% 20%, rgba(96, 126, 120, 0.4), transparent 60%), radial-gradient(circle at 80% 70%, rgba(36, 51, 48, 0.6), transparent 70%), #15201e"
           }}
@@ -36,11 +38,12 @@ export default function Services() {
             </div>
             <h3 className="text-white text-base sm:text-lg font-bold tracking-wide">Photographer</h3>
           </div>
-        </div>
+        </Link>
 
         {/* Videographer Card */}
-        <div 
-          className="h-[200px] sm:h-[220px] rounded-2xl p-6 flex flex-col justify-end relative overflow-hidden group shadow-lg border border-white/5 cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+        <Link 
+          href="/services/videographer"
+          className="h-[200px] sm:h-[220px] rounded-2xl p-6 flex flex-col justify-end relative overflow-hidden group shadow-lg border border-white/5 cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block decoration-none"
           style={{
             background: "url('/hero_laptop.png') center/cover no-repeat, radial-gradient(circle at 30% 20%, rgba(96, 126, 120, 0.4), transparent 60%), radial-gradient(circle at 80% 70%, rgba(36, 51, 48, 0.6), transparent 70%), #15201e"
           }}
@@ -52,11 +55,12 @@ export default function Services() {
             </div>
             <h3 className="text-white text-base sm:text-lg font-bold tracking-wide">Videographer</h3>
           </div>
-        </div>
+        </Link>
 
         {/* Singer/Musician Card */}
-        <div 
-          className="h-[200px] sm:h-[220px] rounded-2xl p-6 flex flex-col justify-end relative overflow-hidden group shadow-lg border border-white/5 cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 sm:col-span-2 lg:col-span-1"
+        <Link 
+          href="/services/singer"
+          className="h-[200px] sm:h-[220px] rounded-2xl p-6 flex flex-col justify-end relative overflow-hidden group shadow-lg border border-white/5 cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 sm:col-span-2 lg:col-span-1 block decoration-none"
           style={{
             background: "url('/hero_music.png') center/cover no-repeat, radial-gradient(circle at 30% 20%, rgba(96, 126, 120, 0.4), transparent 60%), radial-gradient(circle at 80% 70%, rgba(36, 51, 48, 0.6), transparent 70%), #15201e"
           }}
@@ -68,9 +72,10 @@ export default function Services() {
             </div>
             <h3 className="text-white text-base sm:text-lg font-bold tracking-wide">Singer / Musician</h3>
           </div>
-        </div>
+        </Link>
 
       </div>
     </section>
   );
 }
+

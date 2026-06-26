@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CustomToaster from "@/components/CustomToaster";
+import Providers from "@/components/Providers";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -25,10 +26,12 @@ export default function RootLayout({
       className={cn("h-full antialiased", "font-sans", geist.variable)}
     >
       <body className="min-h-full flex flex-col">
-        <CustomToaster />
-        <Navbar />
-        {children}
-        <Footer />
+        <Providers>
+          <CustomToaster />
+          <Navbar />
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

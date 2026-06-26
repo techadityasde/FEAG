@@ -34,7 +34,13 @@ export default function Navbar() {
         </nav>
 
         {/* Right side: Login & Register */}
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-3">
+          <Link href="/wishlist" className="relative text-lg hover:opacity-80 transition-opacity cursor-pointer p-1 select-none flex items-center justify-center">
+            🔖
+            <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white leading-none shadow-sm">
+              3
+            </span>
+          </Link>
           <Button asChild variant="outline" size="sm" className="gap-2 text-xs font-semibold py-1 h-7 border-border hover:bg-muted text-foreground cursor-pointer">
             <Link href="/login">
               <User className="size-3.5" />
@@ -93,12 +99,24 @@ export default function Navbar() {
             <Button asChild size="sm" className="w-full justify-center py-1 h-7 text-white bg-primary hover:bg-primary/95 text-xs font-semibold shadow-sm cursor-pointer" onClick={() => setMobileMenuOpen(false)}>
               <Link href="/join-us">Join Us</Link>
             </Button>
-            <Button asChild variant="outline" size="sm" className="w-full gap-2 justify-center py-1 h-7 border-border text-foreground hover:bg-muted text-xs font-semibold cursor-pointer" onClick={() => setMobileMenuOpen(false)}>
-              <Link href="/login">
-                <User className="size-3.5" />
-                Login
+            <div className="flex items-center gap-2">
+              <Link 
+                href="/wishlist" 
+                className="relative text-lg hover:opacity-80 transition-opacity cursor-pointer p-1.5 border border-border rounded-md bg-white flex items-center justify-center select-none aspect-square h-7"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                🔖
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white leading-none shadow-sm">
+                  3
+                </span>
               </Link>
-            </Button>
+              <Button asChild variant="outline" size="sm" className="flex-1 gap-2 justify-center py-1 h-7 border-border text-foreground hover:bg-muted text-xs font-semibold cursor-pointer" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/login">
+                  <User className="size-3.5" />
+                  Login
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       )}

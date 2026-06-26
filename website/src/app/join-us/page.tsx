@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import { 
   Smartphone, 
   User, 
@@ -16,6 +17,14 @@ import {
 import { Button } from "@/components/ui/button";
 import JoinUsSkeleton from "@/components/skeleton/JoinUsSkeleton";
 
+import { RootState } from "@/lib/store/store";
+import {
+  updateOnboardingData,
+  setSignUpMethod,
+  submitOnboarding,
+  clearOnboardingData,
+} from "@/lib/store/onboardingSlice";
+
 import { FormValues } from "./types";
 import Step1Mobile from "./components/Step1Mobile";
 import Step2Name from "./components/Step2Name";
@@ -23,18 +32,71 @@ import Step3Category from "./components/Step3Category";
 import Step4Location from "./components/Step4Location";
 
 export default function JoinUs() {
-  const [pageLoading, setPageLoading] = useState(true);
-  const [activeStep, setActiveStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<boolean[]>([false, false, false, false]);
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
+  const dispatch = useDispatch();
+  const savedData = useSelector((state: RootState) => state.onboarding);
 
-  const steps = [
-    { label: "Mobile Verification", icon: Smartphone },
-    { label: "Personal Information", icon: User },
-    { label: "Professional Category", icon: Sparkles },
-    { label: "Location Details", icon: MapPin },
-  ];
+  const [pageLoading, setPageLoading] = useState(true);
+  // Initialize OTP verification from Redux store data
+  const [otpVerified, setOtpVerified] = useState(
+    savedData.mobile !== "" && savedData.otp === "123456"
+  );
+
+  const [activeStep, setActiveStep] = useState(() => {
+    if (savedData.signUpMethod === "google") {
+      // If mobile verified, go to Category (Step 1)
+      if (savedData.mobile !== "" && savedData.otp === "123456") {
+        return 1;
+      }
+      return 0;
+    } else {
+      // Mobile / Null flow
+      if (savedData.mobile !== "" && savedData.otp === "123456") {
+        // If mobile is verified, go to Personal Info (Step 1)
+        if (savedData.name !== "" && savedData.email !== "") {
+          // If personal info is done, go to Category (Step 2)
+          return 2;
+        }
+        return 1;
+      }
+      return 0;
+    }
+  });
+
+  const [completedSteps, setCompletedSteps] = useState<boolean[]>(() => {
+    const verified = savedData.mobile !== "" && savedData.otp === "123456";
+    if (savedData.signUpMethod === "google") {
+      return [verified, false, false];
+    } else {
+      const personalDone = savedData.name !== "" && savedData.email !== "";
+      return [verified, personalDone, false, false];
+    }
+  });
+
+  const [formSubmitted, setFormSubmitted] = useState(savedData.isSubmitted);
+
+  // Track the user's entry method: 'mobile' | 'google' | null
+  const [signUpMethod, setSignUpMethodState] = useState<"mobile" | "google" | null>(
+    savedData.signUpMethod || null
+  );
+
+  const setSignUpMethodWrapper = (method: "mobile" | "google" | null) => {
+    setSignUpMethodState(method);
+    dispatch(setSignUpMethod(method));
+  };
+
+  // Calculate wizard step titles dynamically based on sign-up method chosen
+  const steps = signUpMethod === "google"
+    ? [
+        { label: "Mobile & Name Verification", icon: Smartphone },
+        { label: "Professional Category", icon: Sparkles },
+        { label: "Location Details", icon: MapPin },
+      ]
+    : [
+        { label: "Mobile Verification", icon: Smartphone },
+        { label: "Personal Information", icon: User },
+        { label: "Professional Category", icon: Sparkles },
+        { label: "Location Details", icon: MapPin },
+      ];
 
   const {
     control,
@@ -46,13 +108,14 @@ export default function JoinUs() {
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
-      mobile: "",
-      otp: "",
-      name: "",
-      role: "",
-      category: "",
-      pincode: "",
-      location: "",
+      mobile: savedData.mobile || "",
+      otp: savedData.otp || "",
+      name: savedData.name || "",
+      email: savedData.email || "",
+      role: savedData.role || "",
+      category: savedData.category || "",
+      pincode: savedData.pincode || "",
+      location: savedData.location || "",
     },
     mode: "onChange",
   });
@@ -69,24 +132,85 @@ export default function JoinUs() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const googleSignup = urlParams.get("google_signup");
+    
+    if (googleSignup) {
+      // Clear query params from browser URL history immediately
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      if (googleSignup === "success") {
+        const name = urlParams.get("name") || "";
+        const email = urlParams.get("email") || "";
+        const mobile = urlParams.get("mobile") || "";
+
+        setValue("name", name, { shouldValidate: true });
+        setValue("email", email, { shouldValidate: true });
+        if (mobile) {
+          setValue("mobile", mobile, { shouldValidate: true });
+        }
+        setSignUpMethod("google");
+        setCompletedSteps([false, false, false]);
+        setActiveStep(0);
+        toast.success("Successfully authenticated with Google!");
+      } else if (googleSignup === "error") {
+        const msg = urlParams.get("message") || "Unknown error";
+        toast.error("Google authentication failed: " + msg);
+      }
+    }
+  }, [setValue]);
+
   const handleNextStep = async () => {
     let isValid = false;
 
-    if (activeStep === 0) {
-      isValid = otpVerified;
-    } else if (activeStep === 1) {
-      isValid = await trigger("name");
-    } else if (activeStep === 2) {
+    if (signUpMethod === "google") {
+      // Flow B: Google Account First
+      if (activeStep === 0) {
+        // Step 1: Mobile & Name Verification
+        const isNameValid = await trigger("name");
+        isValid = isNameValid && otpVerified;
+      }
+    } else {
+      // Flow A: Mobile Number First
+      if (activeStep === 0) {
+        // Step 1: Mobile OTP verification
+        isValid = otpVerified;
+      } else if (activeStep === 1) {
+        // Step 2: Personal info (Name & Email inputs)
+        isValid = await trigger(["name", "email"]);
+      }
+    }
+
+    const categoryStepIdx = signUpMethod === "google" ? 1 : 2;
+    const locationStepIdx = signUpMethod === "google" ? 2 : 3;
+
+    // Role / Category Validation
+    if (activeStep === categoryStepIdx) {
       if (watchedRole === "creator") {
         isValid = await trigger(["role", "category"]);
       } else {
         isValid = await trigger("role");
       }
-    } else if (activeStep === 3) {
+    } else if (activeStep === locationStepIdx) {
+      // Location Details Validation
       isValid = await trigger(["pincode", "location"]);
     }
 
     if (isValid) {
+      // Build current form state values to store
+      const currentValues: Partial<FormValues> = {
+        mobile: watchedMobile,
+        otp: watchedOtp,
+        name: watch("name"),
+        email: watch("email"),
+        role: watchedRole,
+        category: watch("category"),
+        pincode: watchedPincode,
+        location: watch("location"),
+      };
+      dispatch(updateOnboardingData(currentValues));
+
       const newCompleted = [...completedSteps];
       newCompleted[activeStep] = true;
       setCompletedSteps(newCompleted);
@@ -94,6 +218,7 @@ export default function JoinUs() {
       if (activeStep < steps.length - 1) {
         setActiveStep((prev) => prev + 1);
       } else {
+        dispatch(submitOnboarding());
         setFormSubmitted(true);
         toast.success("Registration completed successfully!");
       }
@@ -103,6 +228,15 @@ export default function JoinUs() {
   const handlePrevStep = () => {
     if (activeStep > 0) {
       setActiveStep((prev) => prev - 1);
+    } else if (activeStep === 0 && signUpMethod === "google") {
+      // Going back to Google Login (Step 0) clears details in page & store
+      setSignUpMethodWrapper(null);
+      setValue("name", "");
+      setValue("email", "");
+      setOtpVerified(false);
+      dispatch(clearOnboardingData());
+      setCompletedSteps([false, false, false, false]);
+      setActiveStep(0);
     }
   };
 
@@ -124,7 +258,13 @@ export default function JoinUs() {
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-8 max-w-md">
           Your creative onboarding profile has been verified successfully. We are excited to showcase your talent on our platform.
         </p>
-        <Button onClick={() => window.location.href = "/"} className="bg-primary hover:bg-primary/95 text-white font-semibold cursor-pointer">
+        <Button
+          onClick={() => {
+            dispatch(clearOnboardingData());
+            window.location.href = "/";
+          }}
+          className="bg-primary hover:bg-primary/95 text-white font-semibold cursor-pointer"
+        >
           Return to Home
         </Button>
       </div>
@@ -195,20 +335,36 @@ export default function JoinUs() {
             }}
             onOtpVerified={() => {
               setOtpVerified(true);
-              setCompletedSteps([true, false, false, false]);
-              setActiveStep(1);
+              if (signUpMethod === "google") {
+                setCompletedSteps([true, false, false]);
+                setActiveStep(1);
+              } else {
+                setSignUpMethod("mobile");
+                setCompletedSteps([true, false, false, false]);
+                setActiveStep(1);
+              }
             }}
+            showSocialLogin={signUpMethod === null}
+            onGoogleLogin={(name, email) => {
+              setValue("name", name, { shouldValidate: true });
+              setValue("email", email, { shouldValidate: true });
+              setSignUpMethod("google");
+              setCompletedSteps([false, false, false]);
+              setActiveStep(0);
+            }}
+            signUpMethod={signUpMethod}
           />
         )}
 
-        {activeStep === 1 && (
+        {signUpMethod !== "google" && activeStep === 1 && (
           <Step2Name
             control={control}
             errors={errors}
+            isEmailEditable={true}
           />
         )}
 
-        {activeStep === 2 && (
+        {((signUpMethod !== "google" && activeStep === 2) || (signUpMethod === "google" && activeStep === 1)) && (
           <Step3Category
             control={control}
             errors={errors}
@@ -217,7 +373,7 @@ export default function JoinUs() {
           />
         )}
 
-        {activeStep === 3 && (
+        {((signUpMethod !== "google" && activeStep === 3) || (signUpMethod === "google" && activeStep === 2)) && (
           <Step4Location
             control={control}
             errors={errors}
@@ -232,7 +388,7 @@ export default function JoinUs() {
           />
         )}
 
-        {activeStep > 0 && (
+        {(activeStep > 0 || (signUpMethod === "google" && activeStep === 0)) && (
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/40">
             <button
               type="button"
@@ -242,14 +398,16 @@ export default function JoinUs() {
               <ChevronLeft className="size-4" />
               Back
             </button>
-            <Button
-              type="button"
-              onClick={handleNextStep}
-              className="bg-primary hover:bg-primary/95 text-white font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
-            >
-              {activeStep === steps.length - 1 ? "Submit Details" : "Next Step"}
-              <ChevronRight className="size-4" />
-            </Button>
+            {(activeStep > 0 || otpVerified) && (
+              <Button
+                type="button"
+                onClick={handleNextStep}
+                className="bg-primary hover:bg-primary/95 text-white font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer animate-in fade-in duration-200"
+              >
+                {activeStep === steps.length - 1 ? "Submit Details" : "Next Step"}
+                <ChevronRight className="size-4" />
+              </Button>
+            )}
           </div>
         )}
 
