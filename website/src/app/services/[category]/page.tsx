@@ -269,79 +269,85 @@ export default function CategoryPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Section 2: Filters Bar */}
-      <CategoryFilterBar
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onReset={handleResetFilters}
-        locations={locations}
-      />
-
-      {/* Section 3: Listings Grid */}
-      <section className="w-full max-w-[1400px] mx-auto px-3 min-[360px]:px-4 sm:px-6 lg:px-8">
-        {isLoading ? (
-          <ServicesSkeleton />
-        ) : paginatedList.length > 0 ? (
-          <>
-            {/* Grid display */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {paginatedList.map((professional) => (
-                <CategoryCard
-                  key={professional.id}
-                  professional={professional}
-                  onBook={handleBook}
-                  onViewProfile={handleViewProfile}
-                />
-              ))}
-            </div>
-
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-12">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="size-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none transition-colors cursor-pointer"
-                  aria-label="Previous page"
-                >
-                  <ChevronLeft className="size-4" />
-                </button>
-
-                {Array.from({ length: totalPages }).map((_, idx) => {
-                  const pageNumber = idx + 1;
-                  const isActive = pageNumber === currentPage;
-                  return (
-                    <button
-                      key={pageNumber}
-                      onClick={() => setCurrentPage(pageNumber)}
-                      className={`size-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${isActive
-                        ? "bg-primary text-white shadow-sm"
-                        : "border border-border hover:bg-muted text-foreground"
-                        }`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                })}
-
-                <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="size-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none transition-colors cursor-pointer"
-                  aria-label="Next page"
-                >
-                  <ChevronRight className="size-4" />
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          <EmptyState
+      {/* Main Content Area */}
+      <div className="w-full max-w-[1400px] mx-auto px-3 min-[360px]:px-4 sm:px-6 lg:px-8 mt-8 flex flex-col md:flex-row gap-8">
+        
+        {/* Left Sidebar Filters (Responsive) */}
+        <aside className="w-full md:w-64 lg:w-72 shrink-0 md:sticky md:top-24 self-start z-10">
+          <CategoryFilterBar
+            filters={filters}
+            onFilterChange={handleFilterChange}
             onReset={handleResetFilters}
-            categoryLabel={details.label}
+            locations={locations}
           />
-        )}
-      </section>
+        </aside>
+
+        {/* Right Content Area (Listings) */}
+        <section className="flex-1 w-full min-w-0">
+          {isLoading ? (
+            <ServicesSkeleton />
+          ) : paginatedList.length > 0 ? (
+            <>
+              {/* Grid display */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                {paginatedList.map((professional) => (
+                  <CategoryCard
+                    key={professional.id}
+                    professional={professional}
+                    onBook={handleBook}
+                    onViewProfile={handleViewProfile}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-12 mb-8">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="size-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none transition-colors cursor-pointer"
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft className="size-4" />
+                  </button>
+
+                  {Array.from({ length: totalPages }).map((_, idx) => {
+                    const pageNumber = idx + 1;
+                    const isActive = pageNumber === currentPage;
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => setCurrentPage(pageNumber)}
+                        className={`size-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${isActive
+                          ? "bg-primary text-white shadow-sm"
+                          : "border border-border hover:bg-muted text-foreground"
+                          }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="size-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted text-foreground disabled:opacity-50 disabled:pointer-events-none transition-colors cursor-pointer"
+                    aria-label="Next page"
+                  >
+                    <ChevronRight className="size-4" />
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <EmptyState
+              onReset={handleResetFilters}
+              categoryLabel={details.label}
+            />
+          )}
+        </section>
+      </div>
     </div>
   );
 }

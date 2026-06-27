@@ -49,6 +49,44 @@ export default function LoginPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const googleLogin = urlParams.get("google_login");
+    
+    if (googleLogin) {
+      // Clear query params from browser URL history immediately
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      if (googleLogin === "success") {
+        const email = urlParams.get("email") || "";
+
+        // Verify Google email against registration records
+        const saved = localStorage.getItem("feag_onboarding_data");
+        let registeredEmail = "";
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            registeredEmail = parsed.email || "";
+          } catch (e) {
+            // Fallback
+          }
+        }
+
+        if (!registeredEmail || registeredEmail !== email) {
+          toast.error("This Google account is not registered. Please sign up first.");
+        } else {
+          toast.success("Successfully authenticated with Google!");
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 800);
+        }
+      } else if (googleLogin === "error") {
+        const msg = urlParams.get("message") || "Unknown error";
+        toast.error("Google authentication failed: " + msg);
+      }
+    }
+  }, []);
+
   const handleSendOtp = async () => {
     const isValidPhone = await trigger("mobile");
     if (!isValidPhone) {
@@ -158,35 +196,8 @@ export default function LoginPage() {
   const handleGoogleSignIn = () => {
     setIsGoogleSigningIn(true);
     toast.loading("Connecting to Google...", { id: "google-login" });
-
-    setTimeout(() => {
-      setIsGoogleSigningIn(false);
-
-      // Verify Google email against registration records
-      const saved = localStorage.getItem("feag_onboarding_data");
-      let registeredEmail = "";
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          registeredEmail = parsed.email || "";
-        } catch (e) {
-          // Fallback
-        }
-      }
-
-      // Mock Google profile returns "john.doe@example.com"
-      const mockGoogleEmail = "john.doe@example.com";
-
-      if (registeredEmail !== mockGoogleEmail) {
-        toast.error("This Google account is not registered. Please sign up first.", { id: "google-login" });
-        return;
-      }
-
-      toast.success("Successfully authenticated with Google!", { id: "google-login" });
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 800);
-    }, 1200);
+    const mobile = watchedMobile || "";
+    window.location.href = `/api/auth/google?mobile=${encodeURIComponent(mobile)}&source=login`;
   };
 
   if (pageLoading) {

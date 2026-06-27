@@ -8,14 +8,19 @@ export async function GET(request: NextRequest) {
   const stateParam = searchParams.get("state") || "{}";
 
   let mobile = "";
+  let source = "join-us";
   try {
     const parsed = JSON.parse(stateParam);
     mobile = parsed.mobile || "";
+    source = parsed.source || "join-us";
   } catch (e) {}
+
+  const targetPath = source === "login" ? "/login" : "/join-us";
+  const paramPrefix = source === "login" ? "google_login" : "google_signup";
 
   const redirectError = (msg: string) => {
     return NextResponse.redirect(
-      `http://localhost:3000/join-us?google_signup=error&message=${encodeURIComponent(msg)}`
+      `http://localhost:3000${targetPath}?${paramPrefix}=error&message=${encodeURIComponent(msg)}`
     );
   };
 
@@ -49,7 +54,7 @@ export async function GET(request: NextRequest) {
     const { name, email } = userinfoResponse.data;
 
     return NextResponse.redirect(
-      `http://localhost:3000/join-us?google_signup=success&name=${encodeURIComponent(
+      `http://localhost:3000${targetPath}?${paramPrefix}=success&name=${encodeURIComponent(
         name || ""
       )}&email=${encodeURIComponent(email || "")}&mobile=${encodeURIComponent(mobile)}`
     );
