@@ -142,17 +142,7 @@ export default function CustomBookingForm({
             {errors.eventLocation && <span className="text-xs text-destructive font-medium">{errors.eventLocation.message}</span>}
           </div>
 
-          {/* Common: Guests Count */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="guestsCount" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">Approx. Guests Count</label>
-            <Controller
-              name="guestsCount"
-              control={control}
-              render={({ field }) => (
-                <input {...field} id="guestsCount" type="number" placeholder="Enter number of guests" className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm outline-none focus:ring-1 focus:ring-ring text-foreground" />
-              )}
-            />
-          </div>
+         
 
           {/* Dynamic Fields - Photographer */}
           {category === "photographer" && (

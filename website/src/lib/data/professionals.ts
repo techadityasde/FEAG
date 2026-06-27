@@ -25,7 +25,7 @@ export const professionals: Professional[] = [
   {
     id: "p1",
     username: "Arjun Singh",
-    profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/men/32.jpg",
     location: "Mumbai, MH",
     rating: 4.9,
     totalReviews: 120,
@@ -44,7 +44,7 @@ export const professionals: Professional[] = [
   {
     id: "p2",
     username: "Elena Rossi",
-    profileImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
     location: "New Delhi, DL",
     rating: 4.8,
     totalReviews: 82,
@@ -63,7 +63,7 @@ export const professionals: Professional[] = [
   {
     id: "p3",
     username: "Marcus Chen",
-    profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/men/46.jpg",
     location: "Bangalore, KA",
     rating: 5.0,
     totalReviews: 44,
@@ -82,7 +82,7 @@ export const professionals: Professional[] = [
   {
     id: "p4",
     username: "Priya Sharma",
-    profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/women/65.jpg",
     location: "Mumbai, MH",
     rating: 4.6,
     totalReviews: 95,
@@ -101,7 +101,7 @@ export const professionals: Professional[] = [
   {
     id: "p5",
     username: "David K.",
-    profileImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/men/22.jpg",
     location: "Kolkata, WB",
     rating: 4.3,
     totalReviews: 31,
@@ -122,7 +122,7 @@ export const professionals: Professional[] = [
   {
     id: "v1",
     username: "Kabir Mehta",
-    profileImage: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/men/11.jpg",
     location: "Mumbai, MH",
     rating: 4.9,
     totalReviews: 68,
@@ -141,7 +141,7 @@ export const professionals: Professional[] = [
   {
     id: "v2",
     username: "Sophia Lin",
-    profileImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/women/24.jpg",
     location: "Bangalore, KA",
     rating: 4.7,
     totalReviews: 50,
@@ -160,7 +160,7 @@ export const professionals: Professional[] = [
   {
     id: "v3",
     username: "David Miller",
-    profileImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/men/73.jpg",
     location: "New Delhi, DL",
     rating: 4.5,
     totalReviews: 29,
@@ -179,7 +179,7 @@ export const professionals: Professional[] = [
   {
     id: "v4",
     username: "Ananya Patel",
-    profileImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/women/39.jpg",
     location: "Hyderabad, TS",
     rating: 4.8,
     totalReviews: 37,
@@ -198,7 +198,7 @@ export const professionals: Professional[] = [
   {
     id: "v5",
     username: "Alex Mercer",
-    profileImage: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/men/50.jpg",
     location: "Pune, MH",
     rating: 4.2,
     totalReviews: 14,
@@ -219,7 +219,7 @@ export const professionals: Professional[] = [
   {
     id: "s1",
     username: "Rohan Sharma",
-    profileImage: "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/men/82.jpg",
     location: "New Delhi, DL",
     rating: 4.9,
     totalReviews: 145,
@@ -238,7 +238,7 @@ export const professionals: Professional[] = [
   {
     id: "s2",
     username: "Aisha Khan",
-    profileImage: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/women/14.jpg",
     location: "Mumbai, MH",
     rating: 4.8,
     totalReviews: 112,
@@ -257,7 +257,7 @@ export const professionals: Professional[] = [
   {
     id: "s3",
     username: "Chloe Bennett",
-    profileImage: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/women/68.jpg",
     location: "Bangalore, KA",
     rating: 4.7,
     totalReviews: 53,
@@ -276,7 +276,7 @@ export const professionals: Professional[] = [
   {
     id: "s4",
     username: "Vikram Malhotra",
-    profileImage: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/men/91.jpg",
     location: "Chennai, TN",
     rating: 4.6,
     totalReviews: 28,
@@ -295,7 +295,7 @@ export const professionals: Professional[] = [
   {
     id: "s5",
     username: "Sarah Jenkins",
-    profileImage: "https://images.unsplash.com/photo-1554151228-14d9def656e4?w=500&auto=format&fit=crop&q=80",
+    profileImage: "https://randomuser.me/api/portraits/women/79.jpg",
     location: "Mumbai, MH",
     rating: 4.4,
     totalReviews: 19,
