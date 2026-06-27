@@ -19,9 +19,6 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
-          <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors py-2">
-            About Us
-          </Link>
           <Link href="/#services" className="relative text-foreground py-2 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary">
             Services
           </Link>
@@ -61,13 +58,6 @@ export default function Navbar() {
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-3 animate-in fade-in slide-in-from-top-4 duration-200">
-          <Link
-            href="/about"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-md text-foreground hover:bg-muted text-sm font-medium"
-          >
-            About Us
-          </Link>
           <Link
             href="/#services"
             onClick={() => setMobileMenuOpen(false)}
