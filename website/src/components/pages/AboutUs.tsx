@@ -62,20 +62,24 @@ export default function AboutUs() {
               About FEAG
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#2E2215] leading-tight tracking-tight">
-              Where Creativity Meets Opportunity
+              Capture Every Special Moment
             </h1>
             <div className="mt-5 space-y-4 text-xs min-[360px]:text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl">
               <p>
-                FEAG is a technology-driven creative marketplace built to connect photographers, videographers, singers, and musicians with people and businesses looking for reliable event talent. Whether it&apos;s capturing life&apos;s biggest celebrations, producing engaging video content, or bringing a live performance to the stage, FEAG makes discovering and hiring the right professional simple, transparent, and reliable.
+                Every celebration becomes a memory, and every memory deserves to be captured beautifully.
               </p>
               <p>
-                Our platform brings together skilled photographers, videographers, singers, and musicians in one place. Every profile is designed to showcase experience, portfolios, past work, and expertise, helping clients make confident decisions while giving creators the visibility they deserve.
+                <strong>FEAG &ndash; For Empowering Ambitious Generation </strong> helps you find trusted creative professionals who can capture your special moments with care. Whether you&apos;re celebrating a birthday, going on a trip with friends, planning a family outing, an anniversary, a pre-wedding shoot, or any special occasion, you can book a photographer, videographer, singer and musician
+                 in just a few steps.
               </p>
               <p>
-                At FEAG, we believe creative talent should never go unnoticed. Our mission is to create opportunities for visual artists and performers to grow their careers while making it effortless for clients to find trusted experts for weddings, corporate events, personal celebrations, commercial projects, and content shoots.
+                No need to worry if you don&apos;t have a good camera or don&apos;t want to spend your time taking photos. Our professionals will come to your location, capture your happiest moments, and make sure you enjoy every second with your family and friends.
               </p>
               <p>
-                We&apos;re building more than a booking platform. We&apos;re building a focused creative community where moments are captured beautifully, stories are filmed professionally, performances feel memorable, and every successful project strengthens lasting relationships between clients and creators.
+                After the shoot, you&apos;ll receive your photos and videos digitally in high quality. If you want something extra, you can also request professionally edited photos, cinematic videos, or social media reels that are ready to share.
+              </p>
+              <p>
+                At FEAG, we don&apos;t just capture pictures&mdash;we help you keep your memories alive forever while creating opportunities for talented creative professionals across the country.
               </p>
             </div>
           </div>
