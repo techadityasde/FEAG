@@ -34,6 +34,7 @@ export interface HeroSectionProps {
   wishlisted: boolean;
   onWishlist: () => void;
   onShare: () => void;
+  onCustomRequest?: () => void;
 }
 
 export interface PortfolioSectionProps {
@@ -96,6 +97,7 @@ export interface StickyBookingPanelProps {
   selectedPackage: "basic" | "professional" | "premium";
   getPackagePrice: (pkg: "basic" | "professional" | "premium") => number;
   onBookClick: () => void;
+  onCustomRequest?: () => void;
 }
 
 export interface LightboxModalProps {

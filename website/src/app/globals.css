@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import "../../node_modules/shadcn/dist/tailwind.css";
 
 :root {
   --font-geist-sans: Arial, Helvetica, sans-serif;

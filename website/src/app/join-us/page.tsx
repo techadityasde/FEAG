@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import JoinUsSkeleton from "@/components/skeleton/JoinUsSkeleton";
 
 import { RootState } from "@/lib/store/store";
+import { login } from "@/lib/store/authSlice";
 import {
   updateOnboardingData,
   setSignUpMethod,
@@ -219,6 +220,7 @@ export default function JoinUs() {
         setActiveStep((prev) => prev + 1);
       } else {
         dispatch(submitOnboarding());
+        dispatch(login(currentValues));
         setFormSubmitted(true);
         toast.success("Registration completed successfully!");
       }

@@ -1,5 +1,5 @@
 import React from "react";
-import { MapPin, BadgeCheck, Star } from "lucide-react";
+import { MapPin, BadgeCheck, Star, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CategoryPricing from "./CategoryPricing";
 import RatingDisplay from "./RatingDisplay";
@@ -40,6 +40,18 @@ export default function CategoryCard({
           className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
+
+        {/* Navigate Icon - Top Left */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewProfile(id);
+          }}
+          className="absolute top-3 left-3 bg-black/40 hover:bg-primary/90 backdrop-blur-md text-white p-1.5 rounded-full flex items-center justify-center border border-white/10 shadow-sm transition-colors cursor-pointer z-10"
+          aria-label="View Profile"
+        >
+          <ArrowUpRight className="size-4" />
+        </button>
 
         {/* Rating Pill - Glassmorphism */}
         <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white py-1 px-1.5 rounded-full flex items-center gap-1 border border-white/10 shadow-sm text-xs font-semibold">
