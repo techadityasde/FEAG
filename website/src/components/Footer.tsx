@@ -24,9 +24,9 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Company Column */}
+        {/* Quick Links Column */}
         <div className="flex flex-col gap-3">
-          <h4 className="font-bold text-[#2E2215] text-sm">Company</h4>
+          <h4 className="font-bold text-[#2E2215] text-sm">Quick Links</h4>
           <ul className="space-y-2 text-xs sm:text-sm">
             <li><Link href="/about" className="hover:text-foreground transition-colors">About Us</Link></li>
             <li><Link href="/contact" className="hover:text-foreground transition-colors">Contact Us</Link></li>
@@ -39,11 +39,15 @@ export default function Footer() {
           <ul className="space-y-2 text-xs sm:text-sm">
             <li><a href="#privacy" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
           </ul>
-          <span className="text-[10px] sm:text-xs text-[#6D5F52] mt-4 block">
-            &copy; {new Date().getFullYear()} FEAG Services. All rights reserved.
-          </span>
         </div>
 
+      </div>
+
+      {/* Bottom Copyright Section */}
+      <div className="max-w-[1400px] mx-auto px-3 min-[360px]:px-4 sm:px-6 lg:px-8 mt-12 pt-6 border-t border-[#6D5F52]/20 text-center">
+        <span className="text-[10px] sm:text-xs text-[#6D5F52]">
+          &copy; {new Date().getFullYear()} FEAG Services. All rights reserved.
+        </span>
       </div>
     </footer>
   );

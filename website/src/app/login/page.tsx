@@ -6,6 +6,9 @@ import toast from "react-hot-toast";
 import { Smartphone, Loader2 } from "lucide-react";
 import Turnstile from "react-turnstile";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "@/lib/store/authSlice";
+import { RootState } from "@/lib/store/store";
 
 import { Button } from "@/components/ui/button";
 import LoginSkeleton from "@/components/skeleton/LoginSkeleton";
@@ -16,6 +19,8 @@ interface LoginFormValues {
 }
 
 export default function LoginPage() {
+  const dispatch = useDispatch();
+  const onboardingData = useSelector((state: RootState) => state.onboarding);
   const [pageLoading, setPageLoading] = useState(true);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [isVerifyingTurnstile, setIsVerifyingTurnstile] = useState(false);
@@ -61,20 +66,13 @@ export default function LoginPage() {
         const email = urlParams.get("email") || "";
 
         // Verify Google email against registration records
-        const saved = localStorage.getItem("feag_onboarding_data");
-        let registeredEmail = "";
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            registeredEmail = parsed.email || "";
-          } catch (e) {
-            // Fallback
-          }
-        }
+        const registeredEmail = onboardingData.email || "";
+        const userData = { ...onboardingData };
 
         if (!registeredEmail || registeredEmail !== email) {
           toast.error("This Google account is not registered. Please sign up first.");
         } else {
+          dispatch(login(userData));
           toast.success("Successfully authenticated with Google!");
           setTimeout(() => {
             window.location.href = "/";
@@ -94,17 +92,8 @@ export default function LoginPage() {
       return;
     }
 
-    // Check if the mobile number is registered inside localStorage
-    const saved = localStorage.getItem("feag_onboarding_data");
-    let registeredMobile = "";
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        registeredMobile = parsed.mobile || "";
-      } catch (e) {
-        // Fallback
-      }
-    }
+    // Check if the mobile number is registered
+    const registeredMobile = onboardingData.mobile || "";
 
     if (watchedMobile !== registeredMobile) {
       toast.error("This mobile number is not registered. Please join us first.");
@@ -161,16 +150,8 @@ export default function LoginPage() {
       setIsVerifyingOtp(false);
 
       // Re-verify registration data
-      const saved = localStorage.getItem("feag_onboarding_data");
-      let registeredMobile = "";
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          registeredMobile = parsed.mobile || "";
-        } catch (e) {
-          // Fallback
-        }
-      }
+      const registeredMobile = onboardingData.mobile || "";
+      const userData = { ...onboardingData };
 
       if (watchedMobile !== registeredMobile) {
         toast.error("This mobile number is not registered. Please sign up first.");
@@ -182,6 +163,7 @@ export default function LoginPage() {
       }
 
       if (watchedOtp === "123456") {
+        dispatch(login(userData));
         toast.success("Welcome back to FEAG!");
         setTimeout(() => {
           window.location.href = "/";

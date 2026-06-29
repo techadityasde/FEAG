@@ -9,7 +9,7 @@ export default function PackagesSection({
   setSelectedPackage,
 }: PackagesSectionProps) {
   return (
-    <section className="bg-white border border-border/50 rounded-2xl p-2 sm:p-8 shadow-sm space-y-6">
+    <section id="packages-section" className="bg-white border border-border/50 rounded-2xl p-2 sm:p-8 shadow-sm space-y-6">
       <h2 className="text-xl font-extrabold text-foreground tracking-tight">Service Packages</h2>
       
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">

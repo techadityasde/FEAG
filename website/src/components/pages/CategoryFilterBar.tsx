@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export interface FilterState {
   searchQuery: string;
+  category?: string;
   location: string;
   priceRange: string;
   rating: string;
@@ -17,6 +18,7 @@ interface CategoryFilterBarProps {
   onFilterChange: (updatedFilters: Partial<FilterState>) => void;
   onReset: () => void;
   locations: string[];
+  showCategoryFilter?: boolean;
 }
 
 export default function CategoryFilterBar({
@@ -24,6 +26,7 @@ export default function CategoryFilterBar({
   onFilterChange,
   onReset,
   locations,
+  showCategoryFilter = false,
 }: CategoryFilterBarProps) {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   
@@ -108,6 +111,24 @@ export default function CategoryFilterBar({
               />
             </div>
           </div>
+
+          {/* Category Filter (Optional) */}
+          {showCategoryFilter && (
+            <div className="flex flex-col gap-2">
+              <label htmlFor="category" className="text-foreground">Service Category</label>
+              <select
+                id="category"
+                className="w-full px-3 h-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary transition-all font-normal cursor-pointer"
+                value={filters.category || "All"}
+                onChange={(e) => onFilterChange({ category: e.target.value })}
+              >
+                <option value="All">All Categories</option>
+                <option value="photographer">Photographer</option>
+                <option value="videographer">Videographer</option>
+                <option value="singer">Singer</option>
+              </select>
+            </div>
+          )}
 
           {/* Location */}
           <div className="flex flex-col gap-2">
@@ -232,6 +253,23 @@ export default function CategoryFilterBar({
 
             {/* Content / Inputs */}
             <div className="flex-1 overflow-y-auto p-5 space-y-5 text-sm font-semibold text-muted-foreground">
+              {/* Category */}
+              {showCategoryFilter && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-foreground">Service Category</label>
+                  <select
+                    className="w-full px-3 h-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary font-normal cursor-pointer"
+                    value={localFilters.category || "All"}
+                    onChange={(e) => handleLocalChange("category", e.target.value)}
+                  >
+                    <option value="All">All Categories</option>
+                    <option value="photographer">Photographer</option>
+                    <option value="videographer">Videographer</option>
+                    <option value="singer">Singer</option>
+                  </select>
+                </div>
+              )}
+
               {/* Location */}
               <div className="flex flex-col gap-2">
                 <label className="text-foreground">Location</label>

@@ -53,7 +53,7 @@ export default function CustomBookingForm({
   const todayStr = `${yyyy}-${mm}-${dd}`;
 
   return (
-    <section id="booking-request-section" className="bg-white border border-border/50 rounded-2xl p-2 sm:p-8 shadow-sm space-y-6">
+    <section id="booking-request-section" className="space-y-6">
       <div>
         <h2 className="text-xl font-extrabold text-foreground tracking-tight">Custom Booking Request</h2>
         <p className="text-xs text-muted-foreground mt-1">Submit custom booking events or direct specific packaging requirements to {username}.</p>

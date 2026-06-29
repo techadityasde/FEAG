@@ -6,6 +6,9 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
+import { AlertTriangle } from "lucide-react";
 
 import { professionals } from "@/lib/data/professionals";
 import { BookingFormValues, PortfolioItem } from "../types";
@@ -23,6 +26,8 @@ import FAQSection from "../components/FAQSection";
 import SimilarProfessionals from "../components/SimilarProfessionals";
 import StickyBookingPanel from "../components/StickyBookingPanel";
 import LightboxModal from "../components/LightboxModal";
+import { Modal } from "@/components/ui/Modal";
+import CheckoutSidepanel from "@/components/ui/CheckoutSidepanel";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -110,6 +115,12 @@ export default function ProfessionalProfile({ params }: PageProps) {
   // Lightbox State
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
+  const [isCheckoutPanelOpen, setIsCheckoutPanelOpen] = useState(false);
+  const [isActiveOrderModalOpen, setIsActiveOrderModalOpen] = useState(false);
+
+  const orders = useSelector((state: RootState) => state.orders?.orders || []);
+
   // Calendar dates mock
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const bookedDates = ["2026-06-28", "2026-07-02", "2026-07-05", "2026-07-12"];
@@ -185,6 +196,22 @@ export default function ProfessionalProfile({ params }: PageProps) {
     toast.success("Profile link copied to clipboard!");
   };
 
+  const handleBookClick = () => {
+    const hasActiveOrder = orders.some(
+      (order) => 
+        order.professionalName.toLowerCase() === professional.username.toLowerCase() && 
+        order.selectedPackage === selectedPackage && 
+        order.status === "active"
+    );
+
+    if (hasActiveOrder) {
+      setIsActiveOrderModalOpen(true);
+      return;
+    }
+
+    setIsCheckoutPanelOpen(true);
+  };
+
   const handleWishlist = () => {
     setWishlisted(!wishlisted);
     toast.success(wishlisted ? "Removed from wishlist" : "Saved to wishlist!");
@@ -217,14 +244,6 @@ export default function ProfessionalProfile({ params }: PageProps) {
     }
   };
 
-  const scrollToBookingSection = () => {
-    const element = document.getElementById("booking-request-section");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      toast.success(`Active selection: ${selectedPackage} package. Fill out custom form below.`);
-    }
-  };
-
   return (
     <div className="flex-1 w-full bg-background min-h-screen pb-16 relative">
       {/* Dynamic light gradient bg */}
@@ -251,6 +270,7 @@ export default function ProfessionalProfile({ params }: PageProps) {
               wishlisted={wishlisted}
               onWishlist={handleWishlist}
               onShare={handleShare}
+              onCustomRequest={() => setIsCustomModalOpen(true)}
             />
 
             <PortfolioSection
@@ -285,14 +305,23 @@ export default function ProfessionalProfile({ params }: PageProps) {
               limitedDates={limitedDates}
             /> */}
 
-            <CustomBookingForm
-              professional={professional}
-              control={control}
-              handleSubmit={handleSubmit}
-              onSubmit={onSubmitBooking}
-              errors={errors}
-              setValue={setValue}
-            />
+            <Modal 
+              isOpen={isCustomModalOpen} 
+              onClose={() => setIsCustomModalOpen(false)}
+              maxWidth="max-w-2xl"
+            >
+              <CustomBookingForm
+                professional={professional}
+                control={control}
+                handleSubmit={handleSubmit}
+                onSubmit={(data: any) => {
+                  onSubmitBooking();
+                  setIsCustomModalOpen(false);
+                }}
+                errors={errors}
+                setValue={setValue}
+              />
+            </Modal>
 
             <ReviewSection
               rating={rating}
@@ -309,11 +338,12 @@ export default function ProfessionalProfile({ params }: PageProps) {
           </div>
 
           {/* Desktop Sticky Sidebar Panel */}
-          <div className="lg:col-span-4 sticky top-22 hidden lg:block space-y-6">
+          <div className="hidden lg:block lg:col-span-4 sticky top-24">
             <StickyBookingPanel
               selectedPackage={selectedPackage}
               getPackagePrice={getPackagePrice}
-              onBookClick={scrollToBookingSection}
+              onBookClick={handleBookClick}
+              onCustomRequest={() => setIsCustomModalOpen(true)}
             />
           </div>
 
@@ -330,13 +360,13 @@ export default function ProfessionalProfile({ params }: PageProps) {
 
         <div className="flex items-center gap-2">
           <Button
-            onClick={scrollToBookingSection}
+            onClick={handleBookClick}
             className="bg-primary hover:bg-primary/95 text-white font-extrabold text-xs py-2 px-4 h-9 rounded-lg cursor-pointer"
           >
-            Book Now
+            Checkout
           </Button>
           <Button
-            onClick={scrollToBookingSection}
+            onClick={() => setIsCustomModalOpen(true)}
             variant="outline"
             className="border-border text-foreground hover:bg-muted text-[10px] font-bold py-2 px-3 h-9 rounded-lg cursor-pointer"
           >
@@ -345,7 +375,7 @@ export default function ProfessionalProfile({ params }: PageProps) {
         </div>
       </div>
 
-      {/* FULL-SCREEN LIGHTBOX MODAL */}
+      {/* Lightbox Modal for Media */}
       {lightboxIndex !== null && (
         <LightboxModal
           mediaItem={filteredMedia[lightboxIndex]}
@@ -355,6 +385,31 @@ export default function ProfessionalProfile({ params }: PageProps) {
         />
       )}
 
+      {/* Checkout Sidepanel */}
+      <CheckoutSidepanel
+        isOpen={isCheckoutPanelOpen}
+        onClose={() => setIsCheckoutPanelOpen(false)}
+        professional={professional}
+        selectedPackage={selectedPackage}
+        packagePrice={getPackagePrice(selectedPackage)}
+      />
+
+      {/* Active Order Exists Modal */}
+      <Modal isOpen={isActiveOrderModalOpen} onClose={() => setIsActiveOrderModalOpen(false)} maxWidth="max-w-sm">
+        <div className="p-6 text-center space-y-4">
+          <div className="h-12 w-12 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+             <AlertTriangle className="h-6 w-6" />
+          </div>
+          <h3 className="text-lg font-bold text-foreground">Active Order Exists</h3>
+          <p className="text-sm text-muted-foreground">You already have an active order for this professional's {selectedPackage} package. Please complete it first before making another booking.</p>
+          <div className="pt-4 flex gap-3 w-full">
+            <Button className="flex-1 border-border font-bold text-xs" variant="outline" onClick={() => setIsActiveOrderModalOpen(false)}>Cancel</Button>
+            <Button asChild className="flex-1 bg-primary text-white font-bold text-xs">
+              <Link href="/orders">View Orders</Link>
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

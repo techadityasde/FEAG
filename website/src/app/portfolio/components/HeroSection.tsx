@@ -9,12 +9,18 @@ export default function HeroSection({
   wishlisted,
   onWishlist,
   onShare,
+  onCustomRequest,
 }: HeroSectionProps) {
   const { username, profileImage, location, rating, totalReviews, experience, category, isVerified } = professional;
 
   const scrollToBooking = () => {
-    const element = document.getElementById("booking-request-section");
-    if (element) element.scrollIntoView({ behavior: "smooth" });
+    const element = document.getElementById("packages-section");
+    if (element) {
+      const navHeight = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+    }
   };
 
   return (
@@ -71,6 +77,13 @@ export default function HeroSection({
             className="bg-primary hover:bg-primary/95 text-white font-bold text-xs sm:text-sm py-2 px-5 h-9 rounded-lg shadow-sm cursor-pointer"
           >
             Book Now
+          </Button>
+          <Button 
+            onClick={onCustomRequest}
+            variant="outline"
+            className="border-primary/30 hover:border-primary text-primary hover:bg-primary/5 font-bold text-xs sm:text-sm py-2 px-5 h-9 rounded-lg shadow-sm cursor-pointer"
+          >
+            Custom Event Request
           </Button>
           <Button onClick={onWishlist} variant="outline" className="p-2.5 h-9 rounded-lg border-border hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer">
             <Heart className={`size-4.5 ${wishlisted ? "fill-red-500 text-red-500" : ""}`} />

@@ -7,6 +7,7 @@ export default function StickyBookingPanel({
   selectedPackage,
   getPackagePrice,
   onBookClick,
+  onCustomRequest,
 }: StickyBookingPanelProps) {
   return (
     <>
@@ -39,10 +40,10 @@ export default function StickyBookingPanel({
               onClick={onBookClick}
               className="w-full bg-primary hover:bg-primary/95 text-white font-extrabold text-sm py-2 h-10 rounded-lg cursor-pointer shadow-sm"
             >
-              Confirm & Customize
+              Checkout
             </Button>
             <Button 
-              onClick={onBookClick}
+              onClick={onCustomRequest}
               variant="outline" 
               className="w-full border-border text-foreground hover:bg-muted text-xs font-bold h-10 rounded-lg cursor-pointer"
             >
