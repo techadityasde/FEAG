@@ -203,7 +203,7 @@ export default function ContactForm() {
             onChange={updateField("phone")}
             placeholder="Ex: (+91) 4"
             required
-            // aria-invalid={Boolean(errors.phone)}
+            // aria-invalid={Boolean(errors.phone)} 
             className="w-full bg-transparent px-3 py-2.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground outline-none"
           />
         </div>
