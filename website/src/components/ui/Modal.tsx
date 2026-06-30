@@ -7,9 +7,19 @@ export interface ModalProps {
   title?: string;
   children: React.ReactNode;
   maxWidth?: string;
+  disableOutsideClick?: boolean;
+  hideCloseButton?: boolean;
 }
 
-export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-xl" }: ModalProps) {
+export function Modal({ 
+  isOpen, 
+  onClose, 
+  title, 
+  children, 
+  maxWidth = "max-w-xl",
+  disableOutsideClick = false,
+  hideCloseButton = false,
+}: ModalProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -35,7 +45,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-xl" 
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
-        onClick={onClose} 
+        onClick={() => !disableOutsideClick && onClose()} 
       />
       
       {/* Modal Content */}
@@ -48,16 +58,18 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-xl" 
             <h2 className="text-lg font-extrabold text-foreground tracking-tight">
               {title}
             </h2>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/50 bg-background/50"
-              aria-label="Close modal"
-            >
-              <X className="size-4" />
-            </button>
+            {!hideCloseButton && (
+              <button
+                onClick={onClose}
+                className="p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/50 bg-background/50"
+                aria-label="Close modal"
+              >
+                <X className="size-4" />
+              </button>
+            )}
           </div>
         )}
-        {!title && (
+        {!title && !hideCloseButton && (
           <button
             onClick={onClose}
             className="absolute top-4 right-4 z-10 p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/50 bg-background/50 shadow-sm"

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, ShieldCheck, Loader2 } from "lucide-react";
+import { X, ShieldCheck, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Professional } from "@/lib/data/professionals";
 import toast from "react-hot-toast";
@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import { addTransaction } from "@/lib/store/transactionSlice";
 import { addOrder } from "@/lib/store/orderSlice";
+import { LoginModal } from "@/components/auth/LoginModal";
 
 interface RazorpaySuccessResponse {
   razorpay_payment_id: string;
@@ -42,9 +43,11 @@ export default function CheckoutSidepanel({
 }: CheckoutSidepanelProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const location = useSelector((state: RootState) => state.location);
   const router = useRouter();
 
   // Load Razorpay Script
@@ -68,6 +71,7 @@ export default function CheckoutSidepanel({
 
     if (!user) {
       toast.error("Please login to proceed with booking.");
+      setIsLoginModalOpen(true);
       return;
     }
 
@@ -231,6 +235,19 @@ export default function CheckoutSidepanel({
             </div>
           </div>
 
+          {/* Location Display */}
+          <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm flex flex-col gap-1">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="bg-primary/10 p-1.5 rounded-full">
+                <MapPin className="size-4 text-primary" />
+              </div>
+              <h3 className="text-sm font-bold text-foreground">Service Address</h3>
+            </div>
+            <p className="text-xs text-muted-foreground ml-9">
+              {location.address || "Location not selected"}
+            </p>
+          </div>
+
           {/* Pricing Details */}
           <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm space-y-3">
             <div className="flex justify-between text-sm">
@@ -294,6 +311,12 @@ export default function CheckoutSidepanel({
           </p>
         </div>
       </div>
+      
+      {/* Login Modal for unauthenticated users */}
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
     </>
   );
 }
