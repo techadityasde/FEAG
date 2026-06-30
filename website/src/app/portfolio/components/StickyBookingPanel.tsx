@@ -1,7 +1,11 @@
-import React from "react";
-import { CheckCircle2 } from "lucide-react";
+import React, { useState } from "react";
+import { CheckCircle2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StickyBookingPanelProps } from "../types";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
+import { LocationModal } from "@/components/LocationModal";
+import toast from "react-hot-toast";
 
 export default function StickyBookingPanel({
   selectedPackage,
@@ -9,6 +13,17 @@ export default function StickyBookingPanel({
   onBookClick,
   onCustomRequest,
 }: StickyBookingPanelProps) {
+  const location = useSelector((state: RootState) => state.location);
+  const [isLocationModalOpen, setLocationModalOpen] = useState(false);
+
+  const handleCheckout = () => {
+    if (!location.address) {
+      toast.error("Please select the address");
+    } else {
+      onBookClick();
+    }
+  };
+
   return (
     <>
       {/* Desktop Sticky Panel */}
@@ -35,9 +50,38 @@ export default function StickyBookingPanel({
             </div>
           </div>
 
+          {/* Location Display */}
+          <div className="p-3 rounded-lg border border-border/50 bg-muted/20">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <MapPin className="size-4 text-primary" />
+                <h4 className="text-xs font-bold text-foreground">Service Address</h4>
+              </div>
+              {location.address && (
+                <button 
+                  onClick={() => setLocationModalOpen(true)}
+                  className="text-[10px] text-primary font-bold hover:underline cursor-pointer"
+                >
+                  Change
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground ml-6">
+              {location.address || "Location not selected"}
+            </p>
+            {!location.address && (
+              <button 
+                onClick={() => setLocationModalOpen(true)} 
+                className="text-[10px] text-primary font-bold ml-6 mt-1 hover:underline cursor-pointer"
+              >
+                Select Address
+              </button>
+            )}
+          </div>
+
           <div className="space-y-2">
             <Button 
-              onClick={onBookClick}
+              onClick={handleCheckout}
               className="w-full bg-primary hover:bg-primary/95 text-white font-extrabold text-sm py-2 h-10 rounded-lg cursor-pointer shadow-sm"
             >
               Checkout
@@ -60,6 +104,10 @@ export default function StickyBookingPanel({
           </div>
         </div>
       </div>
+      <LocationModal 
+        isOpen={isLocationModalOpen} 
+        onClose={() => setLocationModalOpen(false)} 
+      />
     </>
   );
 }

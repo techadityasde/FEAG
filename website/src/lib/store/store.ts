@@ -7,19 +7,21 @@ import onboardingReducer from "./onboardingSlice";
 import authReducer from "./authSlice";
 import transactionReducer from "./transactionSlice";
 import orderReducer from "./orderSlice";
+import locationReducer from "./locationSlice";
 
 const rootReducer = combineReducers({
   auth: authReducer,
   onboarding: onboardingReducer,
   transactions: transactionReducer,
   orders: orderReducer,
+  location: locationReducer,
   [apiSlice.reducerPath]: apiSlice.reducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth', 'onboarding', 'transactions', 'orders'], // persist auth, onboarding, transactions, and orders
+  whitelist: ['auth', 'onboarding', 'transactions', 'orders', 'location'], // persist auth, onboarding, transactions, orders, and location
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

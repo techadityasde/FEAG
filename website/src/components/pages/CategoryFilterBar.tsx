@@ -78,7 +78,7 @@ export default function CategoryFilterBar({
       </div>
 
       {/* Desktop Sidebar Filters (Hidden on Mobile) */}
-      <div className="hidden md:flex flex-col gap-6 bg-card border border-border/60 rounded-xl p-5 shadow-sm max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden">
+      <div className="hidden md:flex flex-col gap-6 bg-card border border-border/60 rounded-lg p-5 shadow-sm max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden">
         <div className="flex items-center justify-between border-b border-border/60 pb-4 shrink-0">
           <h3 className="font-extrabold text-foreground text-lg tracking-wide flex items-center gap-2">
             <SlidersHorizontal className="size-5 text-primary" />

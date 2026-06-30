@@ -13,6 +13,7 @@ const OrderTrackingContent = ({ id }: { id: string }) => {
   const order = useSelector((state: RootState) => 
     state.orders.orders.find(o => o.orderId === id)
   );
+  const location = useSelector((state: RootState) => state.location);
 
   if (!order) {
     return notFound();
@@ -98,10 +99,19 @@ const OrderTrackingContent = ({ id }: { id: string }) => {
 
         {/* Tracking Timeline */}
         <div className="bg-card border border-border p-6 md:p-8 rounded-2xl shadow-sm">
-          <h3 className="text-lg font-bold mb-8 flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-primary" />
-            Live Tracking Status
-          </h3>
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+            <h3 className="text-lg font-bold flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" />
+              Live Tracking Status
+            </h3>
+            
+            {location.address && (
+              <div className="bg-muted/30 p-3 rounded-xl border border-border/50 text-sm md:max-w-xs w-full text-left">
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Delivery Address</p>
+                <p className="font-semibold text-foreground line-clamp-2">{location.address}</p>
+              </div>
+            )}
+          </div>
           
           <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
             {steps.map((step, idx) => (
