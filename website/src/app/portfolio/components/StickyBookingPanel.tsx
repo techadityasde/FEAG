@@ -6,8 +6,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import { LocationModal } from "@/components/LocationModal";
 import toast from "react-hot-toast";
+import { getDistance } from "@/lib/utils";
 
 export default function StickyBookingPanel({
+  professional,
   selectedPackage,
   getPackagePrice,
   onBookClick,
@@ -16,6 +18,13 @@ export default function StickyBookingPanel({
   const location = useSelector((state: RootState) => state.location);
   const [isLocationModalOpen, setLocationModalOpen] = useState(false);
 
+  let distanceStr = "";
+  if (location.lat && location.lng && professional.lat && professional.lng) {
+    const dist = getDistance(location.lat, location.lng, professional.lat, professional.lng);
+    distanceStr = `${dist.toFixed(1)} km away`;
+  }
+// console.log("Selected Package:", selectedPackage);
+// console.log("Location:", location);
   const handleCheckout = () => {
     if (!location.address) {
       toast.error("Please select the address");
@@ -69,6 +78,11 @@ export default function StickyBookingPanel({
             <p className="text-xs text-muted-foreground ml-6">
               {location.address || "Location not selected"}
             </p>
+            {distanceStr && (
+              <p className="text-[10px] font-semibold text-emerald-600 ml-6 mt-0.5">
+                {distanceStr}
+              </p>
+            )}
             {!location.address && (
               <button 
                 onClick={() => setLocationModalOpen(true)} 

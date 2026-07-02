@@ -3,6 +3,7 @@ import { Controller } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import Turnstile from "react-turnstile";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Step1Props } from "../types";
@@ -259,6 +260,13 @@ export default function Step1Mobile({
                 )}
                 Continue with Google
               </button>
+              
+              <div className="mt-2 text-center">
+                <span className="text-xs text-muted-foreground">Already registered? </span>
+                <Link href="/login" className="text-xs font-bold text-primary hover:underline">
+                  Login here
+                </Link>
+              </div>
             </>
           )}
         </div>

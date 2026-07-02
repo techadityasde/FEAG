@@ -8,37 +8,58 @@ import { notFound } from "next/navigation";
 import { PackageOpen, MapPin, CheckCircle2, Clock, Calendar, ArrowLeft, Loader2, CircleDashed } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { professionals } from "@/lib/data/professionals";
 
 const OrderTrackingContent = ({ id }: { id: string }) => {
   const order = useSelector((state: RootState) => 
     state.orders.orders.find(o => o.orderId === id)
   );
+  console.log("Order Tracking ID:", order);
   const location = useSelector((state: RootState) => state.location);
 
   if (!order) {
     return notFound();
   }
 
-  const steps = [
-    {
-      title: "Order Placed",
-      description: "We have received your order securely.",
-      icon: PackageOpen,
-      completed: true,
+  const professional = order ? professionals.find(p => p.id === order.professionalId) : null;
+
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "", 
+  });
+
+  const mapRef = React.useRef<google.maps.Map | null>(null);
+
+  const onLoad = React.useCallback(
+    function callback(map: google.maps.Map) {
+      if (professional?.lat && professional?.lng && location?.lat && location?.lng) {
+        const bounds = new window.google.maps.LatLngBounds();
+        bounds.extend({ lat: professional.lat, lng: professional.lng });
+        bounds.extend({ lat: location.lat, lng: location.lng });
+        map.fitBounds(bounds);
+        
+        // Ensure it doesn't zoom in too tightly if points are very close
+        const listener = window.google.maps.event.addListener(map, 'idle', () => {
+          if (map.getZoom()! > 16) map.setZoom(16);
+          window.google.maps.event.removeListener(listener);
+        });
+      } else {
+        // Fallback center if one is missing
+        map.setCenter({ 
+          lat: location?.lat || professional?.lat || 20.5937, 
+          lng: location?.lng || professional?.lng || 78.9629 
+        });
+        map.setZoom(5);
+      }
+      mapRef.current = map;
     },
-    {
-      title: "Processing",
-      description: "Professional is reviewing your requirements.",
-      icon: Clock,
-      completed: order.status === "active" || order.status === "completed",
-    },
-    {
-      title: "Delivered",
-      description: "Service has been delivered successfully.",
-      icon: CheckCircle2,
-      completed: order.status === "completed",
-    }
-  ];
+    [professional, location]
+  );
+
+  const onUnmount = React.useCallback(function callback() {
+    mapRef.current = null;
+  }, []);
 
   return (
     <div className="min-h-screen bg-background/50 py-10 px-4 md:px-8">
@@ -97,48 +118,84 @@ const OrderTrackingContent = ({ id }: { id: string }) => {
           </div>
         </div>
 
-        {/* Tracking Timeline */}
+        {/* Tracking Map */}
         <div className="bg-card border border-border p-6 md:p-8 rounded-2xl shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+          <div className="flex flex-col gap-6 mb-8">
             <h3 className="text-lg font-bold flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" />
               Live Tracking Status
             </h3>
             
-            {location.address && (
-              <div className="bg-muted/30 p-3 rounded-xl border border-border/50 text-sm md:max-w-xs w-full text-left">
-                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Delivery Address</p>
-                <p className="font-semibold text-foreground line-clamp-2">{location.address}</p>
-              </div>
-            )}
+            <div className="flex flex-col sm:flex-row items-stretch justify-between gap-4 w-full">
+              {location.address && (
+                <div className="bg-muted/30 p-3 rounded-xl border border-border/50 text-sm w-full text-left">
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Service Address</p>
+                  <p className="font-semibold text-foreground line-clamp-2">{location.address}</p>
+                </div>
+              )}
+              {professional?.location && (
+                <div className="bg-muted/30 p-3 rounded-xl border border-border/50 text-sm w-full text-left">
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Creator Address</p>
+                  <p className="font-semibold text-foreground line-clamp-2">{professional.location}</p>
+                </div>
+              )}
+            </div>
           </div>
           
-          <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
-            {steps.map((step, idx) => (
-              <div key={idx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                {/* Icon */}
-                <div className={cn(
-                  "flex items-center justify-center w-10 h-10 rounded-full border-4 border-card shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10 transition-colors duration-500",
-                  step.completed ? "bg-primary text-white" : "bg-muted text-muted-foreground"
-                )}>
-                  {step.completed && idx === 1 && order.status === "active" ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <step.icon className="h-4 w-4" />
-                  )}
-                </div>
-                
-                {/* Content */}
-                <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-border/50 bg-background/50 group-hover:border-border transition-colors">
-                  <h4 className={cn("text-base font-bold", step.completed ? "text-foreground" : "text-muted-foreground")}>
-                    {step.title}
-                  </h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {step.description}
-                  </p>
+          <div className="h-[400px] md:h-[500px] w-full rounded-xl overflow-hidden border border-border relative bg-muted/10">
+            {!isLoaded ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-muted/20">
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  <p className="text-sm font-bold text-muted-foreground animate-pulse">Loading Live Map...</p>
                 </div>
               </div>
-            ))}
+            ) : (
+              <GoogleMap
+                mapContainerStyle={{ width: "100%", height: "100%" }}
+                onLoad={onLoad}
+                onUnmount={onUnmount}
+                options={{
+                  disableDefaultUI: false,
+                  zoomControl: true,
+                  mapTypeControl: false,
+                  streetViewControl: false,
+                  styles: [
+                    {
+                      featureType: "poi",
+                      elementType: "labels",
+                      stylers: [{ visibility: "off" }]
+                    }
+                  ]
+                }}
+              >
+                {/* Professional Start Point Marker */}
+                {professional?.lat && professional?.lng && (
+                  <Marker
+                    position={{ lat: professional.lat, lng: professional.lng }}
+                    title={professional.username}
+                    label={{
+                      text: "P",
+                      color: "white",
+                      fontWeight: "bold"
+                    }}
+                  />
+                )}
+                
+                {/* Customer Service Point Marker */}
+                {location?.lat && location?.lng && (
+                  <Marker
+                    position={{ lat: location.lat, lng: location.lng }}
+                    title="Service Location"
+                    label={{
+                      text: "S",
+                      color: "white",
+                      fontWeight: "bold"
+                    }}
+                  />
+                )}
+              </GoogleMap>
+            )}
           </div>
         </div>
 

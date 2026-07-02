@@ -12,7 +12,11 @@ export interface PortfolioItem {
 export interface BookingFormValues {
   eventType: string;
   eventDate: string;
-  eventLocation: string;
+  eventTime: string;
+  eventAddress: string;
+  streetAddress: string;
+  locality: string;
+  pincode: string;
   guestsCount: string;
   budgetRange: string;
   notes: string;
@@ -21,7 +25,8 @@ export interface BookingFormValues {
   needAlbum?: string;
   needDrone?: string;
   venueType?: string;
-  cinematicFilm?: string;
+  otherRequirements?: string;
+  reelDuration?: string;
   reelsCount?: string;
   musicGenre?: string;
   setupType?: string;
@@ -94,6 +99,7 @@ export interface SimilarProfessionalsProps {
 }
 
 export interface StickyBookingPanelProps {
+  professional: Professional;
   selectedPackage: "basic" | "professional" | "premium";
   getPackagePrice: (pkg: "basic" | "professional" | "premium") => number;
   onBookClick: () => void;

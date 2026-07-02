@@ -5,6 +5,10 @@ export interface Order {
   transactionId: string;
   professionalId: string;
   professionalName: string;
+  professionalUsername?: string;
+  professionalLocation?: string;
+  professionalImage?: string;
+  professionalCategory?: string;
   selectedPackage: string;
   amount: number;
   date: string;
