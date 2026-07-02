@@ -29,7 +29,7 @@ export default function CategoryFilterBar({
   showCategoryFilter = false,
 }: CategoryFilterBarProps) {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  
+
   // Keep a local copy of filters inside the drawer so user can "Apply" or "Reset"
   const [localFilters, setLocalFilters] = useState<FilterState>({ ...filters });
 
@@ -56,7 +56,7 @@ export default function CategoryFilterBar({
     <div className="w-full">
       {/* Mobile Filter Action Button (Visible only on Mobile < 768px) */}
       <div className="md:hidden flex items-center justify-between gap-4 w-full mb-6">
-        <div className="relative flex-1">
+        {/* <div className="relative flex-1">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/75" />
           <input
             type="text"
@@ -65,8 +65,8 @@ export default function CategoryFilterBar({
             value={filters.searchQuery}
             onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
           />
-        </div>
-        
+        </div> */}
+
         <Button
           onClick={() => setIsMobileDrawerOpen(true)}
           variant="outline"
@@ -97,7 +97,7 @@ export default function CategoryFilterBar({
 
         <div className="flex flex-col gap-5 text-sm font-semibold text-muted-foreground">
           {/* Search by Name */}
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <label htmlFor="search" className="text-foreground">Search by Name</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/75" />
@@ -110,7 +110,7 @@ export default function CategoryFilterBar({
                 onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Category Filter (Optional) */}
           {showCategoryFilter && (
@@ -233,7 +233,7 @@ export default function CategoryFilterBar({
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 transition-opacity duration-300 md:hidden flex justify-start">
           {/* Backdrop closer */}
           <div className="absolute inset-0" onClick={() => setIsMobileDrawerOpen(false)} />
-          
+
           {/* Drawer Panel */}
           <div className="relative w-[85%] max-w-sm bg-card h-full flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-300 border-r border-border">
             {/* Header */}

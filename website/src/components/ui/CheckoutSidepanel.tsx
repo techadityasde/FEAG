@@ -7,6 +7,8 @@ import { Professional } from "@/lib/data/professionals";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { getDistance } from "@/lib/utils";
 
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
@@ -62,6 +64,12 @@ export default function CheckoutSidepanel({
   }, [isOpen, scriptLoaded]);
 
   if (!isOpen || !professional) return null;
+
+  let distanceStr = "";
+  if (location.lat && location.lng && professional?.lat && professional?.lng) {
+    const dist = getDistance(location.lat, location.lng, professional.lat, professional.lng);
+    distanceStr = `${dist.toFixed(1)} km away`;
+  }
 
   const handlePayment = async () => {
     if (!scriptLoaded) {
@@ -129,6 +137,10 @@ export default function CheckoutSidepanel({
               transactionId: response.razorpay_payment_id,
               professionalId: professional.id,
               professionalName: professional.username,
+              professionalUsername: professional.username,
+              professionalLocation: professional.location,
+              professionalImage: professional.profileImage,
+              professionalCategory: professional.category,
               selectedPackage: selectedPackage || "",
               amount: packagePrice,
               date: new Date().toISOString(),
@@ -228,10 +240,22 @@ export default function CheckoutSidepanel({
                 <p className="text-xs text-muted-foreground capitalize">
                   {selectedPackage} Package
                 </p>
-                <p className="text-xs text-muted-foreground font-medium mt-0.5">
-                  {professional.category}
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-xs text-muted-foreground font-medium">
+                    {professional.category}
+                  </p>
+                </div>
               </div>
+            </div>
+            
+            <div className="flex justify-end mt-1">
+              <Link 
+                href="/discover" 
+                onClick={onClose} 
+                className="text-[10px] text-primary hover:underline font-bold transition-colors"
+              >
+                Discover more
+              </Link>
             </div>
           </div>
 
@@ -246,6 +270,11 @@ export default function CheckoutSidepanel({
             <p className="text-xs text-muted-foreground ml-9">
               {location.address || "Location not selected"}
             </p>
+            {distanceStr && (
+              <p className="text-[10px] text-primary font-bold ml-9 mt-0.5">
+                {distanceStr}
+              </p>
+            )}
           </div>
 
           {/* Pricing Details */}

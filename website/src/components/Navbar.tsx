@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   User,
@@ -14,21 +14,63 @@ import {
   Search,
   ChevronDown,
   Compass,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import { logout } from "@/lib/store/authSlice";
-import { cn } from "@/lib/utils";
+import { cn, getDistance } from "@/lib/utils";
 import { LocationModal } from "./LocationModal";
 import { professionals } from "@/lib/data/professionals";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+
+const professions = [
+  "photographer...",
+  "videographer...",
+  "singer...",
+];
+
+const AnimatedPlaceholder = ({ leftClass }: { leftClass: string }) => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % professions.length);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className={cn("pointer-events-none absolute inset-y-0 flex items-center overflow-hidden w-[calc(100%-4rem)] text-muted-foreground text-sm font-normal", leftClass, "z-20")}>
+      <span className="mr-1">Search</span>
+      <div className="flex flex-col justify-center h-full overflow-hidden">
+        <AnimatePresence mode="popLayout">
+          <motion.span
+            key={index}
+            initial={{ y: 25, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -25, opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="block truncate"
+          >
+            {professions[index]}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
 
 export default function Navbar() {
   const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth,
   );
+  const router = useRouter();
   const orders = useSelector((state: RootState) => state.orders?.orders || []);
   const location = useSelector((state: RootState) => state.location);
   const dispatch = useDispatch();
@@ -37,68 +79,111 @@ export default function Navbar() {
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProfessionals, setFilteredProfessionals] = useState<any[]>([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   const isCustomer = isAuthenticated && user?.role === "customer";
   const activeOrdersCount = orders.filter(
     (order: any) => order.status === "active",
   ).length;
-
+  // console.log("location", location);
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    const filtered =
-      e.target.value.length > 0
-        ? professionals.filter((professional) =>
-          professional.username
-            .toLowerCase()
-            .includes(e.target.value.toLowerCase()),
-        )
-        : [];
-    setFilteredProfessionals(filtered);
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value.length > 0) {
+      let filtered: any[] = professionals.filter(
+        (professional) =>
+          professional.username.toLowerCase().includes(value.toLowerCase()) ||
+          professional.location.toLowerCase().includes(value.toLowerCase()) ||
+          professional.category?.toLowerCase().includes(value.toLowerCase()),
+      );
+
+      // Calculate distance and filter if user location is available
+      const locLat = location.lat;
+      const locLng = location.lng;
+      if (locLat !== null && locLng !== null) {
+        filtered = filtered
+          .map((p) => {
+            if (p.lat !== undefined && p.lng !== undefined) {
+              const dist = getDistance(locLat, locLng, p.lat, p.lng);
+              return { ...p, distance: dist };
+            }
+            return p;
+          })
+          .sort((a, b) => {
+            if (a.distance !== undefined && b.distance !== undefined) {
+              return a.distance - b.distance;
+            }
+            return 0;
+          });
+      }
+
+      setFilteredProfessionals(filtered);
+    } else {
+      setFilteredProfessionals([]);
+    }
   };
 
   const SearchDropdown = () =>
     filteredProfessionals.length > 0 ? (
-      <div className="absolute top-full mt-2 left-0 w-full bg-white p-2 rounded-lg border border-border shadow-xl max-h-60 overflow-y-auto z-50">
+      <div className="absolute top-full mt-2 left-0 w-full bg-white p-2 rounded-lg border border-border shadow-xl max-h-60 overflow-y-auto z-50 ">
         {filteredProfessionals.map((professional) => (
           <div
             key={professional.id}
-            className="mb-1 flex items-center justify-between gap-2 text-sm min-[360px]:text-base text-muted-foreground p-2 hover:bg-muted rounded-md transition-colors"
+            className="cursor-pointer flex items-center justify-between gap-2 text-sm min-[360px]:text-base text-muted-foreground py-2 px-2 border-b border-border/50 last:border-0 hover:bg-muted rounded-md transition-colors"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              router.push(`/portfolio/${professional.username}`);
+              setSearchTerm("");
+              setFilteredProfessionals([]);
+            }}
           >
             <div className="flex items-center gap-2">
               <Image
                 src={professional.profileImage}
                 alt={professional.username}
-                width={22}
-                height={22}
+                width={28}
+                height={28}
                 className="rounded-full"
               />
               <div className="flex flex-col">
-                <span className="font-semibold text-[12px]">
+                <span className="font-semibold text-[12px] text-foreground flex items-center gap-1.5">
                   {professional.username}
+                  <span className="flex items-center text-[10px] text-yellow-500 font-bold bg-yellow-500/10 px-1 py-0.5 rounded">
+                    <Star className="size-3 fill-yellow-500 mr-0.5" />
+                    {professional.rating}
+                  </span>
                 </span>
+                {professional.distance !== undefined && (
+                  <span className="text-[10px] text-muted-foreground font-medium">
+                    {professional.distance.toFixed(1)} km away
+                  </span>
+                )}
               </div>
             </div>
-            <div>
-              <span className="text-[8px] min-[360px]:text-xs text-muted-foreground bg-primary/30 px-2 py-0.5 rounded-full font-semibold">
+            <div className="flex items-end">
+              <span className="text-[10px] text-muted-foreground bg-primary/30 px-2 py-0.5 rounded-full font-semibold">
                 {professional.category}
               </span>
-              <Link
+              {/* <Link
                 href={`/portfolio/${professional.username}`}
                 onClick={() => {
                   setSearchTerm("");
                   setFilteredProfessionals([]);
                 }}
-                className="ml-2 text-primary text-[10px] min-[360px]:text-xs font-semibold hover:underline"
+                className="mt-1 text-primary text-[10px] ml-2 font-semibold hover:underline"
               >
                 View
-              </Link>
+              </Link> */}
             </div>
           </div>
         ))}
       </div>
     ) : searchTerm ? (
-      <div className="absolute top-full mt-2 left-0 w-full bg-white p-4 rounded-lg border border-border shadow-xl z-50 text-center text-sm text-muted-foreground">
-        No professionals found
+      <div className="absolute top-full mt-2 left-0 w-full bg-white p-4 rounded-lg border border-border shadow-xl z-50 text-center text-sm font-semibold text-muted-foreground">
+        No user available in your nearest
       </div>
     ) : null;
 
@@ -115,9 +200,6 @@ export default function Navbar() {
               <MapPin className="size-4 text-primary" fill="currentColor" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-sm tracking-wide text-foreground">
-                In 44 minutes
-              </span>
               <div className="flex items-center text-xs text-muted-foreground">
                 <span className="max-w-[180px] truncate">
                   {location.address || "Select Location"}
@@ -126,31 +208,125 @@ export default function Navbar() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            {!isCustomer && (
-              <Link
-                href="/login"
-                className="text-xs font-semibold bg-muted px-4 py-1.5 rounded-full border border-border text-foreground transition-colors hover:bg-muted/80"
-              >
-                Login
-              </Link>
-            )}
-            {isCustomer && (
-              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm uppercase shadow-sm border-2 border-background">
-                {user?.name?.charAt(0) || <User className="size-4" />}
+          <div className="flex items-center gap-3 relative">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="flex items-center justify-center p-2 rounded-full bg-muted border border-border"
+            >
+              {isCustomer ? (
+                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white font-bold text-[10px] uppercase">
+                  {user?.name?.charAt(0) || <User className="size-3" />}
+                </div>
+              ) : (
+                <Menu className="size-5" />
+              )}
+            </button>
+
+            {isMobileMenuOpen && (
+              <div className="absolute top-full right-0 mt-3 w-56 bg-white border border-border rounded-xl shadow-2xl py-2 flex flex-col z-50">
+                {isCustomer && (
+                  <div className="px-4 py-3 border-b border-border mb-1">
+                    <p className="text-sm font-bold text-foreground truncate">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user?.email || user?.mobile}</p>
+                  </div>
+                )}
+                
+                <Link
+                  href="/"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                >
+                  <Compass className="size-4" />
+                  Home
+                </Link>
+
+                <Link
+                  href="/discover"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                >
+                  <Search className="size-4" />
+                  Discover
+                </Link>
+
+                {isCustomer ? (
+                  <>
+                    <Link
+                      href="/orders"
+                      onClick={closeMobileMenu}
+                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                    >
+                      <PackageOpen className="size-4" />
+                      Orders
+                      {activeOrdersCount > 0 && (
+                        <span className="ml-auto bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          {activeOrdersCount}
+                        </span>
+                      )}
+                    </Link>
+                    <Link
+                      href="/my-account"
+                      onClick={closeMobileMenu}
+                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                    >
+                      <User className="size-4" />
+                      My Account
+                    </Link>
+                    <Link
+                        href="/wishlist"
+                        onClick={closeMobileMenu}
+                        className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                      >
+                        <Heart className="size-4" />
+                        Wishlist
+                      </Link>
+                    <div className="h-px bg-border my-1 mx-2" />
+                    <button
+                      onClick={() => {
+                        dispatch(logout());
+                        closeMobileMenu();
+                      }}
+                      className="px-4 py-2.5 text-sm font-bold text-destructive hover:bg-destructive/10 flex items-center gap-3 text-left w-full transition-colors"
+                    >
+                      <LogOut className="size-4" />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="h-px bg-border my-1 mx-2" />
+                    <Link
+                      href="/login"
+                      onClick={closeMobileMenu}
+                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                    >
+                      <User className="size-4" />
+                      Login
+                    </Link>
+                    <Link
+                      href="/join-us"
+                      onClick={closeMobileMenu}
+                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                    >
+                      <Star className="size-4" />
+                      Join Us
+                    </Link>
+                  </>
+                )}
               </div>
             )}
           </div>
         </div>
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground z-20" />
           <input
             type="text"
-            placeholder="Search for 'Kitchen cleaning'"
+            placeholder=""
             value={searchTerm}
             onChange={handleSearch}
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted/50 border border-border text-foreground font-medium text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:bg-background transition-all"
+            className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted/50 border border-border text-foreground font-medium text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:bg-background transition-all relative z-10"
           />
+          {!searchTerm && <AnimatedPlaceholder leftClass="left-10" />}
           <SearchDropdown />
         </div>
       </header>
@@ -173,7 +349,7 @@ export default function Navbar() {
             Discover
           </Link>
           {/* Desktop Search Center */}
-          <div className="flex items-center gap-3 w-[50%] mx-auto">
+          <div className="flex items-center gap-3 w-[60%] mx-auto">
             <button
               onClick={() => setLocationModalOpen(true)}
               className="flex items-center w-1/2 gap-2 px-4 py-2 border border-border rounded-lg bg-muted/30 hover:bg-muted text-sm font-semibold whitespace-nowrap transition-colors"
@@ -186,14 +362,21 @@ export default function Navbar() {
             </button>
 
             <div className="relative w-1/2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground z-20" />
               <input
                 type="text"
-                placeholder="Search professionals, services..."
+                placeholder=""
                 value={searchTerm}
                 onChange={handleSearch}
-                className="w-full pl-9 pr-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary text-sm font-medium placeholder:font-normal"
+                onBlur={() => {
+                  setTimeout(() => {
+                    setSearchTerm("");
+                    setFilteredProfessionals([]);
+                  }, 200);
+                }}
+                className="w-full pl-9 pr-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary text-sm font-medium relative z-10"
               />
+              {!searchTerm && <AnimatedPlaceholder leftClass="left-9" />}
               <SearchDropdown />
             </div>
           </div>
@@ -301,69 +484,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-border shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-50 px-2 pb-[env(safe-area-inset-bottom)]">
-        <div className="flex justify-around items-center h-16">
-          <Link
-            href="/"
-            className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1",
-              pathname === "/"
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <div className="font-extrabold text-[16px] leading-none mb-0.5 px-1 bg-foreground text-background rounded-sm tracking-tighter">
-              FEAG
-            </div>
-            <span className="text-[10px] font-semibold">Home</span>
-          </Link>
 
-          <Link
-            href="/discover"
-            className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1",
-              pathname === "/discover"
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <Compass className="size-5" />
-            <span className="text-[10px] font-semibold">Discover</span>
-          </Link>
-
-          <Link
-            href="/orders"
-            className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1 relative",
-              pathname === "/orders"
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <div className="relative">
-              <PackageOpen className="size-5" />
-              {activeOrdersCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
-              )}
-            </div>
-            <span className="text-[10px] font-semibold">Orders</span>
-          </Link>
-
-          <Link
-            href={isCustomer ? "/my-account" : "/login"}
-            className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1",
-              pathname === "/my-account"
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <User className="size-5" />
-            <span className="text-[10px] font-semibold">Account</span>
-          </Link>
-        </div>
-      </nav>
 
       {/* Location Modal */}
       <LocationModal

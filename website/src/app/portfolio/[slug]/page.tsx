@@ -6,8 +6,9 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
+import { logout } from "@/lib/store/authSlice";
 import { AlertTriangle } from "lucide-react";
 
 import { professionals } from "@/lib/data/professionals";
@@ -27,6 +28,7 @@ import SimilarProfessionals from "../components/SimilarProfessionals";
 import StickyBookingPanel from "../components/StickyBookingPanel";
 import LightboxModal from "../components/LightboxModal";
 import { Modal } from "@/components/ui/Modal";
+import { LoginModal } from "@/components/auth/LoginModal";
 import CheckoutSidepanel from "@/components/ui/CheckoutSidepanel";
 
 interface PageProps {
@@ -118,8 +120,38 @@ export default function ProfessionalProfile({ params }: PageProps) {
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [isCheckoutPanelOpen, setIsCheckoutPanelOpen] = useState(false);
   const [isActiveOrderModalOpen, setIsActiveOrderModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [pendingCustomModal, setPendingCustomModal] = useState(false);
 
   const orders = useSelector((state: RootState) => state.orders?.orders || []);
+  const auth = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    if (auth.isAuthenticated && pendingCustomModal) {
+      if (auth.user?.role === "creator") {
+        toast.error("You are not authorized for this feature. This is only for customers or clients.");
+        dispatch(logout());
+      } else {
+        setIsCustomModalOpen(true);
+      }
+      setPendingCustomModal(false);
+      setIsLoginModalOpen(false);
+    }
+  }, [auth.isAuthenticated, auth.user, pendingCustomModal, dispatch]);
+
+  const handleCustomRequest = () => {
+    if (auth.isAuthenticated) {
+      if (auth.user?.role === "creator") {
+        toast.error("You are not authorized for this feature. This is only for customers or clients.");
+      } else {
+        setIsCustomModalOpen(true);
+      }
+    } else {
+      setPendingCustomModal(true);
+      setIsLoginModalOpen(true);
+    }
+  };
 
   // Calendar dates mock
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -130,7 +162,11 @@ export default function ProfessionalProfile({ params }: PageProps) {
     defaultValues: {
       eventType: "",
       eventDate: "",
-      eventLocation: "",
+      eventTime: "",
+      eventAddress: "",
+      streetAddress: "",
+      locality: "",
+      pincode: "",
       guestsCount: "",
       budgetRange: "",
       notes: "",
@@ -138,7 +174,8 @@ export default function ProfessionalProfile({ params }: PageProps) {
       needAlbum: "",
       needDrone: "",
       venueType: "",
-      cinematicFilm: "",
+      otherRequirements: "",
+      reelDuration: "",
       reelsCount: "",
       musicGenre: "",
       setupType: "",
@@ -270,7 +307,7 @@ export default function ProfessionalProfile({ params }: PageProps) {
               wishlisted={wishlisted}
               onWishlist={handleWishlist}
               onShare={handleShare}
-              onCustomRequest={() => setIsCustomModalOpen(true)}
+              onCustomRequest={handleCustomRequest}
             />
 
             <PortfolioSection
@@ -340,10 +377,11 @@ export default function ProfessionalProfile({ params }: PageProps) {
           {/* Desktop Sticky Sidebar Panel */}
           <div className="hidden lg:block lg:col-span-4 sticky top-24">
             <StickyBookingPanel
+              professional={professional}
               selectedPackage={selectedPackage}
               getPackagePrice={getPackagePrice}
               onBookClick={handleBookClick}
-              onCustomRequest={() => setIsCustomModalOpen(true)}
+              onCustomRequest={handleCustomRequest}
             />
           </div>
 
@@ -366,7 +404,7 @@ export default function ProfessionalProfile({ params }: PageProps) {
             Checkout
           </Button>
           <Button
-            onClick={() => setIsCustomModalOpen(true)}
+            onClick={handleCustomRequest}
             variant="outline"
             className="border-border text-foreground hover:bg-muted text-[10px] font-bold py-2 px-3 h-9 rounded-lg cursor-pointer"
           >
@@ -410,6 +448,14 @@ export default function ProfessionalProfile({ params }: PageProps) {
           </div>
         </div>
       </Modal>
+
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => {
+          setIsLoginModalOpen(false);
+          setPendingCustomModal(false);
+        }} 
+      />
     </div>
   );
 }
