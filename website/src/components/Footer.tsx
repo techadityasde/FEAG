@@ -53,6 +53,14 @@ export default function Footer() {
                 Terms &amp; Conditions
               </Link>
             </li>
+            <li>
+              <Link
+                href="/cancellation-and-refund-policy"
+                className="hover:text-foreground transition-colors"
+              >
+                Cancellation &amp; Refund Policy
+              </Link>
+            </li>
           </ul>
         </div>
 
