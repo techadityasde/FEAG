@@ -28,6 +28,7 @@ export default function CategoryCard({
     hourlyPricing,
     isVerified,
     category,
+    fullName
   } = professional;
 
   return (
@@ -70,7 +71,7 @@ export default function CategoryCard({
           <div className="flex justify-between items-center gap-2 mb-1">
             <div className="flex items-center gap-1.5 min-w-0">
               <h3 className="font-extrabold text-foreground text-base sm:text-lg tracking-tight truncate">
-                {username}
+                {fullName}
               </h3>
               {isVerified && (
                 <BadgeCheck
@@ -85,9 +86,16 @@ export default function CategoryCard({
           </div>
 
           {/* Location row */}
-          <div className="flex items-center gap-1 text-muted-foreground text-xs mb-1">
-            <MapPin className="size-3.5 text-primary shrink-0" />
-            <span>{location}</span>
+          <div className="flex items-center justify-between text-muted-foreground text-xs mb-1">
+            <div className="flex items-center gap-1 flex-1 min-w-0 pr-2">
+              <MapPin className="size-3.5 text-primary shrink-0" />
+              <span className="truncate" title={location}>{location}</span>
+            </div>
+            {professional.distance !== undefined && (
+              <span className="text-[10px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded-full shrink-0">
+                {professional.distance.toFixed(1)} Km away
+              </span>
+            )}
           </div>
 
           {/* Short description */}

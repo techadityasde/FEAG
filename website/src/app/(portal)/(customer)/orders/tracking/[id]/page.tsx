@@ -97,8 +97,16 @@ const OrderTrackingContent = ({ id }: { id: string }) => {
             </div>
             <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              {new Date(order.date).toLocaleDateString()}
+              {order.bookingDate 
+                ? new Date(order.bookingDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+                : new Date(order.date).toLocaleDateString()}
             </div>
+            {order.bookingSlot && (
+              <div className="flex items-center gap-1.5 text-sm font-medium text-foreground mt-0.5">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                {order.bookingSlot}
+              </div>
+            )}
           </div>
           
           <div className="space-y-1.5 md:text-right">

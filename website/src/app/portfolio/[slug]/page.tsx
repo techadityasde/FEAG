@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import { logout } from "@/lib/store/authSlice";
+import { setBookingDate, setBookingSlot } from "@/lib/store/bookingSlice";
+import { toggleWishlist } from "@/lib/store/wishlistSlice";
 import { AlertTriangle } from "lucide-react";
 
 import { professionals } from "@/lib/data/professionals";
@@ -30,13 +32,14 @@ import LightboxModal from "../components/LightboxModal";
 import { Modal } from "@/components/ui/Modal";
 import { LoginModal } from "@/components/auth/LoginModal";
 import CheckoutSidepanel from "@/components/ui/CheckoutSidepanel";
+import { calculateFSPACustomPrice } from "@/lib/fspa";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
 // Mock portfolio media items based on category
-const mockPortfolioMedia: Record<"photographer" | "videographer" | "singer", PortfolioItem[]> = {
+const mockPortfolioMedia: Record<string, PortfolioItem[]> = {
   photographer: [
     { id: "m1", type: "image", url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80", title: "Elegant Wedding Vows" },
     { id: "m2", type: "image", url: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&auto=format&fit=crop&q=80", title: "Candid Couple Dance" },
@@ -64,7 +67,7 @@ const mockPortfolioMedia: Record<"photographer" | "videographer" | "singer", Por
 };
 
 // Mock professional details
-const mockHighlights = {
+const mockHighlights: Record<string, { key: string, value: string }[]> = {
   photographer: [
     { key: "Camera Gear", value: "Sony A7R V & Canon EOS R5" },
     { key: "Drone Coverage", value: "DJI Mavic 3 Pro (4K)" },
@@ -103,7 +106,8 @@ const mockReviews = [
 
 export default function ProfessionalProfile({ params }: PageProps) {
   const slug = use(params).slug;
-
+  const bookings = useSelector((state: RootState) => state.booking);
+  console.log("bookings", bookings)
   // Decode username and lookup professional
   const decodedSlug = decodeURIComponent(slug);
   const professional = professionals.find(
@@ -111,8 +115,7 @@ export default function ProfessionalProfile({ params }: PageProps) {
   );
 
   const [activeTab, setActiveTab] = useState<"all" | "images" | "videos" | "audio">("all");
-  const [selectedPackage, setSelectedPackage] = useState<"basic" | "professional" | "premium">("basic");
-  const [wishlisted, setWishlisted] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<"basic" | "professional" | "premium" | "custom" | null>(null);
 
   // Lightbox State
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -125,7 +128,25 @@ export default function ProfessionalProfile({ params }: PageProps) {
 
   const orders = useSelector((state: RootState) => state.orders?.orders || []);
   const auth = useSelector((state: RootState) => state.auth);
+  const booking = useSelector((state: RootState) => state.booking);
+  const event = useSelector((state: RootState) => state.event);
+  const locationState = useSelector((state: RootState) => state.location);
+  const wishlist = useSelector((state: RootState) => state.wishlist?.items || []);
+  const packageState = useSelector((state: RootState) => state.package);
   const dispatch = useDispatch();
+
+  const isWishlisted = professional ? wishlist.some(item => item.id === professional.id) : false;
+
+  const handleWishlistToggle = () => {
+    if (!professional) return;
+
+    dispatch(toggleWishlist(professional));
+    if (isWishlisted) {
+      toast.success("Removed from wishlist");
+    } else {
+      toast.success("Added to wishlist");
+    }
+  };
 
   React.useEffect(() => {
     if (auth.isAuthenticated && pendingCustomModal) {
@@ -139,6 +160,14 @@ export default function ProfessionalProfile({ params }: PageProps) {
       setIsLoginModalOpen(false);
     }
   }, [auth.isAuthenticated, auth.user, pendingCustomModal, dispatch]);
+
+  React.useEffect(() => {
+    if (booking.isCustomSlot && booking.customStartTime && booking.customEndTime) {
+      setSelectedPackage("custom");
+    } else if (selectedPackage === "custom") {
+      setSelectedPackage(null);
+    }
+  }, [booking.isCustomSlot, booking.customStartTime, booking.customEndTime]);
 
   const handleCustomRequest = () => {
     if (auth.isAuthenticated) {
@@ -154,7 +183,8 @@ export default function ProfessionalProfile({ params }: PageProps) {
   };
 
   // Calendar dates mock
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const selectedDate = booking?.selectedDate || null;
+  const selectedSlot = booking?.selectedSlot || null;
   const bookedDates = ["2026-06-28", "2026-07-02", "2026-07-05", "2026-07-12"];
   const limitedDates = ["2026-06-29", "2026-07-08", "2026-07-15"];
 
@@ -222,10 +252,33 @@ export default function ProfessionalProfile({ params }: PageProps) {
     .filter((p) => p.category === category && p.id !== professional.id)
     .slice(0, 3);
 
-  const getPackagePrice = (pkg: "basic" | "professional" | "premium") => {
+  const parseTime = (timeStr: string) => {
+    if (!timeStr) return 0;
+    const [time, period] = timeStr.split(" ");
+    let [hours, minutes] = time.split(":").map(Number);
+    if (period.toUpperCase() === "PM" && hours !== 12) hours += 12;
+    if (period.toUpperCase() === "AM" && hours === 12) hours = 0;
+    return hours + minutes / 60;
+  };
+
+  const calculateCustomHours = (start?: string | null, end?: string | null) => {
+    if (!start || !end) return 0;
+    const startTime = parseTime(start);
+    let endTime = parseTime(end);
+    if (endTime < startTime) endTime += 24;
+    return endTime - startTime;
+  };
+
+  const getPackagePrice = (pkg: "basic" | "professional" | "premium" | "custom" | null) => {
+    if (!pkg) return 0;
     if (pkg === "basic") return hourlyPricing.oneHourPrice;
     if (pkg === "professional") return hourlyPricing.twoHourPrice;
-    return hourlyPricing.threeHourPrice;
+    if (pkg === "premium") return hourlyPricing.threeHourPrice;
+    if (pkg === "custom") {
+      const hours = calculateCustomHours(booking.customStartTime, booking.customEndTime);
+      return calculateFSPACustomPrice(hourlyPricing, hours).totalPrice;
+    }
+    return 0;
   };
 
   const handleShare = () => {
@@ -234,10 +287,30 @@ export default function ProfessionalProfile({ params }: PageProps) {
   };
 
   const handleBookClick = () => {
+    if (!selectedPackage) {
+      toast.error("Please select a package before proceeding to payment.");
+      return;
+    }
+
+    if (!booking.selectedDate || !booking.selectedSlot) {
+      toast.error("Please select the date and time before proceeding to checkout.");
+      return;
+    }
+    
+    if (!locationState.address) {
+      toast.error("Please select address before proceeding to checkout.");
+      return;
+    }
+
+    if (!event.eventFunction) {
+      toast.error("Please select an event before proceeding to checkout.");
+      return;
+    }
+
     const hasActiveOrder = orders.some(
-      (order) => 
-        order.professionalName.toLowerCase() === professional.username.toLowerCase() && 
-        order.selectedPackage === selectedPackage && 
+      (order: any) =>
+        order.professionalName.toLowerCase() === professional.username.toLowerCase() &&
+        order.selectedPackage === selectedPackage &&
         order.status === "active"
     );
 
@@ -249,19 +322,22 @@ export default function ProfessionalProfile({ params }: PageProps) {
     setIsCheckoutPanelOpen(true);
   };
 
-  const handleWishlist = () => {
-    setWishlisted(!wishlisted);
-    toast.success(wishlisted ? "Removed from wishlist" : "Saved to wishlist!");
-  };
+
 
   const onSubmitBooking = () => {
     toast.success(`Booking request sent successfully to ${username}!`);
   };
 
   const selectCalendarDate = (dateStr: string) => {
-    setSelectedDate(dateStr);
+    dispatch(setBookingDate(dateStr));
     setValue("eventDate", dateStr);
     toast.success(`Selected Date: ${dateStr}`);
+  };
+
+  const selectCalendarSlot = (slot: string) => {
+    dispatch(setBookingSlot(slot));
+    setValue("eventTime", slot);
+    toast.success(`Selected Time: ${slot}`);
   };
 
   // Lightbox navigation helpers
@@ -304,12 +380,26 @@ export default function ProfessionalProfile({ params }: PageProps) {
           <div className="lg:col-span-8 space-y-8">
             <HeroSection
               professional={professional}
-              wishlisted={wishlisted}
-              onWishlist={handleWishlist}
+              wishlisted={isWishlisted}
+              onWishlist={handleWishlistToggle}
               onShare={handleShare}
               onCustomRequest={handleCustomRequest}
             />
-
+            <CalendarSection
+              selectedDate={selectedDate}
+              onSelectDate={selectCalendarDate}
+              bookedDates={bookedDates}
+              limitedDates={limitedDates}
+              availableDates={professional.availableDates || []}
+              selectedSlot={selectedSlot}
+              onSelectSlot={selectCalendarSlot}
+            />
+            <PackagesSection
+              hourlyPricing={hourlyPricing}
+              selectedPackage={selectedPackage}
+              setSelectedPackage={setSelectedPackage}
+              booking={booking}
+            />
             <PortfolioSection
               category={category}
               filteredMedia={filteredMedia}
@@ -329,21 +419,10 @@ export default function ProfessionalProfile({ params }: PageProps) {
               highlights={highlights}
             /> */}
 
-            <PackagesSection
-              hourlyPricing={hourlyPricing}
-              selectedPackage={selectedPackage}
-              setSelectedPackage={setSelectedPackage}
-            />
 
-            {/* <CalendarSection
-              selectedDate={selectedDate}
-              onSelectDate={selectCalendarDate}
-              bookedDates={bookedDates}
-              limitedDates={limitedDates}
-            /> */}
 
-            <Modal 
-              isOpen={isCustomModalOpen} 
+            <Modal
+              isOpen={isCustomModalOpen}
               onClose={() => setIsCustomModalOpen(false)}
               maxWidth="max-w-2xl"
             >
@@ -391,9 +470,43 @@ export default function ProfessionalProfile({ params }: PageProps) {
 
       {/* MOBILE STICKY BOTTOM BAR PANEL */}
       <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/80 bg-white/95 backdrop-blur-md px-4 py-3 shadow-lg lg:hidden flex items-center justify-between gap-4 select-none">
-        <div className="flex flex-col">
-          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide">Starting from</span>
-          <span className="text-lg font-black text-foreground">₹{getPackagePrice(selectedPackage)}</span>
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-end gap-1.5">
+            <span className="text-lg font-black text-foreground leading-none">₹{getPackagePrice(selectedPackage)}</span>
+            {selectedPackage && getPackagePrice(selectedPackage) > 0 && (
+              <span className="text-xs font-semibold text-muted-foreground line-through leading-none mb-0.5">
+                ₹{Math.round(getPackagePrice(selectedPackage) * 1.2)}
+              </span>
+            )}
+            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide leading-relaxed mb-0.5">
+              {selectedPackage}
+            </span>
+          </div>
+
+          {booking?.selectedDate ? (
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold">
+              <span className="text-muted-foreground">
+                {new Date(booking.selectedDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              </span>
+              {booking?.isCustomSlot && booking.customStartTime && booking.customEndTime ? (
+                <>
+                  <span className="text-muted-foreground/40">•</span>
+                  <span className="text-emerald-600 font-extrabold truncate max-w-[130px]">
+                    {booking.customStartTime}-{booking.customEndTime}
+                  </span>
+                </>
+              ) : booking?.selectedSlot ? (
+                <>
+                  <span className="text-muted-foreground/40">•</span>
+                  <span className="text-primary font-bold truncate max-w-[130px]">
+                    {booking.selectedSlot}
+                  </span>
+                </>
+              ) : null}
+            </div>
+          ) : (
+            <span className="text-[10px] font-medium text-muted-foreground">Select a date</span>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -403,13 +516,13 @@ export default function ProfessionalProfile({ params }: PageProps) {
           >
             Checkout
           </Button>
-          <Button
+          {/* <Button
             onClick={handleCustomRequest}
             variant="outline"
             className="border-border text-foreground hover:bg-muted text-[10px] font-bold py-2 px-3 h-9 rounded-lg cursor-pointer"
           >
             Custom
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -436,7 +549,7 @@ export default function ProfessionalProfile({ params }: PageProps) {
       <Modal isOpen={isActiveOrderModalOpen} onClose={() => setIsActiveOrderModalOpen(false)} maxWidth="max-w-sm">
         <div className="p-6 text-center space-y-4">
           <div className="h-12 w-12 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
-             <AlertTriangle className="h-6 w-6" />
+            <AlertTriangle className="h-6 w-6" />
           </div>
           <h3 className="text-lg font-bold text-foreground">Active Order Exists</h3>
           <p className="text-sm text-muted-foreground">You already have an active order for this professional's {selectedPackage} package. Please complete it first before making another booking.</p>
@@ -449,12 +562,12 @@ export default function ProfessionalProfile({ params }: PageProps) {
         </div>
       </Modal>
 
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
+      <LoginModal
+        isOpen={isLoginModalOpen}
         onClose={() => {
           setIsLoginModalOpen(false);
           setPendingCustomModal(false);
-        }} 
+        }}
       />
     </div>
   );

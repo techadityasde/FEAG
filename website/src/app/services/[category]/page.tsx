@@ -12,6 +12,8 @@ import CategoryFilterBar, { FilterState } from "@/components/pages/CategoryFilte
 import CategoryCard from "@/components/pages/CategoryCard";
 import ServicesSkeleton from "@/components/skeleton/ServicesSkeleton";
 import EmptyState from "@/components/pages/EmptyState";
+import SearchFormPlan from "@/components/pages/SearchFormPlan";
+import { useFilteredProfessionals } from "@/hooks/useFilteredProfessionals";
 
 interface PageProps {
   params: Promise<{ category: string }>;
@@ -25,7 +27,7 @@ export default function CategoryPage({ params }: PageProps) {
   const { category } = use(params);
 
   // Validate category slug
-  const validCategories = ["photographer", "videographer", "singer"];
+  const validCategories = ["photographer", "videographer", "singer", "Cinematic"];
   const isCategoryValid = validCategories.includes(category);
 
   // States
@@ -87,8 +89,8 @@ export default function CategoryPage({ params }: PageProps) {
     );
   }
 
-  // Get unique locations in this category for the dropdown options
-  const categoryProfessionals = professionals.filter((p) => p.category === category);
+  // Get dynamically filtered professionals including distance calculations
+  const categoryProfessionals = useFilteredProfessionals({ categoryOverride: category });
   const locations = Array.from(
     new Set(categoryProfessionals.map((p) => p.location))
   ).sort();
@@ -227,51 +229,14 @@ export default function CategoryPage({ params }: PageProps) {
 
   return (
     <div className="flex-1 w-full bg-background min-h-screen pb-16">
-      {/* Section 1: Page Header / Hero Banner */}
-      <section
-        style={details.bgStyle}
-        className="w-full text-white py-6 sm:py-3 relative overflow-hidden border-b border-border/20 shadow-md"
-      >
-        <div className="max-w-[1400px] mx-auto px-3 min-[360px]:px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex-1 pr-16 md:pr-0">
-            <span className="text-[10px] sm:text-xs font-bold tracking-[0.25em] text-primary uppercase mb-1">
-              Category
-            </span>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight mb-2 text-white">
-              {details.title}
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed font-medium">
-              {details.description}
-            </p>
-          </div>
-
-          {/* Right Column: Back Button & Stats Box */}
-          <div className="flex flex-col items-end md:justify-between md:self-stretch gap-3 shrink-0 self-start md:self-auto">
-            {/* Back Button - Top Right Corner on mobile, aligned top-right on desktop */}
-            <Link
-              href="/#services"
-              className="absolute top-0 right-3 min-[360px]:right-4 sm:right-6 lg:right-8 md:relative md:top-auto md:right-auto text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/10 hover:border-white/20 rounded-lg px-2.5 py-1 text-[12px] font-semibold flex items-center gap-1.5 backdrop-blur-md transition-all active:scale-95 duration-200 cursor-pointer shadow-sm md:self-end"
-            >
-              <ArrowLeft className="size-3.5" />
-              <span>Back</span>
-            </Link>
-
-            {/* Total Professionals Count Display Box - Aligned Right on Desktop */}
-            <div className="inline-flex flex-col border border-white/10 bg-white/5 rounded-lg py-2 px-3 backdrop-blur-md shrink-0">
-              <span className="text-base sm:text-lg font-black tracking-tight text-white leading-none">
-                {isLoading ? "-" : totalCount === 0 ? "0" : details.mockTotalCount}
-              </span>
-              <span className="text-[9px] font-bold tracking-[0.1em] text-primary/80 uppercase mt-1">
-                Available {details.label}s
-              </span>
-            </div>
-          </div>
-        </div>
+      {/* Section 1: Search Form replacing Hero Banner */}
+      <section className="w-full max-w-[1400px] mx-auto px-3 min-[360px]:px-4 sm:px-6 lg:px-8 mt-6 mb-4">
+        <SearchFormPlan activeTab={category} />
       </section>
 
       {/* Main Content Area */}
       <div className="w-full max-w-[1400px] mx-auto px-3 min-[360px]:px-4 sm:px-6 lg:px-8 mt-8 flex flex-col md:flex-row gap-8">
-        
+
         {/* Left Sidebar Filters (Responsive) */}
         <aside className="w-full md:w-64 lg:w-72 shrink-0 md:sticky md:top-24 self-start z-10">
           <CategoryFilterBar

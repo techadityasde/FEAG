@@ -4,7 +4,7 @@ interface CategoryPricingProps {
   oneHourPrice: number;
   twoHourPrice: number;
   threeHourPrice: number;
-  category: "photographer" | "videographer" | "singer";
+  category: "photographer" | "videographer" | "singer" | "Cinematic";
 }
 
 export default function CategoryPricing({

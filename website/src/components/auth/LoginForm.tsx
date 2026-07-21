@@ -6,9 +6,20 @@ import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import Turnstile from "react-turnstile";
 import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import { login } from "@/lib/store/authSlice";
-import { RootState } from "@/lib/store/store";
+import { auth } from "@/lib/firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
+import { professionals } from "@/lib/data/professionals";
+import { customers } from "@/lib/data/customers";
+
+declare global {
+  interface Window {
+    recaptchaVerifier: any;
+    grecaptcha: any;
+  }
+}
 
 import { Button } from "@/components/ui/button";
 import LoginSkeleton from "@/components/skeleton/LoginSkeleton";
@@ -24,14 +35,40 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProps) {
+  const router = useRouter();
   const dispatch = useDispatch();
-  const onboardingData = useSelector((state: RootState) => state.onboarding);
   const [pageLoading, setPageLoading] = useState(true);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [isVerifyingTurnstile, setIsVerifyingTurnstile] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !pageLoading) {
+      // Clean up any existing verifier from a previous mount (React Strict Mode fix)
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) { }
+        window.recaptchaVerifier = null;
+      }
+
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+      });
+    }
+
+    return () => {
+      if (typeof window !== "undefined" && window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) { }
+        window.recaptchaVerifier = null;
+      }
+    };
+  }, [pageLoading]);
 
   const {
     control,
@@ -62,7 +99,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const googleLogin = urlParams.get("google_login");
-    
+
     if (googleLogin) {
       // Clear query params from browser URL history immediately
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -71,17 +108,30 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
         const email = urlParams.get("email") || "";
 
         // Verify Google email against registration records
-        const registeredEmail = onboardingData.email || "";
-        const userData = { ...onboardingData };
+        const matchedProfessional = professionals.find(p => p.email === email);
+        const matchedCustomer = customers.find(c => c.email === email);
+        const matchedUser = matchedProfessional || matchedCustomer;
 
-        if (!registeredEmail || registeredEmail !== email) {
+        if (!matchedUser) {
           toast.error("This Google account is not registered. Please sign up first.");
         } else {
-          dispatch(login(userData));
+          const userData = {
+            mobile: matchedUser.mobile,
+            email: matchedUser.email,
+            name: (matchedUser as any).username || (matchedUser as any).name,
+            role: matchedUser.role,
+            category: (matchedUser as any).category || "",
+            location: matchedUser.location,
+            profileImage: matchedUser.profileImage
+          };
+          dispatch(login(userData as any));
           toast.success("Successfully authenticated with Google!");
           setTimeout(() => {
             if (onSuccess) onSuccess();
-            else window.location.href = "/";
+            else {
+              if (matchedUser.role === 'creator') router.push("/creator/dashboard");
+              else router.push("/my-account");
+            }
           }, 800);
         }
       } else if (googleLogin === "error") {
@@ -89,7 +139,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
         toast.error("Google authentication failed: " + msg);
       }
     }
-  }, [dispatch, onboardingData, onSuccess]);
+  }, [dispatch, onSuccess, router]);
 
   const handleSendOtp = async () => {
     const isValidPhone = await trigger("mobile");
@@ -99,9 +149,11 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
     }
 
     // Check if the mobile number is registered
-    const registeredMobile = onboardingData.mobile || "";
+    const matchedProfessional = professionals.find(p => p.mobile === watchedMobile);
+    const matchedCustomer = customers.find(c => c.mobile === watchedMobile);
+    const matchedUser = matchedProfessional || matchedCustomer;
 
-    if (watchedMobile !== registeredMobile) {
+    if (!matchedUser) {
       toast.error("This mobile number is not registered. Please join us first.");
       setError("mobile", {
         type: "manual",
@@ -124,21 +176,32 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
       });
       const data = await res.json();
 
-      if (data.success) {
-        setOtpSent(true);
-        toast.success("Security verified! OTP sent to +91 " + watchedMobile);
-      } else {
+      if (!data.success) {
         toast.error("Turnstile failed: " + (data.error || "Verification issue"));
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-          setOtpSent(true);
-          toast.success("[DEV FALLBACK] OTP simulated!");
+        if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+          setIsVerifyingTurnstile(false);
+          return;
         }
       }
-    } catch (e) {
-      toast.error("Verification endpoint error");
-      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        setOtpSent(true);
-        toast.success("[DEV FALLBACK] OTP simulated!");
+
+      const appVerifier = window.recaptchaVerifier;
+      const phoneNumber = `+91${watchedMobile}`;
+
+      const confirmation = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+      setConfirmationResult(confirmation);
+
+      setOtpSent(true);
+      toast.success(`OTP sent successfully to ${phoneNumber}`);
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Failed to send OTP. Please try again.");
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.render().then((widgetId: any) => {
+          // Try to reset the widget if it exists globally
+          if (window.grecaptcha) {
+            window.grecaptcha.reset(widgetId);
+          }
+        }).catch(() => { });
       }
     } finally {
       setIsVerifyingTurnstile(false);
@@ -152,34 +215,60 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
     }
 
     setIsVerifyingOtp(true);
-    setTimeout(() => {
-      setIsVerifyingOtp(false);
+    try {
+      if (confirmationResult) {
+        await confirmationResult.confirm(watchedOtp);
 
-      // Re-verify registration data
-      const registeredMobile = onboardingData.mobile || "";
-      const userData = { ...onboardingData };
+        // Re-verify registration data
+        const matchedProfessional = professionals.find(p => p.mobile === watchedMobile);
+        const matchedCustomer = customers.find(c => c.mobile === watchedMobile);
+        const matchedUser = matchedProfessional || matchedCustomer;
 
-      if (watchedMobile !== registeredMobile) {
-        toast.error("This mobile number is not registered. Please sign up first.");
-        setError("mobile", {
-          type: "manual",
-          message: "Mobile number is not registered",
-        });
-        return;
-      }
+        if (!matchedUser) {
+          toast.error("This mobile number is not registered. Please sign up first.");
+          setError("mobile", {
+            type: "manual",
+            message: "Mobile number is not registered",
+          });
+          return;
+        }
 
-      if (watchedOtp === "123456") {
-        dispatch(login(userData));
+        const userData = {
+          mobile: matchedUser.mobile,
+          email: matchedUser.email,
+          name: (matchedUser as any).username || (matchedUser as any).name,
+          role: matchedUser.role,
+          category: (matchedUser as any).category || "",
+          location: matchedUser.location,
+          profileImage: matchedUser.profileImage,
+          isProfileDone: (matchedUser as any).isProfileDone,
+          isVerified: (matchedUser as any).isVerified,
+          fullName: (matchedUser as any).fullName || "",
+          username: (matchedUser as any).username || "",
+          gender: (matchedUser as any).gender || "",
+          experience: (matchedUser as any).experience || "",
+          description: (matchedUser as any).description || "",
+        };
+
+        dispatch(login(userData as any));
         toast.success("Welcome back to FEAG!");
         setTimeout(() => {
           if (onSuccess) onSuccess();
-          else window.location.href = "/";
+          else {
+            if (matchedUser.role === 'creator') router.push("/creator/profile");
+            else router.push("/my-account");
+          }
         }, 800);
       } else {
-        setError("otp", { type: "manual", message: "Invalid OTP code. Enter 123456 for testing." });
-        toast.error("Incorrect verification code");
+        toast.error("Verification session expired. Please request OTP again.");
       }
-    }, 1000);
+    } catch (err: any) {
+      console.error(err);
+      setError("otp", { type: "manual", message: "Invalid OTP code." });
+      toast.error("Incorrect verification code");
+    } finally {
+      setIsVerifyingOtp(false);
+    }
   };
 
   const handleGoogleSignIn = () => {
@@ -196,7 +285,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
       </div>
     );
   }
-
+  console.log(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)
   return (
     <div className="flex flex-col gap-5 w-full">
       {showTitle && (
@@ -284,7 +373,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
               <label htmlFor="otp" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
                 Verification OTP
               </label>
-              <span className="text-[10px] text-muted-foreground">Test OTP: <strong className="text-primary font-bold">123456</strong></span>
+              <span className="text-[10px] text-muted-foreground">Sent to <strong className="text-primary font-bold">+91 {watchedMobile}</strong></span>
             </div>
             <Controller
               name="otp"
@@ -395,6 +484,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
           </Link>
         </p>
       </div>
+      <div id="recaptcha-container"></div>
     </div>
   );
 }

@@ -12,7 +12,12 @@ export interface Order {
   selectedPackage: string;
   amount: number;
   date: string;
+  bookingDate?: string;
+  bookingSlot?: string;
   status: "active" | "completed" | "cancelled";
+  cancelReason?: string;
+  cancelTime?: string;
+  cancelCharge?: number;
 }
 
 interface OrderState {
@@ -36,12 +41,21 @@ const orderSlice = createSlice({
         order.status = action.payload.status;
       }
     },
+    cancelOrder: (state, action: PayloadAction<{ orderId: string, cancelReason: string, cancelTime: string, cancelCharge: number }>) => {
+      const order = state.orders.find(o => o.orderId === action.payload.orderId);
+      if (order) {
+        order.status = "cancelled";
+        order.cancelReason = action.payload.cancelReason;
+        order.cancelTime = action.payload.cancelTime;
+        order.cancelCharge = action.payload.cancelCharge;
+      }
+    },
     clearOrders: (state) => {
       state.orders = [];
     }
   },
 });
 
-export const { addOrder, updateOrderStatus, clearOrders } = orderSlice.actions;
+export const { addOrder, updateOrderStatus, cancelOrder, clearOrders } = orderSlice.actions;
 
 export default orderSlice.reducer;

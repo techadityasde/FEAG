@@ -8,6 +8,15 @@ export interface User {
   category?: string;
   pincode?: string;
   location?: string;
+  landmark?: string;
+  profileImage?: string;
+  isProfileDone?: boolean;
+  isVerified?: boolean;
+  fullName?: string;
+  username?: string;
+  gender?: string;
+  experience?: string;
+  description?: string;
 }
 
 export interface AuthState {
@@ -32,8 +41,29 @@ export const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
     },
+    updateProfileImage: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        state.user.profileImage = action.payload;
+      }
+    },
+    updateLocation: (state, action: PayloadAction<{ location: string; pincode: string }>) => {
+      if (state.user) {
+        state.user.location = action.payload.location;
+        state.user.pincode = action.payload.pincode;
+      }
+    },
+    updateMobile: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        state.user.mobile = action.payload;
+      }
+    },
+    markProfileDone: (state) => {
+      if (state.user) {
+        state.user.isProfileDone = true;
+      }
+    },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, updateProfileImage, updateLocation, updateMobile, markProfileDone } = authSlice.actions;
 export default authSlice.reducer;

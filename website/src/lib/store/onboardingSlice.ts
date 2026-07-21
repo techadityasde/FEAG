@@ -9,7 +9,9 @@ export interface OnboardingState extends FormValues {
 const initialState: OnboardingState = {
   mobile: "",
   otp: "",
-  name: "",
+  firstName: "",
+  lastName: "",
+  gender: "",
   email: "",
   role: "",
   category: "",

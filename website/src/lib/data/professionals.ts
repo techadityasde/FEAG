@@ -1,3 +1,16 @@
+export interface TimeSlot {
+  id: string;
+  startTime: string;
+  endTime: string;
+  isBooked: boolean;
+}
+
+export interface AvailableDate {
+  date: string;
+  isSlotBooked: boolean;
+  slots: TimeSlot[]; // inside AvailableDate
+}
+
 export interface HourlyPricing {
   oneHourPrice: number;
   twoHourPrice: number;
@@ -5,7 +18,11 @@ export interface HourlyPricing {
 }
 
 export interface Professional {
+  role: 'creator';
+  mobile: string;
+  email: string;
   id: string;
+  fullName: string;
   username: string;
   profileImage: string;
   location: string; // E.g., "Mumbai, MH", "New Delhi, DL", "Bangalore, KA"
@@ -17,16 +34,30 @@ export interface Professional {
   hourlyPricing: HourlyPricing;
   isVerified: boolean;
   availability: 'Anytime' | 'Weekdays' | 'Weekends';
-  category: 'photographer' | 'videographer' | 'singer';
+  category: 'photographer' | 'videographer' | 'singer' | 'Cinematic';
+  feature: 'photo' | 'video' | 'photo+video' | 'singer';
+  availableDates?: AvailableDate[];
   lat?: number;
   lng?: number;
+  distance?: number; // Calculated dynamically from useFilteredProfessionals
+  isSaved: boolean;
+  isProfileDone: boolean;
+  gender?: "male" | "female" | "other";
+  orders?: any[];
+  wallet?: any[];
 }
 
 export const professionals: Professional[] = [
   // PHOTOGRAPHERS
   {
     id: "p1",
-    username: "Arjun Singh",
+    fullName: "Arjun Singh",
+    username: "arjun_singh708",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9823288167",
+    email: "arjun.singh@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/32.jpg",
     location: "Mumbai, MH",
     lat: 19.0737,
@@ -41,13 +72,104 @@ export const professionals: Professional[] = [
       twoHourPrice: 2800,
       threeHourPrice: 4000
     },
-    isVerified: true,
+    isVerified: false,
     availability: "Anytime",
-    category: "photographer"
+    category: "Cinematic",
+    isSaved: false,
+    feature: "photo+video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "p2",
-    username: "Elena Rossi",
+    fullName: "Elena Rossi",
+    username: "elena_rossi656",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9843656487",
+    email: "elena.rossi@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
     location: "New Delhi, DL",
     lat: 28.6213,
@@ -62,13 +184,104 @@ export const professionals: Professional[] = [
       twoHourPrice: 2200,
       threeHourPrice: 3200
     },
-    isVerified: true,
+    isVerified: false,
     availability: "Weekends",
-    category: "photographer"
+    category: "Cinematic",
+    isSaved: false,
+    feature: "photo+video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "p3",
-    username: "Marcus Chen",
+    fullName: "Marcus Chen",
+    username: "marcus_chen487",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9862530225",
+    email: "marcus.chen@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/46.jpg",
     location: "Bangalore, KA",
     lat: 12.9605,
@@ -83,13 +296,104 @@ export const professionals: Professional[] = [
       twoHourPrice: 4500,
       threeHourPrice: 6000
     },
-    isVerified: true,
+    isVerified: false,
     availability: "Weekdays",
-    category: "photographer"
+    category: "photographer",
+    isSaved: false,
+    feature: "photo",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "p4",
-    username: "Priya Sharma",
+    fullName: "Priya Sharma",
+    username: "priya_sharma924",
+    gender: "female",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9889687036",
+    email: "priya.sharma@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/65.jpg",
     location: "Mumbai, MH",
     lat: 19.0395,
@@ -106,11 +410,102 @@ export const professionals: Professional[] = [
     },
     isVerified: false,
     availability: "Weekends",
-    category: "photographer"
+    category: "photographer",
+    isSaved: false,
+    feature: "photo",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "p5",
-    username: "David K.",
+    fullName: "David K.",
+    username: "david_k_422",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9822488100",
+    email: "david.k.@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/22.jpg",
     location: "Kolkata, WB",
     lat: 22.5688,
@@ -127,13 +522,104 @@ export const professionals: Professional[] = [
     },
     isVerified: false,
     availability: "Anytime",
-    category: "photographer"
+    category: "photographer",
+    isSaved: false,
+    feature: "photo",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
 
   // VIDEOGRAPHERS
   {
     id: "v1",
-    username: "Kabir Mehta",
+    fullName: "Kabir Mehta",
+    username: "kabir_mehta606",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9892592008",
+    email: "kabir.mehta@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/11.jpg",
     location: "Mumbai, MH",
     lat: 19.0362,
@@ -148,13 +634,104 @@ export const professionals: Professional[] = [
       twoHourPrice: 5500,
       threeHourPrice: 8000
     },
-    isVerified: true,
+    isVerified: false,
     availability: "Anytime",
-    category: "videographer"
+    category: "Cinematic",
+    isSaved: false,
+    feature: "photo+video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "v2",
-    username: "Sophia Lin",
+    fullName: "Sophia Lin",
+    username: "sophia_lin440",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9810443656",
+    email: "sophia.lin@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/24.jpg",
     location: "Bangalore, KA",
     lat: 12.9698,
@@ -169,13 +746,104 @@ export const professionals: Professional[] = [
       twoHourPrice: 3800,
       threeHourPrice: 5000
     },
-    isVerified: true,
+    isVerified: false,
     availability: "Weekends",
-    category: "videographer"
+    category: "videographer",
+    isSaved: false,
+    feature: "video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "v3",
-    username: "David Miller",
+    fullName: "David Miller",
+    username: "david_miller637",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9894048725",
+    email: "david.miller@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/73.jpg",
     location: "New Delhi, DL",
     lat: 28.5822,
@@ -192,11 +860,102 @@ export const professionals: Professional[] = [
     },
     isVerified: false,
     availability: "Weekdays",
-    category: "videographer"
+    category: "videographer",
+    isSaved: false,
+    feature: "video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "v4",
-    username: "Ananya Patel",
+    fullName: "Ananya Patel",
+    username: "ananya_patel349",
+    gender: "female",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9875952004",
+    email: "ananya.patel@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/39.jpg",
     location: "Hyderabad, TS",
     lat: 17.3922,
@@ -211,13 +970,104 @@ export const professionals: Professional[] = [
       twoHourPrice: 6500,
       threeHourPrice: 9000
     },
-    isVerified: true,
+    isVerified: false,
     availability: "Anytime",
-    category: "videographer"
+    category: "videographer",
+    isSaved: false,
+    feature: "video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "v5",
-    username: "Alex Mercer",
+    fullName: "Alex Mercer",
+    username: "alex_mercer574",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9860520993",
+    email: "alex.mercer@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/50.jpg",
     location: "Pune, MH",
     lat: 18.5648,
@@ -234,13 +1084,104 @@ export const professionals: Professional[] = [
     },
     isVerified: false,
     availability: "Weekends",
-    category: "videographer"
+    category: "videographer",
+    isSaved: false,
+    feature: "video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
 
   // SINGERS
   {
     id: "s1",
-    username: "Rohan Sharma",
+    fullName: "Rohan Sharma",
+    username: "rohan_sharma660",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9831610118",
+    email: "rohan.sharma@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/82.jpg",
     location: "New Delhi, DL",
     lat: 28.6281,
@@ -255,13 +1196,104 @@ export const professionals: Professional[] = [
       twoHourPrice: 7500,
       threeHourPrice: 10000
     },
-    isVerified: true,
+    isVerified: false,
     availability: "Weekends",
-    category: "singer"
+    category: "singer",
+    isSaved: false,
+    feature: "singer",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "s2",
-    username: "Aisha Khan",
+    fullName: "Aisha Khan",
+    username: "aisha_khan681",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9846239710",
+    email: "aisha.khan@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/14.jpg",
     location: "Mumbai, MH",
     lat: 19.0956,
@@ -276,13 +1308,104 @@ export const professionals: Professional[] = [
       twoHourPrice: 6500,
       threeHourPrice: 9000
     },
-    isVerified: true,
+    isVerified: false,
     availability: "Anytime",
-    category: "singer"
+    category: "singer",
+    isSaved: false,
+    feature: "singer",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "s3",
-    username: "Chloe Bennett",
+    fullName: "Chloe Bennett",
+    username: "chloe_bennett823",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9884383101",
+    email: "chloe.bennett@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/68.jpg",
     location: "Bangalore, KA",
     lat: 12.9416,
@@ -299,11 +1422,102 @@ export const professionals: Professional[] = [
     },
     isVerified: false,
     availability: "Weekdays",
-    category: "singer"
+    category: "singer",
+    isSaved: false,
+    feature: "singer",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "s4",
-    username: "Vikram Malhotra",
+    fullName: "Vikram Malhotra",
+    username: "vikram_malhotra423",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9882328743",
+    email: "vikram.malhotra@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/91.jpg",
     location: "Chennai, TN",
     lat: 13.0467,
@@ -318,13 +1532,104 @@ export const professionals: Professional[] = [
       twoHourPrice: 3600,
       threeHourPrice: 5000
     },
-    isVerified: true,
+    isVerified: false,
     availability: "Anytime",
-    category: "singer"
+    category: "singer",
+    isSaved: false,
+    feature: "singer",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "s5",
-    username: "Sarah Jenkins",
+    fullName: "Sarah Jenkins",
+    username: "sarah_jenkins593",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9860815292",
+    email: "sarah.jenkins@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/79.jpg",
     location: "Mumbai, MH",
     lat: 19.0859,
@@ -341,12 +1646,103 @@ export const professionals: Professional[] = [
     },
     isVerified: false,
     availability: "Weekends",
-    category: "singer"
+    category: "singer",
+    isSaved: false,
+    feature: "singer",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   // LUCKNOW PROFESSIONALS
   {
     id: "l1",
-    username: "Ravi Prakash",
+    fullName: "Ravi Prakash",
+    username: "ravi_prakash740",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9820053694",
+    email: "ravi.prakash@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/15.jpg",
     location: "Gomti Nagar, Lucknow, UP",
     lat: 26.8528,
@@ -357,13 +1753,104 @@ export const professionals: Professional[] = [
     experienceYears: 5,
     description: "Expert in candid wedding photography and pre-wedding shoots across scenic locations in Lucknow.",
     hourlyPricing: { oneHourPrice: 1500, twoHourPrice: 2800, threeHourPrice: 4000 },
-    isVerified: true,
+    isVerified: false,
     availability: "Anytime",
-    category: "photographer"
+    category: "photographer",
+    isSaved: false,
+    feature: "photo",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "l2",
-    username: "Snehil Verma",
+    fullName: "Snehil Verma",
+    username: "snehil_verma813",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9837037104",
+    email: "snehil.verma@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/25.jpg",
     location: "Indira Nagar, Lucknow, UP",
     lat: 26.8837,
@@ -374,13 +1861,104 @@ export const professionals: Professional[] = [
     experienceYears: 3,
     description: "Creative videographer specializing in reel-style highlights for birthdays and engagements.",
     hourlyPricing: { oneHourPrice: 2000, twoHourPrice: 3800, threeHourPrice: 5000 },
-    isVerified: true,
+    isVerified: false,
     availability: "Weekends",
-    category: "videographer"
+    category: "videographer",
+    isSaved: false,
+    feature: "video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "l3",
-    username: "Amitabh Tiwari",
+    fullName: "Amitabh Tiwari",
+    username: "amitabh_tiwari752",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9899400898",
+    email: "amitabh.tiwari@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/35.jpg",
     location: "Hazratganj, Lucknow, UP",
     lat: 26.8485,
@@ -391,13 +1969,104 @@ export const professionals: Professional[] = [
     experienceYears: 10,
     description: "Renowned classical singer performing at prestigious cultural events and private baithaks.",
     hourlyPricing: { oneHourPrice: 4000, twoHourPrice: 7500, threeHourPrice: 10000 },
-    isVerified: true,
+    isVerified: false,
     availability: "Anytime",
-    category: "singer"
+    category: "singer",
+    isSaved: false,
+    feature: "singer",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "l4",
-    username: "Pooja Yadav",
+    fullName: "Pooja Yadav",
+    username: "pooja_yadav220",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9826100019",
+    email: "pooja.yadav@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/45.jpg",
     location: "Alambagh, Lucknow, UP",
     lat: 26.8142,
@@ -410,11 +2079,102 @@ export const professionals: Professional[] = [
     hourlyPricing: { oneHourPrice: 3000, twoHourPrice: 5500, threeHourPrice: 8000 },
     isVerified: false,
     availability: "Weekdays",
-    category: "videographer"
+    category: "videographer",
+    isSaved: false,
+    feature: "video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "l5",
-    username: "Nikhil Srivastava",
+    fullName: "Nikhil Srivastava",
+    username: "nikhil_srivastava216",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9862700174",
+    email: "nikhil.srivastava@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/55.jpg",
     location: "Ashiyana, Lucknow, UP",
     lat: 26.7821,
@@ -425,13 +2185,104 @@ export const professionals: Professional[] = [
     experienceYears: 4,
     description: "Specialist in outdoor portrait and fashion photography, utilizing natural light.",
     hourlyPricing: { oneHourPrice: 1200, twoHourPrice: 2200, threeHourPrice: 3200 },
-    isVerified: true,
+    isVerified: false,
     availability: "Weekends",
-    category: "photographer"
+    category: "photographer",
+    isSaved: false,
+    feature: "photo",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "l6",
-    username: "Sneha Kapoor",
+    fullName: "Sneha Kapoor",
+    username: "sneha_kapoor640",
+    gender: "female",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9812122182",
+    email: "sneha.kapoor@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/55.jpg",
     location: "Mahanagar, Lucknow, UP",
     lat: 26.8776,
@@ -444,11 +2295,102 @@ export const professionals: Professional[] = [
     hourlyPricing: { oneHourPrice: 2500, twoHourPrice: 4500, threeHourPrice: 6000 },
     isVerified: false,
     availability: "Anytime",
-    category: "singer"
+    category: "singer",
+    isSaved: false,
+    feature: "singer",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "l7",
-    username: "Aditya Mishra",
+    fullName: "Aditya Mishra",
+    username: "aditya_mishra295",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9859138327",
+    email: "aditya.mishra@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/65.jpg",
     location: "Aminabad, Lucknow, UP",
     lat: 26.8437,
@@ -459,13 +2401,104 @@ export const professionals: Professional[] = [
     experienceYears: 7,
     description: "Street-style photographer bringing raw emotions into event highlights and cultural shoots.",
     hourlyPricing: { oneHourPrice: 1800, twoHourPrice: 3200, threeHourPrice: 4500 },
-    isVerified: true,
+    isVerified: false,
     availability: "Anytime",
-    category: "photographer"
+    category: "photographer",
+    isSaved: false,
+    feature: "photo",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "l8",
-    username: "Riya Sharma",
+    fullName: "Riya Sharma",
+    username: "riya_sharma718",
+    gender: "female",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9828606556",
+    email: "riya.sharma@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/75.jpg",
     location: "Chowk, Lucknow, UP",
     lat: 26.8665,
@@ -478,11 +2511,102 @@ export const professionals: Professional[] = [
     hourlyPricing: { oneHourPrice: 2500, twoHourPrice: 4800, threeHourPrice: 6500 },
     isVerified: false,
     availability: "Weekends",
-    category: "videographer"
+    category: "videographer",
+    isSaved: false,
+    feature: "video",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "l9",
-    username: "Karan Singh",
+    fullName: "Aditya Srivastava",
+    username: "aditya_srivastava257",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9729289604",
+    email: "aditya.srivastava@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/75.jpg",
     location: "Vikas Nagar, Lucknow, UP",
     lat: 26.8925,
@@ -491,15 +2615,106 @@ export const professionals: Professional[] = [
     totalReviews: 104,
     experience: "8+ Years Exp.",
     experienceYears: 8,
-    description: "Acoustic singer and guitarist perfect for small gatherings and private celebrations.",
+    description: "Professional photographer with a passion for capturing moments.",
     hourlyPricing: { oneHourPrice: 3000, twoHourPrice: 5500, threeHourPrice: 7500 },
-    isVerified: true,
+    isVerified: false,
     availability: "Anytime",
-    category: "singer"
+    category: "photographer",
+    isSaved: false,
+    feature: "singer",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   },
   {
     id: "l10",
-    username: "Shreya Gupta",
+    fullName: "Shreya Gupta",
+    username: "shreya_gupta668",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9843222910",
+    email: "shreya.gupta@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/85.jpg",
     location: "Omaxe City, Lucknow, UP",
     lat: 26.7584,
@@ -510,8 +2725,205 @@ export const professionals: Professional[] = [
     experienceYears: 4,
     description: "Maternity and newborn photographer offering a comforting and premium photoshoot experience.",
     hourlyPricing: { oneHourPrice: 1600, twoHourPrice: 3000, threeHourPrice: 4200 },
-    isVerified: true,
+    isVerified: false,
     availability: "Weekdays",
-    category: "photographer"
+    category: "photographer",
+    isSaved: false,
+    feature: "photo",
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
+  },
+  {
+    id: "techaditya",
+    fullName: "Tech Aditya",
+    username: "tech_aditya101",
+    gender: "male",
+    role: "creator",
+    isProfileDone: false,
+    mobile: "9335265907",
+    email: "techaditya.sde@gmail.com",
+    profileImage: "https://randomuser.me/api/portraits/men/99.jpg",
+    location: "New Delhi, DL",
+    lat: 28.6139,
+    lng: 77.2090,
+    rating: 5.0,
+    totalReviews: 42,
+    experience: "3+ Years Exp.",
+    experienceYears: 3,
+    description: "Expert software engineer and tech creator, bringing innovative digital experiences to life.",
+    hourlyPricing: {
+      oneHourPrice: 1000,
+      twoHourPrice: 1800,
+      threeHourPrice: 2500
+    },
+    isVerified: true,
+    availability: "Anytime",
+    category: "videographer",
+    feature: "video",
+    isSaved: false,
+    availableDates: [
+      {
+        date: "2026-07-17",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-18",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-19",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-20",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-21",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-22",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-23",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-24",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      },
+      {
+        date: "2026-07-25",
+        isSlotBooked: false,
+        slots: [
+          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+        ]
+      }
+    ]
   }
 ];

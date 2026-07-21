@@ -3,12 +3,15 @@ import { Control, FieldErrors, UseFormSetValue, UseFormSetError, UseFormClearErr
 export interface FormValues {
   mobile: string;
   otp: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  gender: string;
   email: string;
   role: "creator" | "customer" | "";
   category?: string;
   pincode: string;
   location: string;
+  landmark?: string;
 }
 
 export interface StepProps {
@@ -36,6 +39,7 @@ export interface Step2Props {
   control: Control<FormValues>;
   errors: FieldErrors<FormValues>;
   isEmailEditable?: boolean;
+  mobile?: string;
 }
 
 export type Step3Props = Pick<StepProps, "control" | "errors" | "setValue" | "clearErrors">;

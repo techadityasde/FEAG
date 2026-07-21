@@ -63,8 +63,9 @@ export interface HighlightsSectionProps {
 
 export interface PackagesSectionProps {
   hourlyPricing: { oneHourPrice: number; twoHourPrice: number; threeHourPrice: number };
-  selectedPackage: "basic" | "professional" | "premium";
-  setSelectedPackage: (pkg: "basic" | "professional" | "premium") => void;
+  selectedPackage: "basic" | "professional" | "premium" | "custom" | null;
+  setSelectedPackage: (pkg: "basic" | "professional" | "premium" | "custom" | null) => void;
+  booking: any;
 }
 
 export interface CalendarSectionProps {
@@ -72,6 +73,9 @@ export interface CalendarSectionProps {
   onSelectDate: (dateStr: string) => void;
   bookedDates: string[];
   limitedDates: string[];
+  availableDates: any[];
+  selectedSlot: string | null;
+  onSelectSlot: (slot: string) => void;
 }
 
 export interface CustomBookingFormProps {
@@ -100,8 +104,8 @@ export interface SimilarProfessionalsProps {
 
 export interface StickyBookingPanelProps {
   professional: Professional;
-  selectedPackage: "basic" | "professional" | "premium";
-  getPackagePrice: (pkg: "basic" | "professional" | "premium") => number;
+  selectedPackage: "basic" | "professional" | "premium" | "custom" | null;
+  getPackagePrice: (pkg: "basic" | "professional" | "premium" | "custom" | null) => number;
   onBookClick: () => void;
   onCustomRequest?: () => void;
 }
