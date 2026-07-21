@@ -1,88 +1,85 @@
-# FEAG - Empowering Ambitious Generation
+# FEAG (Find Events & Gigs)
 
-This is a [Next.js](https://nextjs.org) web application that serves as the frontend client portal for the FEAG platform.
+A comprehensive Next.js web application designed to connect users with event professionals (Photographers, Videographers, Singers, DJs, etc.). The platform features advanced searching, real-time filtering, interactive portfolios, and a robust date/time slot booking engine.
 
-## 🚀 Getting Started
+## 🌊 Application Flow & Pages
 
-First, install the dependencies and run the development server:
+### 1. Landing / Home Page
+- **Hero Section**: Introduces the platform with a dynamic, aesthetic interface.
+- **Advanced Search Bar (`SearchFormPlan.tsx`)**: The core discovery engine. Users can select:
+  - **Category**: (e.g., Photographer, Singer).
+  - **Location**: Fetches geographic coordinates for proximity sorting.
+  - **Event Type & Function**: Cascading selection (e.g., Event: *Wedding* -> Function: *Haldi*).
+  - **Date & Time Slot**: Users can select predefined standard slots (e.g., 10:00 AM - 01:00 PM) OR toggle to a **Custom Slot** picker (12-hour AM/PM format).
+- **Recommendations**: Displays curated lists of top-rated professionals.
 
-```bash
-npm install
-npm run dev
-```
+### 2. Services / Listings Page (`/services/[category]`)
+- **Dynamic Filtering (`useFilteredProfessionals.ts`)**: 
+  - Reads directly from the global Redux store (Location, Booking, Category).
+  - Filters professionals by category.
+  - Calculates the geographic distance from the user's searched location to the professional and sorts by proximity.
+  - Enforces the **Slot Booking Pattern** (see below) to ensure only available professionals are shown.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Professional Portfolio Page (`/portfolio/[slug]`)
+- **Detailed Profile**: Displays the professional's rating, pricing packages (Basic, Professional, Premium), and biography.
+- **Media Gallery**: Features images, videos, and audio tracks with a Lightbox modal.
+- **Availability Calendar (`CalendarSection.tsx`)**:
+  - Interactive calendar displaying the professional's schedule.
+  - Greys out past dates and fully booked dates.
+  - If a user searched for a **Custom Time Slot**, the calendar highlights the selected date in dark green and prominently displays the requested custom hours instead of the standard time slots.
+- **Checkout / Custom Request**: Users can instantly book a standard package via a side panel, or open a Custom Booking Modal for tailored event requirements.
 
----
-
-## 🗺️ Website Flow & Architecture
-
-```mermaid
-graph TD
-    Home["Home (/)"] -->|Click Service| Services["Service Category Page (/services/:category)"]
-    Home -->|Click Join Us| JoinUs["Onboarding Page (/join-us)"]
-    Home -->|Click Login| Login["Login Page (/login)"]
-    
-    JoinUs -->|Choose Google| GoogleAuth["Google OAuth Page"]
-    GoogleAuth -->|Callback Redirect| JoinUsGoogle["Join Us - Google Flow (3 Steps)"]
-    JoinUs -->|Choose Mobile| JoinUsMobile["Join Us - Mobile Flow (4 Steps)"]
-    
-    Login -->|Verification Success| Home
-```
-
-### 1. 🏠 Landing / Homepage (`/`)
-* **Visual Components:**
-  * **Loader:** Initial animated screen (`Loader.tsx`) before layout mounts.
-  * **Hero:** Introduces the platform to users.
-  * **Services Grid:** Dynamic cards displaying primary category offerings (Photographers, Videographers, Singers). Clicking cards routes users to the corresponding service listing directory (`/services/[category]`).
-  * **Process Map:** 3-step process guide (Search $\rightarrow$ Book $\rightarrow$ Secure).
-  * **Testimonials:** Review slider showing customer success stories.
-* **Global Navigation Header (`Navbar.tsx`):**
-  * Logo linking back to homepage.
-  * Links to jump-scroll sections (`Services`, `History`, `Support`).
-  * **Wishlist Link:** Renders a bookmark emoji `🔖` with a dynamic primary-colored circular badge showing active wishlist items count (currently static `3`).
-  * **Login Button:** Routes to the sign-in page.
-  * **Join Us Button:** Routes to the onboarding portal.
-
-### 2. 📋 Onboarding portal (`/join-us`)
-* **Form Logic:** Uses `react-hook-form` to track onboarding inputs, which are synced with Redux and `localStorage` to resume state on page refreshes.
-* **Conditional Wizard Paths:**
-
-#### Flow A: Standard Mobile Registration (4 Steps)
-1. **Mobile Verification:** Users input their mobile number and resolve a Cloudflare Turnstile challenge. Standard test OTP `123456` is verified.
-2. **Personal Information:** Requests **Full Name** and **Email Address**.
-3. **Professional Category:** User selects their profile role (`creator` or `customer`) and professional categories (for creators).
-4. **Location Details:** Validates and stores the user's **Pincode** and **City Location**.
-
-#### Flow B: Google OAuth Authentication (3 Steps)
-1. **Google Redirection:** User clicks *Continue with Google*. Any currently entered phone number is preserved in the OAuth `state` parameter, and the browser redirects to `/api/auth/google`.
-2. **OAuth Callback:** Google callback exchanges the authorization code, fetches user metadata (name & email), and redirects the browser back to `/join-us?google_signup=success&name=...&email=...&mobile=...`.
-3. **Optimized Wizard (No Redundant Steps):** On mount, the query parameters are parsed and cleared from history. The flow adjusts to 3 steps, merging **Mobile Verification** and **Full Name** (prefilled, editable) into Step 1, completely omitting the separate personal info step.
-
-### 3. 🔐 User Authentication (`/login`)
-* **Validation:** Before allowing authentication, the login logic checks `localStorage` registration records to ensure the user has completed the onboarding flow first.
-* **Sign-in Methods:**
-  * **Mobile OTP Login:** Requests mobile number, verifies registration, runs Turnstile challenge, and verifies simulated OTP `123456`.
-  * **Google Login:** Verifies the Google email profile against registration records before logging the user in.
-* **Redirect:** Instantly redirects users to the home dashboard `/` upon successful login.
-
-### 4. 🔍 Service Listings & Search (`/services/[category]`)
-* **Data Source:** Pulls from static mock database containing professional records (`src/lib/data/professionals.ts`).
-* **Filtering System:**
-  * **Search:** Performs sub-string username matching.
-  * **Location:** Populates options dynamically based on available professionals in the active category.
-  * **Price Range:** Categorizes hourly rates (e.g. Under 2000, 2000-4000, Above 4000).
-  * **Rating, Experience, and Availability:** Refines matches based on professional profiles.
-* **Sorting Capabilities:** Groups by Recommended, Price (Low to High / High to Low), Highest Rated, and Most Popular.
-* **Grid Presentation:** Features premium category search header and a card grid displaying 4 items per page with custom pagination indicators.
+### 4. User Dashboard & Orders
+- Tracks active bookings, wishlisted professionals, and past orders.
 
 ---
 
-## 💾 State Management & Store
+## 📅 The Slot Booking Pattern
 
-* **Store Setup:** Located in `src/lib/store/store.ts` configuring a Redux toolkit store.
-* **Onboarding Slice (`onboardingSlice.ts`):**
-  * Tracks onboarding data state: `mobile`, `otp`, `name`, `email`, `role`, `category`, `pincode`, `location`, `isSubmitted`, and `signUpMethod`.
-  * Actions: `updateOnboardingData`, `setSignUpMethod`, `submitOnboarding`, and `clearOnboardingData`.
-  * Automatically synchronizes changes with `localStorage` (`feag_onboarding_data`) to prevent data loss on page refreshes.
+FEAG uses a highly specific logical pattern to handle the complex reality of event booking, accommodating both standard preset slots and bespoke custom hours.
 
+### Data Structure (`professionals.ts`)
+Each professional has an `availableDates` array. Each date object looks like this:
+```typescript
+{
+  date: "2026-07-10",
+  isSlotBooked: true, // Represents a Day-Level Custom/Exclusive Booking
+  slots: [
+    { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: true },
+    { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false }
+  ]
+}
+```
+
+### The Filtering Logic
+Managed by `useFilteredProfessionals.ts`, the filtering ensures users never double-book a professional.
+
+1. **Global Day Block (`isSlotBooked`)**: 
+   - If `isSlotBooked` is `true` on a specific date, it means the professional has accepted a custom booking or exclusive event for that day. 
+   - **Result**: The professional is *entirely filtered out* of search results for that date, regardless of whether the user is searching for a Custom Slot or a Standard Slot.
+
+2. **Custom Slot Searches (`isCustomSlot === true`)**:
+   - If a user searches for a custom time range (e.g., 11:00 AM to 4:00 PM), the system only checks `!availableDate.isSlotBooked`. As long as the day hasn't been blocked off entirely, the professional will appear in the results.
+
+3. **Standard Slot Searches**:
+   - If the user searches for a standard slot (e.g., 10:00 AM), the system first ensures the day isn't blocked (`isSlotBooked: false`), and then verifies that the specific standard slot inside the `.slots` array has `isBooked: false`.
+
+---
+
+## 💾 State Management (Redux)
+
+The application relies on a robust Redux Toolkit architecture to pass data between the search bar, listings, and portfolio pages without prop drilling.
+
+- **`bookingSlice`**: The source of truth for time. Stores `selectedDate`, `selectedSlot`, `isCustomSlot`, `customStartTime`, and `customEndTime`.
+- **`eventSlice`**: Stores the selected `eventType` (e.g., Wedding) and specific `eventFunction` (e.g., Reception).
+- **`locationSlice`**: Stores the user's searched coordinates (`lat`, `lng`) for distance sorting.
+- **`tabSlice`**: Tracks the currently active primary category.
+- **`authSlice` & `onboardingSlice`**: Manages JWTs, user sessions, and the multi-step signup process.
+
+## 🛠 Tech Stack
+- **Framework**: Next.js (App Router)
+- **Styling**: Tailwind CSS / Vanilla CSS
+- **State**: Redux Toolkit
+- **Icons**: Lucide React
+- **Forms**: React Hook Form
+- **Notifications**: React Hot Toast

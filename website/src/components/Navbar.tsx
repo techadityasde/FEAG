@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Compass,
   Star,
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,6 +33,7 @@ const professions = [
   "photographer...",
   "videographer...",
   "singer...",
+  "cinematic...",
 ];
 
 const AnimatedPlaceholder = ({ leftClass }: { leftClass: string }) => {
@@ -72,13 +74,15 @@ export default function Navbar() {
   );
   const router = useRouter();
   const orders = useSelector((state: RootState) => state.orders?.orders || []);
+  const wishlistItems = useSelector((state: RootState) => state.wishlist?.items || []);
+  const wishlistCount = wishlistItems.length;
   const location = useSelector((state: RootState) => state.location);
   const dispatch = useDispatch();
   const pathname = usePathname();
 
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProfessionals, setFilteredProfessionals] = useState<any[]>([]);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -87,104 +91,58 @@ export default function Navbar() {
   const activeOrdersCount = orders.filter(
     (order: any) => order.status === "active",
   ).length;
-  // console.log("location", location);
+
+  const searchLower = searchTerm.trim().toLowerCase();
+  const validCategories = ["photographer", "videographer", "singer", "Cinematic"];
+  const matchedCats = validCategories.filter(cat => cat.toLowerCase().includes(searchLower));
+  const displayCategories = matchedCats.map(cat => ({
+    category: cat,
+    count: professionals.filter(p => p.category.toLowerCase() === cat.toLowerCase()).length
+  }));
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-
-    if (value.length > 0) {
-      let filtered: any[] = professionals.filter(
-        (professional) =>
-          professional.username.toLowerCase().includes(value.toLowerCase()) ||
-          professional.location.toLowerCase().includes(value.toLowerCase()) ||
-          professional.category?.toLowerCase().includes(value.toLowerCase()),
-      );
-
-      // Calculate distance and filter if user location is available
-      const locLat = location.lat;
-      const locLng = location.lng;
-      if (locLat !== null && locLng !== null) {
-        filtered = filtered
-          .map((p) => {
-            if (p.lat !== undefined && p.lng !== undefined) {
-              const dist = getDistance(locLat, locLng, p.lat, p.lng);
-              return { ...p, distance: dist };
-            }
-            return p;
-          })
-          .sort((a, b) => {
-            if (a.distance !== undefined && b.distance !== undefined) {
-              return a.distance - b.distance;
-            }
-            return 0;
-          });
-      }
-
-      setFilteredProfessionals(filtered);
-    } else {
-      setFilteredProfessionals([]);
-    }
+    setSearchTerm(e.target.value);
+    setIsSearchFocused(true);
   };
 
   const SearchDropdown = () =>
-    filteredProfessionals.length > 0 ? (
-      <div className="absolute top-full mt-2 left-0 w-full bg-white p-2 rounded-lg border border-border shadow-xl max-h-60 overflow-y-auto z-50 ">
-        {filteredProfessionals.map((professional) => (
-          <div
-            key={professional.id}
-            className="cursor-pointer flex items-center justify-between gap-2 text-sm min-[360px]:text-base text-muted-foreground py-2 px-2 border-b border-border/50 last:border-0 hover:bg-muted rounded-md transition-colors"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              router.push(`/portfolio/${professional.username}`);
-              setSearchTerm("");
-              setFilteredProfessionals([]);
-            }}
-          >
-            <div className="flex items-center gap-2">
-              <Image
-                src={professional.profileImage}
-                alt={professional.username}
-                width={28}
-                height={28}
-                className="rounded-full"
-              />
-              <div className="flex flex-col">
-                <span className="font-semibold text-[12px] text-foreground flex items-center gap-1.5">
-                  {professional.username}
-                  <span className="flex items-center text-[10px] text-yellow-500 font-bold bg-yellow-500/10 px-1 py-0.5 rounded">
-                    <Star className="size-3 fill-yellow-500 mr-0.5" />
-                    {professional.rating}
+    isSearchFocused ? (
+      displayCategories.length > 0 ? (
+        <div className="absolute top-full mt-2 left-0 w-full bg-white p-2 rounded-lg border border-border shadow-xl max-h-60 overflow-y-auto z-50 ">
+          {displayCategories.map((item) => (
+            <div
+              key={item.category}
+              className="cursor-pointer flex items-center justify-between gap-2 text-sm min-[360px]:text-base text-muted-foreground py-3 px-3 border-b border-border/50 last:border-0 hover:bg-muted rounded-md transition-colors"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                router.push(`/services/${item.category}`);
+                setSearchTerm("");
+                setIsSearchFocused(false);
+                (document.activeElement as HTMLElement)?.blur();
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <Search className="size-4 text-muted-foreground/70" />
+                <div className="flex flex-col ml-1">
+                  <span className="font-semibold text-sm text-foreground capitalize">
+                    {item.category}
                   </span>
-                </span>
-                {professional.distance !== undefined && (
-                  <span className="text-[10px] text-muted-foreground font-medium">
-                    {professional.distance.toFixed(1)} km away
+                  <span className="text-[11px] text-muted-foreground font-medium">
+                    {item.count} {item.count === 1 ? 'user' : 'users'}
                   </span>
-                )}
+                </div>
+              </div>
+              <div className="flex items-center text-muted-foreground">
+                <ArrowRight className="size-4" />
               </div>
             </div>
-            <div className="flex items-end">
-              <span className="text-[10px] text-muted-foreground bg-primary/30 px-2 py-0.5 rounded-full font-semibold">
-                {professional.category}
-              </span>
-              {/* <Link
-                href={`/portfolio/${professional.username}`}
-                onClick={() => {
-                  setSearchTerm("");
-                  setFilteredProfessionals([]);
-                }}
-                className="mt-1 text-primary text-[10px] ml-2 font-semibold hover:underline"
-              >
-                View
-              </Link> */}
-            </div>
-          </div>
-        ))}
-      </div>
-    ) : searchTerm ? (
-      <div className="absolute top-full mt-2 left-0 w-full bg-white p-4 rounded-lg border border-border shadow-xl z-50 text-center text-sm font-semibold text-muted-foreground">
-        No user available in your nearest
-      </div>
+          ))}
+        </div>
+      ) : searchTerm ? (
+        <div className="absolute top-full mt-2 left-0 w-full bg-white p-4 rounded-lg border border-border shadow-xl z-50 text-center text-sm font-semibold text-muted-foreground">
+          No category matched
+        </div>
+      ) : null
     ) : null;
 
   return (
@@ -230,7 +188,7 @@ export default function Navbar() {
                     <p className="text-xs text-muted-foreground truncate">{user?.email || user?.mobile}</p>
                   </div>
                 )}
-                
+
                 <Link
                   href="/"
                   onClick={closeMobileMenu}
@@ -273,13 +231,13 @@ export default function Navbar() {
                       My Account
                     </Link>
                     <Link
-                        href="/wishlist"
-                        onClick={closeMobileMenu}
-                        className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
-                      >
-                        <Heart className="size-4" />
-                        Wishlist
-                      </Link>
+                      href="/wishlist"
+                      onClick={closeMobileMenu}
+                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                    >
+                      <Heart className="size-4" />
+                      Wishlist
+                    </Link>
                     <div className="h-px bg-border my-1 mx-2" />
                     <button
                       onClick={() => {
@@ -324,6 +282,12 @@ export default function Navbar() {
             placeholder=""
             value={searchTerm}
             onChange={handleSearch}
+            onClick={() => setIsSearchFocused(true)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setTimeout(() => {
+              setSearchTerm("");
+              setIsSearchFocused(false);
+            }, 200)}
             className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted/50 border border-border text-foreground font-medium text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:bg-background transition-all relative z-10"
           />
           {!searchTerm && <AnimatedPlaceholder leftClass="left-10" />}
@@ -368,10 +332,12 @@ export default function Navbar() {
                 placeholder=""
                 value={searchTerm}
                 onChange={handleSearch}
+                onClick={() => setIsSearchFocused(true)}
+                onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => {
                   setTimeout(() => {
                     setSearchTerm("");
-                    setFilteredProfessionals([]);
+                    setIsSearchFocused(false);
                   }, 200);
                 }}
                 className="w-full pl-9 pr-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary text-sm font-medium relative z-10"
@@ -385,6 +351,18 @@ export default function Navbar() {
           <div className="flex items-center  gap-4">
             {isCustomer ? (
               <>
+                <Link
+                  href="/wishlist"
+                  className="relative p-2 rounded-full hover:bg-muted transition-colors flex items-center justify-center"
+                >
+                  <Heart className="size-5 text-foreground/80 hover:text-foreground transition-colors" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-extrabold text-white shadow-sm border-2 border-background">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+
                 <Link
                   href="/orders"
                   className="relative p-2 rounded-full hover:bg-muted transition-colors flex items-center justify-center mr-1"

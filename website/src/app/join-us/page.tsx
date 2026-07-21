@@ -4,14 +4,15 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { 
-  Smartphone, 
-  User, 
-  Sparkles, 
-  MapPin, 
-  Check, 
-  ChevronRight, 
-  ChevronLeft 
+import { useRouter } from "next/navigation";
+import {
+  Smartphone,
+  User,
+  Sparkles,
+  MapPin,
+  Check,
+  ChevronRight,
+  ChevronLeft
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ import Step3Category from "./components/Step3Category";
 import Step4Location from "./components/Step4Location";
 
 export default function JoinUs() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const savedData = useSelector((state: RootState) => state.onboarding);
 
@@ -53,7 +55,7 @@ export default function JoinUs() {
       // Mobile / Null flow
       if (savedData.mobile !== "" && savedData.otp === "123456") {
         // If mobile is verified, go to Personal Info (Step 1)
-        if (savedData.name !== "" && savedData.email !== "") {
+        if (savedData.firstName !== "" && savedData.lastName !== "" && savedData.email !== "") {
           // If personal info is done, go to Category (Step 2)
           return 2;
         }
@@ -68,12 +70,11 @@ export default function JoinUs() {
     if (savedData.signUpMethod === "google") {
       return [verified, false, false];
     } else {
-      const personalDone = savedData.name !== "" && savedData.email !== "";
+      const personalDone = savedData.firstName !== "" && savedData.lastName !== "" && savedData.email !== "";
       return [verified, personalDone, false, false];
     }
   });
 
-  const [formSubmitted, setFormSubmitted] = useState(savedData.isSubmitted);
 
   // Track the user's entry method: 'mobile' | 'google' | null
   const [signUpMethod, setSignUpMethodState] = useState<"mobile" | "google" | null>(
@@ -88,16 +89,16 @@ export default function JoinUs() {
   // Calculate wizard step titles dynamically based on sign-up method chosen
   const steps = signUpMethod === "google"
     ? [
-        { label: "Mobile & Name Verification", icon: Smartphone },
-        { label: "Professional Category", icon: Sparkles },
-        { label: "Location Details", icon: MapPin },
-      ]
+      { label: "Mobile & Name Verification", icon: Smartphone },
+      { label: "Professional Category", icon: Sparkles },
+      { label: "Location Details", icon: MapPin },
+    ]
     : [
-        { label: "Mobile Verification", icon: Smartphone },
-        { label: "Personal Information", icon: User },
-        { label: "Professional Category", icon: Sparkles },
-        { label: "Location Details", icon: MapPin },
-      ];
+      { label: "Mobile Verification", icon: Smartphone },
+      { label: "Personal Information", icon: User },
+      { label: "Professional Category", icon: Sparkles },
+      { label: "Location Details", icon: MapPin },
+    ];
 
   const {
     control,
@@ -111,7 +112,9 @@ export default function JoinUs() {
     defaultValues: {
       mobile: savedData.mobile || "",
       otp: savedData.otp || "",
-      name: savedData.name || "",
+      firstName: savedData.firstName || "",
+      lastName: savedData.lastName || "",
+      gender: savedData.gender || "",
       email: savedData.email || "",
       role: savedData.role || "",
       category: savedData.category || "",
@@ -136,7 +139,7 @@ export default function JoinUs() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const googleSignup = urlParams.get("google_signup");
-    
+
     if (googleSignup) {
       // Clear query params from browser URL history immediately
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -145,8 +148,11 @@ export default function JoinUs() {
         const name = urlParams.get("name") || "";
         const email = urlParams.get("email") || "";
         const mobile = urlParams.get("mobile") || "";
+        const [firstName, ...rest] = name.trim().split(" ");
+        const lastName = rest.join(" ");
 
-        setValue("name", name, { shouldValidate: true });
+        setValue("firstName", firstName || "", { shouldValidate: true });
+        setValue("lastName", lastName || "", { shouldValidate: true });
         setValue("email", email, { shouldValidate: true });
         if (mobile) {
           setValue("mobile", mobile, { shouldValidate: true });
@@ -169,7 +175,7 @@ export default function JoinUs() {
       // Flow B: Google Account First
       if (activeStep === 0) {
         // Step 1: Mobile & Name Verification
-        const isNameValid = await trigger("name");
+        const isNameValid = await trigger(["firstName", "lastName"]);
         isValid = isNameValid && otpVerified;
       }
     } else {
@@ -179,7 +185,7 @@ export default function JoinUs() {
         isValid = otpVerified;
       } else if (activeStep === 1) {
         // Step 2: Personal info (Name & Email inputs)
-        isValid = await trigger(["name", "email"]);
+        isValid = await trigger(["firstName", "lastName", "gender", "email"]);
       }
     }
 
@@ -203,7 +209,9 @@ export default function JoinUs() {
       const currentValues: Partial<FormValues> = {
         mobile: watchedMobile,
         otp: watchedOtp,
-        name: watch("name"),
+        firstName: watch("firstName"),
+        lastName: watch("lastName"),
+        gender: watch("gender"),
         email: watch("email"),
         role: watchedRole,
         category: watch("category"),
@@ -215,14 +223,16 @@ export default function JoinUs() {
       const newCompleted = [...completedSteps];
       newCompleted[activeStep] = true;
       setCompletedSteps(newCompleted);
-      
+
       if (activeStep < steps.length - 1) {
         setActiveStep((prev) => prev + 1);
       } else {
         dispatch(submitOnboarding());
         dispatch(login(currentValues));
-        setFormSubmitted(true);
+        dispatch(clearOnboardingData());
         toast.success("Registration completed successfully!");
+        const destination = watchedRole === "creator" ? "/creator/dashboard" : "/my-account";
+        router.push(destination);
       }
     }
   };
@@ -233,7 +243,9 @@ export default function JoinUs() {
     } else if (activeStep === 0 && signUpMethod === "google") {
       // Going back to Google Login (Step 0) clears details in page & store
       setSignUpMethodWrapper(null);
-      setValue("name", "");
+      setValue("firstName", "");
+      setValue("lastName", "");
+      setValue("gender", "");
       setValue("email", "");
       setOtpVerified(false);
       dispatch(clearOnboardingData());
@@ -250,64 +262,42 @@ export default function JoinUs() {
     );
   }
 
-  if (formSubmitted) {
-    return (
-      <div className="flex-1 w-full max-w-lg mx-auto px-4 py-16 text-center flex flex-col items-center justify-center animate-in fade-in duration-500">
-        <div className="size-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-6 border border-emerald-200 shadow-sm">
-          <Check className="size-8 stroke-[3]" />
-        </div>
-        <h1 className="text-2xl font-extrabold text-[#2E2215] mb-3 select-none">Welcome to FEAG!</h1>
-        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-8 max-w-md">
-          Your creative onboarding profile has been verified successfully. We are excited to showcase your talent on our platform.
-        </p>
-        <Button
-          onClick={() => {
-            dispatch(clearOnboardingData());
-            window.location.href = "/";
-          }}
-          className="bg-primary hover:bg-primary/95 text-white font-semibold cursor-pointer"
-        >
-          Return to Home
-        </Button>
-      </div>
-    );
-  }
+
 
   const progressPercent = ((activeStep) / (steps.length - 1)) * 100;
 
   return (
-    <main className="w-full max-w-2xl mx-auto px-4 py-3 sm:py-4 flex flex-col justify-start">
+    <main className="w-full max-w-2xl mx-auto px-4 py-2 sm:py-3 flex flex-col justify-start">
 
-      <div className="text-center mb-2.5">
+      <div className="text-center mb-2">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2E2215] tracking-[0.14em] select-none mb-1">
           Join FEAG Onboarding
         </h1>
         <p className="text-xs sm:text-sm text-muted-foreground">Showcase your talent and connect with verified clients.</p>
       </div>
 
-      <div className="flex items-center justify-between relative mb-6 select-none">
+      <div className="flex items-center justify-between relative mb-4 select-none">
         <div className="absolute top-4 sm:top-[18px] left-[8%] right-[8%] h-0.5 bg-border/40 z-0 overflow-hidden">
-          <div 
-            className="h-full bg-primary transition-all duration-500 ease-out" 
+          <div
+            className="h-full bg-primary transition-all duration-500 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
-        
+
         {steps.map((step, idx) => {
           const StepIcon = step.icon;
           const isActive = idx === activeStep;
           const isCompleted = completedSteps[idx];
-          
+
           return (
             <div key={idx} className="relative z-10 flex flex-col items-center">
-              <div 
-                className={`size-8 sm:size-9 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
-                  isCompleted 
-                    ? "bg-emerald-500 border-emerald-500 text-white" 
-                    : isActive 
-                      ? "bg-primary border-primary text-white ring-4 ring-primary/20" 
+              <div
+                className={`size-8 sm:size-9 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${isCompleted
+                    ? "bg-emerald-500 border-emerald-500 text-white"
+                    : isActive
+                      ? "bg-primary border-primary text-white ring-4 ring-primary/20"
                       : "bg-white border-border/80 text-muted-foreground"
-                }`}
+                  }`}
               >
                 {isCompleted ? (
                   <Check className="size-4 stroke-[3]" />
@@ -320,8 +310,8 @@ export default function JoinUs() {
         })}
       </div>
 
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-border/60 shadow-sm flex flex-col gap-4">
-        
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-border/60 shadow-sm flex flex-col gap-3">
+
         {activeStep === 0 && (
           <Step1Mobile
             control={control}
@@ -348,7 +338,10 @@ export default function JoinUs() {
             }}
             showSocialLogin={signUpMethod === null}
             onGoogleLogin={(name, email) => {
-              setValue("name", name, { shouldValidate: true });
+              const [firstName, ...rest] = name.trim().split(" ");
+              const lastName = rest.join(" ");
+              setValue("firstName", firstName || "", { shouldValidate: true });
+              setValue("lastName", lastName || "", { shouldValidate: true });
               setValue("email", email, { shouldValidate: true });
               setSignUpMethod("google");
               setCompletedSteps([false, false, false]);
@@ -363,6 +356,7 @@ export default function JoinUs() {
             control={control}
             errors={errors}
             isEmailEditable={true}
+            mobile={watchedMobile}
           />
         )}
 
@@ -391,7 +385,7 @@ export default function JoinUs() {
         )}
 
         {(activeStep > 0 || (signUpMethod === "google" && activeStep === 0)) && (
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/40">
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/40">
             <button
               type="button"
               onClick={handlePrevStep}
@@ -406,7 +400,7 @@ export default function JoinUs() {
                 onClick={handleNextStep}
                 className="bg-primary hover:bg-primary/95 text-white font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer animate-in fade-in duration-200"
               >
-                {activeStep === steps.length - 1 ? "Submit Details" : "Next Step"}
+                {activeStep === steps.length - 1 ? "Submit" : "Next Step"}
                 <ChevronRight className="size-4" />
               </Button>
             )}

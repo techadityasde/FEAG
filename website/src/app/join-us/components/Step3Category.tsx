@@ -46,9 +46,9 @@ export default function Step3Category({ control, errors, setValue, clearErrors }
                   <Sparkles className="size-4 sm:size-5" />
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-[#2E2215]">Showcase My Talent</h3>
+                  <h3 className="text-xs sm:text-sm font-bold text-[#2E2215]">Join as a Creator</h3>
                   <p className="text-[9px] sm:text-xs text-muted-foreground mt-1 leading-normal max-w-[180px]">
-                    I am a Photographer, Videographer, Singer, or Creative.
+                    I want to register and offer my creative services to clients.
                   </p>
                 </div>
               </button>
@@ -105,6 +105,7 @@ export default function Step3Category({ control, errors, setValue, clearErrors }
                 <option value="" disabled>Select category option</option>
                 <option value="Videographer">Videographer</option>
                 <option value="Photographer">Photographer</option>
+                <option value="Cinematographer">Cinematic<span>{` (Photo + Video)`}</span></option>
                 <option value="Singer">Singer</option>
               </select>
             )}

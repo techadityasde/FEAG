@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import { Controller } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Loader2, MapPin, Search, X } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import { useLoadScript } from "@react-google-maps/api";
-import usePlacesAutocomplete, {
-  getGeocode,
-} from "use-places-autocomplete";
 
 import { Step4Props } from "../types";
 
-const libraries: ("places")[] = ["places"];
+const libraries: "places"[] = ["places"];
 
 export default function Step4Location({
   control,
@@ -25,12 +22,12 @@ export default function Step4Location({
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by your browser');
+      toast.error("Geolocation is not supported by your browser");
       return;
     }
 
     if (!isLoaded || !window.google) {
-      toast.error('Google Maps API is still loading. Please try again.');
+      toast.error("Google Maps API is still loading. Please try again.");
       return;
     }
 
@@ -43,11 +40,11 @@ export default function Step4Location({
         try {
           const geocoder = new window.google.maps.Geocoder();
           const response = await geocoder.geocode({ location: { lat, lng } });
-          
+
           if (response.results && response.results.length > 0) {
             let address = response.results[0].formatted_address;
             let postalCode = "";
-            
+
             // Extract postal code from any of the results
             for (const result of response.results) {
               for (const component of result.address_components) {
@@ -61,79 +58,36 @@ export default function Step4Location({
 
             // Find a locality/sublocality for cleaner address display if desired
             const addressComponent = response.results.find(
-              (r) => r.types.includes("sublocality") || r.types.includes("locality") || r.types.includes("neighborhood")
+              (r: any) =>
+                r.types.includes("sublocality") ||
+                r.types.includes("locality") ||
+                r.types.includes("neighborhood"),
             );
             if (addressComponent) {
-               address = addressComponent.formatted_address;
+              address = addressComponent.formatted_address;
             }
-            
+
             setValue("location", address, { shouldValidate: true });
             if (postalCode) {
               setValue("pincode", postalCode, { shouldValidate: true });
             }
-            
-            toast.success('Location resolved from current position');
+
+            toast.success("Location resolved from current position");
           } else {
-            toast.error('Could not determine address');
+            toast.error("Could not determine address");
           }
         } catch (err) {
-          toast.error('Error reverse geocoding');
+          toast.error("Error reverse geocoding");
         } finally {
           setIsDetecting(false);
         }
       },
       (error) => {
-        toast.error('Error fetching location: ' + error.message);
+        toast.error("Error fetching location: " + error.message);
         setIsDetecting(false);
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true },
     );
-  };
-
-  const {
-    ready,
-    value,
-    suggestions: { status, data },
-    setValue: setPlacesValue,
-    clearSuggestions,
-  } = usePlacesAutocomplete({
-    requestOptions: {
-      componentRestrictions: { country: "in" },
-    },
-    debounce: 300,
-    initOnMount: isLoaded,
-  });
-
-  const handleSelect = async (address: string) => {
-    setPlacesValue(address, false);
-    clearSuggestions();
-    
-    // Fill the actual form values
-    setValue("location", address, { shouldValidate: true });
-
-    try {
-      const results = await getGeocode({ address });
-      let postalCode = "";
-      
-      if (results[0]) {
-        for (const component of results[0].address_components) {
-          if (component.types.includes("postal_code")) {
-            postalCode = component.long_name;
-            break;
-          }
-        }
-      }
-      
-      if (postalCode) {
-        setValue("pincode", postalCode, { shouldValidate: true });
-        toast.success("Location and PIN Code updated");
-      } else {
-        toast.error("Could not find PIN Code for this address");
-      }
-    } catch (error) {
-      console.error("Error: ", error);
-      toast.error("Could not fetch location details.");
-    }
   };
 
   return (
@@ -162,63 +116,13 @@ export default function Step4Location({
         </button>
       </div>
 
-      {/* Google Maps Autocomplete Search */}
-      <div className="flex flex-col gap-1.5 relative">
-        <label className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
-          Search Address
-        </label>
-        <div className="relative flex items-center bg-transparent border border-input rounded-md px-3 py-2 shadow-sm focus-within:border-primary focus-within:ring-1 focus-within:ring-ring transition-all">
-          <Search className="size-4 text-muted-foreground mr-2 shrink-0" />
-          <input
-            type="text"
-            placeholder="Search for your location/society..."
-            value={value}
-            onChange={(e) => {
-              setPlacesValue(e.target.value);
-            }}
-            disabled={!ready}
-            className="flex-1 bg-transparent border-none focus:outline-none text-sm placeholder:text-muted-foreground w-full text-foreground"
-          />
-          {value && (
-            <button 
-              type="button" 
-              onClick={() => {
-                setPlacesValue("");
-                setValue("location", "", { shouldValidate: true });
-                setValue("pincode", "", { shouldValidate: true });
-              }} 
-              className="p-1 ml-1 bg-muted rounded-full text-foreground hover:bg-muted-foreground/20 transition-colors shrink-0 cursor-pointer"
-            >
-              <X className="size-3" />
-            </button>
-          )}
-        </div>
-        
-        {/* Autocomplete dropdown */}
-        {status === "OK" && (
-          <div className="absolute top-[100%] left-0 right-0 mt-1 bg-white border border-border/50 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
-            {data.map(({ place_id, description, structured_formatting: { main_text, secondary_text } }) => (
-              <button
-                key={place_id}
-                type="button"
-                onClick={() => handleSelect(description)}
-                className="flex items-start gap-3 p-3 border-b border-border/20 last:border-0 hover:bg-muted/50 transition-colors text-left w-full cursor-pointer"
-              >
-                <MapPin className="size-4 text-muted-foreground shrink-0 mt-0.5" />
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-semibold text-foreground truncate">{main_text}</span>
-                  <span className="text-xs text-muted-foreground truncate">{secondary_text}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-      
-      {/* Read-only or editable selected address */}
+      {/* Editable address field */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="location" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
-          Selected Address
+        <label
+          htmlFor="location"
+          className="text-xs font-bold text-foreground/80 uppercase tracking-wide"
+        >
+          Address
         </label>
         <Controller
           name="location"
@@ -229,8 +133,8 @@ export default function Step4Location({
               {...field}
               id="location"
               type="text"
-              placeholder="Your selected address will appear here"
-              className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
+              placeholder="Enter your address..."
+              className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm  outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
             />
           )}
         />
@@ -241,9 +145,35 @@ export default function Step4Location({
         )}
       </div>
 
+      {/* Landmark/Locality input */}
+      <div className="flex flex-col gap-1.5">
+        <label
+          htmlFor="landmark"
+          className="text-xs font-bold text-foreground/80 uppercase tracking-wide"
+        >
+          Landmark / Locality
+        </label>
+        <Controller
+          name="landmark"
+          control={control}
+          render={({ field }) => (
+            <input
+              {...field}
+              id="landmark"
+              type="text"
+              placeholder="e.g. Near Apollo Hospital, Sector 50"
+              className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
+            />
+          )}
+        />
+      </div>
+
       {/* PIN Code input */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="pincode" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
+        <label
+          htmlFor="pincode"
+          className="text-xs font-bold text-foreground/80 uppercase tracking-wide"
+        >
           PIN Code
         </label>
         <Controller
@@ -263,7 +193,7 @@ export default function Step4Location({
               type="text"
               maxLength={6}
               placeholder="Enter 6-digit PIN Code (e.g. 110001)"
-              className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
+              className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm  outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
               onChange={(e) => {
                 const val = e.target.value.replace(/\D/g, "");
                 field.onChange(val);

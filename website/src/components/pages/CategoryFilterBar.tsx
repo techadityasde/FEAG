@@ -96,56 +96,6 @@ export default function CategoryFilterBar({
         </div>
 
         <div className="flex flex-col gap-5 text-sm font-semibold text-muted-foreground">
-          {/* Search by Name */}
-          {/* <div className="flex flex-col gap-2">
-            <label htmlFor="search" className="text-foreground">Search by Name</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/75" />
-              <input
-                id="search"
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-9 pr-3 h-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-normal"
-                value={filters.searchQuery}
-                onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
-              />
-            </div>
-          </div> */}
-
-          {/* Category Filter (Optional) */}
-          {showCategoryFilter && (
-            <div className="flex flex-col gap-2">
-              <label htmlFor="category" className="text-foreground">Service Category</label>
-              <select
-                id="category"
-                className="w-full px-3 h-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary transition-all font-normal cursor-pointer"
-                value={filters.category || "All"}
-                onChange={(e) => onFilterChange({ category: e.target.value })}
-              >
-                <option value="All">All Categories</option>
-                <option value="photographer">Photographer</option>
-                <option value="videographer">Videographer</option>
-                <option value="singer">Singer</option>
-              </select>
-            </div>
-          )}
-
-          {/* Location */}
-          <div className="flex flex-col gap-2">
-            <label htmlFor="location" className="text-foreground">Location</label>
-            <select
-              id="location"
-              className="w-full px-3 h-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary transition-all font-normal cursor-pointer"
-              value={filters.location}
-              onChange={(e) => onFilterChange({ location: e.target.value })}
-            >
-              <option value="All">All Locations</option>
-              {locations.map((loc) => (
-                <option key={loc} value={loc}>{loc}</option>
-              ))}
-            </select>
-          </div>
-
           {/* Price Range */}
           <div className="flex flex-col gap-2">
             <label htmlFor="price" className="text-foreground">Price Range</label>

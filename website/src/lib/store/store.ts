@@ -8,6 +8,11 @@ import authReducer from "./authSlice";
 import transactionReducer from "./transactionSlice";
 import orderReducer from "./orderSlice";
 import locationReducer from "./locationSlice";
+import bookingReducer from "./bookingSlice";
+import tabReducer from "./tabSlice";
+import wishlistReducer from "./wishlistSlice";
+import eventReducer from "./eventSlice";
+import packageReducer from "./packageSlice";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -15,13 +20,18 @@ const rootReducer = combineReducers({
   transactions: transactionReducer,
   orders: orderReducer,
   location: locationReducer,
+  booking: bookingReducer,
+  tab: tabReducer,
+  wishlist: wishlistReducer,
+  event: eventReducer,
+  package: packageReducer,
   [apiSlice.reducerPath]: apiSlice.reducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth', 'onboarding', 'transactions', 'orders', 'location'], // persist auth, onboarding, transactions, orders, and location
+  whitelist: ['auth', 'onboarding', 'transactions', 'orders', 'location', 'booking', 'tab', 'wishlist', 'event', 'package'], // persist state
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

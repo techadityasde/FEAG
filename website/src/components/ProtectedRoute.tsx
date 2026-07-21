@@ -11,32 +11,48 @@ interface ProtectedRouteProps {
   allowedRoles?: string[];
 }
 
-export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+export const ProtectedRoute = ({
+  children,
+  allowedRoles,
+}: ProtectedRouteProps) => {
+  const { user, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
+
   const router = useRouter();
+  const pathname = usePathname();
+
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push("/login");
+      router.replace("/login");
       return;
     }
 
-    if (allowedRoles && allowedRoles.length > 0) {
-      if (user?.role && allowedRoles.includes(user.role)) {
-        setIsAuthorized(true);
+    // Role check
+    if (
+      allowedRoles &&
+      allowedRoles.length > 0 &&
+      (!user?.role || !allowedRoles.includes(user.role))
+    ) {
+      if (user?.role === "customer") {
+        router.replace("/my-account");
       } else {
-        // Redirect to appropriate dashboard based on role if they try to access unauthorized route
-        if (user?.role === "professional" || user?.role === "creator") {
-          router.push("/"); // Adjust default creator route when created
-        } else {
-          router.push("/my-account"); // Adjust default customer route
-        }
+        router.replace("/");
       }
-    } else {
-      setIsAuthorized(true);
+
+      return;
     }
-  }, [isAuthenticated, user, allowedRoles, router]);
+
+    setIsAuthorized(true);
+  }, [
+    isAuthenticated,
+    user,
+    allowedRoles,
+    pathname,
+    router,
+  ]);
 
   if (!isAuthenticated || !isAuthorized) {
     return (

@@ -11,10 +11,20 @@ export default function HeroSection({
   onShare,
   onCustomRequest,
 }: HeroSectionProps) {
-  const { username, profileImage, location, rating, totalReviews, experience, category, isVerified } = professional;
+  const { username, profileImage, location, rating, totalReviews, experience, category, isVerified, fullName } = professional;
 
   const scrollToBooking = () => {
     const element = document.getElementById("packages-section");
+    if (element) {
+      const navHeight = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+    }
+  };
+
+  const scrollToPortfolio = () => {
+    const element = document.getElementById("portfolio-section");
     if (element) {
       const navHeight = 80;
       const elementPosition = element.getBoundingClientRect().top;
@@ -34,7 +44,7 @@ export default function HeroSection({
       <div className="flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">{username}</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">{fullName}</h1>
             {isVerified && <BadgeCheck className="size-6 text-blue-500 fill-blue-500/10 shrink-0" />}
           </div>
 
@@ -71,17 +81,25 @@ export default function HeroSection({
         </div>
 
         {/* Hero Actions */}
-        <div className="flex items-center gap-2.5 pt-4 border-t border-border/40">
-          <Button 
+        <div className="flex items-center gap-2.5 pt-4 border-t border-border/40 flex-wrap">
+          <Button
             onClick={scrollToBooking}
             className="bg-primary hover:bg-primary/95 text-white font-bold text-xs sm:text-sm py-2 px-5 h-9 rounded-lg shadow-sm cursor-pointer"
           >
             Book Now
           </Button>
-          <Button 
-            onClick={onCustomRequest}
+          <Button
+            onClick={scrollToPortfolio}
             variant="outline"
             className="border-primary/30 hover:border-primary text-primary hover:bg-primary/5 font-bold text-xs sm:text-sm py-2 px-5 h-9 rounded-lg shadow-sm cursor-pointer"
+          >
+            Showcase Gallery
+          </Button>
+          <Button
+            onClick={onCustomRequest}
+            variant="outline"
+            disabled
+            className="border-border text-muted-foreground font-bold text-xs sm:text-sm py-2 px-5 h-9 rounded-lg shadow-sm cursor-not-allowed"
           >
             Custom Event Request
           </Button>

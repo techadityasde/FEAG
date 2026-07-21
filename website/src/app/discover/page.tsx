@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Search, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Users, Grid, MapPin, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 
 // Data & Components
@@ -12,8 +12,10 @@ import CategoryFilterBar, {
   FilterState,
 } from "@/components/pages/CategoryFilterBar";
 import CategoryCard from "@/components/pages/CategoryCard";
+import SearchFormPlan from "@/components/pages/SearchFormPlan";
 import ServicesSkeleton from "@/components/skeleton/ServicesSkeleton";
 import EmptyState from "@/components/pages/EmptyState";
+import { useFilteredProfessionals } from "@/hooks/useFilteredProfessionals";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -69,12 +71,13 @@ export default function DiscoverPage() {
   };
 
   // Filter and Sort Processing
-  let filteredList = [...professionals];
+  const baseFilteredProfessionals = useFilteredProfessionals({ categoryOverride: filters.category });
+  let filteredList = [...baseFilteredProfessionals];
 
-  // 1. Category Filter
-  if (filters.category && filters.category !== "All") {
-    filteredList = filteredList.filter((p) => p.category === filters.category);
-  }
+  // 1. Category Filter is already handled by useFilteredProfessionals, but just in case:
+  // if (filters.category && filters.category !== "All") {
+  //   filteredList = filteredList.filter((p) => p.category === filters.category);
+  // }
 
   // 2. Search Query Filter
   if (filters.searchQuery.trim() !== "") {
@@ -181,30 +184,8 @@ export default function DiscoverPage() {
 
         {/* Right Content Area (Listings) */}
         <section className="flex-1 w-full min-w-0">
-          <div className="max-w-4xl mx-auto px-4 relative z-10 flex flex-col items-center text-center space-y-2 mb-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-              <Users className="h-3.5 w-3.5" />
-              Discover Talent
-            </div>
-            <h1 className="text-xl md:text-2md lg:text-3md font-extrabold tracking-tight text-foreground max-w-3xl leading-snug">
-              Search across our entire network of top-rated professionals.
-            </h1>
-
-            {/* Large Center Search Bar */}
-            <div className="w-full max-w-2xl relative mt-0 shadow-xl shadow-primary/5 rounded-2xl group">
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search by name, e.g. 'Arjun'..."
-                className="w-full h-12 pl-12 pr-4 rounded-2xl border-2 border-border/50 bg-card text-foreground text-base focus:outline-none focus:border-primary transition-all shadow-sm"
-                value={filters.searchQuery}
-                onChange={(e) =>
-                  handleFilterChange({ searchQuery: e.target.value })
-                }
-              />
-            </div>
+          <div className="max-w-4xl mx-auto relative z-10 flex flex-col items-center text-center mb-8">
+            <SearchFormPlan activeTab={filters.category} />
           </div>
           <div className="flex items-center justify-between mb-6 px-1">
             <h2 className="text-xl font-bold text-foreground">Results</h2>
@@ -249,11 +230,10 @@ export default function DiscoverPage() {
                       <button
                         key={pageNumber}
                         onClick={() => setCurrentPage(pageNumber)}
-                        className={`size-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          isActive
-                            ? "bg-primary text-white shadow-sm"
-                            : "border border-border hover:bg-muted text-foreground"
-                        }`}
+                        className={`size-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${isActive
+                          ? "bg-primary text-white shadow-sm"
+                          : "border border-border hover:bg-muted text-foreground"
+                          }`}
                       >
                         {pageNumber}
                       </button>

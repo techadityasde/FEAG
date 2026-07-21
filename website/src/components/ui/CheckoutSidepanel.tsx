@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, ShieldCheck, Loader2, MapPin } from "lucide-react";
+import { X, ShieldCheck, Loader2, MapPin, Calendar, Clock, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Professional } from "@/lib/data/professionals";
 import toast from "react-hot-toast";
@@ -15,6 +15,7 @@ import { RootState } from "@/lib/store/store";
 import { addTransaction } from "@/lib/store/transactionSlice";
 import { addOrder } from "@/lib/store/orderSlice";
 import { LoginModal } from "@/components/auth/LoginModal";
+import { EventSelectionModal } from "@/components/EventSelectionModal";
 
 interface RazorpaySuccessResponse {
   razorpay_payment_id: string;
@@ -32,7 +33,7 @@ interface CheckoutSidepanelProps {
   isOpen: boolean;
   onClose: () => void;
   professional: Professional | null;
-  selectedPackage: "basic" | "professional" | "premium" | null;
+  selectedPackage: "basic" | "professional" | "premium" | "custom" | null;
   packagePrice: number;
 }
 
@@ -50,7 +51,11 @@ export default function CheckoutSidepanel({
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const location = useSelector((state: RootState) => state.location);
+  const booking = useSelector((state: RootState) => state.booking);
+  const event = useSelector((state: RootState) => state.event);
   const router = useRouter();
+
+  const [isEventModalOpen, setEventModalOpen] = useState(false);
 
   // Load Razorpay Script
   useEffect(() => {
@@ -62,6 +67,18 @@ export default function CheckoutSidepanel({
       document.body.appendChild(script);
     }
   }, [isOpen, scriptLoaded]);
+
+  // Lock body scroll when panel is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   if (!isOpen || !professional) return null;
 
@@ -110,6 +127,29 @@ export default function CheckoutSidepanel({
         order_id: orderData.id,
         handler: function (response: RazorpaySuccessResponse) {
           // Success Handler
+          
+          // Dynamically attach order and wallet transaction to the professional's mock data
+          if (!professional.orders) professional.orders = [];
+          if (!professional.wallet) professional.wallet = [];
+
+          professional.orders.push({
+            orderId: orderData.id,
+            transactionId: response.razorpay_payment_id,
+            selectedPackage: selectedPackage || "",
+            amount: packagePrice,
+            date: new Date().toISOString(),
+            status: "active"
+          });
+
+          professional.wallet.push({
+            transactionId: response.razorpay_payment_id,
+            orderId: orderData.id,
+            amount: packagePrice,
+            date: new Date().toISOString(),
+            type: "credit",
+            status: "completed"
+          });
+
           // your existing handler — only remove `status`, rest stays same
           dispatch(
             addTransaction({
@@ -129,7 +169,7 @@ export default function CheckoutSidepanel({
               },
             }),
           );
-            
+
           // Dispatch to Orders slice
           dispatch(
             addOrder({
@@ -144,10 +184,12 @@ export default function CheckoutSidepanel({
               selectedPackage: selectedPackage || "",
               amount: packagePrice,
               date: new Date().toISOString(),
+              bookingDate: booking?.selectedDate || "",
+              bookingSlot: booking?.selectedSlot || "",
               status: "active",
             })
           );
-            
+
           // slice auto-adds: escrowStatus, platformFee, artistPayout, timeline
 
           toast.success("Payment successful! Your booking is confirmed.");
@@ -198,13 +240,13 @@ export default function CheckoutSidepanel({
       {/* Backdrop overlay */}
       <div
         className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 animate-in fade-in duration-300"
-        // onClick={onClose} removed to prevent accidental bubbling closing
+      // onClick={onClose} removed to prevent accidental bubbling closing
       />
 
       {/* Sidepanel */}
       <div className="fixed inset-y-0 right-0 w-full md:w-[450px] bg-background border-l border-border shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300 ease-out">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border/60 bg-white">
+        <div className="flex items-center justify-between p-4 border-b border-border/60 bg-white">
           <h2 className="text-xl font-extrabold text-foreground tracking-tight">
             Checkout
           </h2>
@@ -217,14 +259,14 @@ export default function CheckoutSidepanel({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {/* Order Summary */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wide">
               Order Summary
             </h3>
 
-            <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm flex gap-4">
+            <div className="bg-white border border-border/60 rounded-xl p-3 shadow-sm flex gap-4">
               <div className="relative size-16 rounded-lg overflow-hidden shrink-0 bg-muted">
                 <Image
                   src={professional.profileImage}
@@ -247,20 +289,40 @@ export default function CheckoutSidepanel({
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-end mt-1">
-              <Link 
-                href="/discover" 
-                onClick={onClose} 
+              <Link
+                href="/discover"
+                onClick={onClose}
                 className="text-[10px] text-primary hover:underline font-bold transition-colors"
               >
                 Discover more
               </Link>
             </div>
           </div>
+          {/* Date & Time Display */}
+          <div className="bg-white border border-border/60 rounded-xl p-3 shadow-sm flex flex-col gap-1">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="bg-primary/10 p-1.5 rounded-full">
+                <Calendar className="size-4 text-primary" />
+              </div>
+              <h3 className="text-sm font-bold text-foreground">Booking Date & Time</h3>
+            </div>
+            <div className="flex flex-col gap-1 ml-9">
+              <span className="text-xs text-muted-foreground">
+                {booking?.selectedDate ? new Date(booking.selectedDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : "Date not selected"}
+              </span>
+              {booking?.selectedSlot && (
+                <div className="flex items-center gap-1.5 mt-0.5 text-xs font-extrabold text-[#2E2215]">
+                  <Clock className="size-3 text-primary" />
+                  <span>{booking.selectedSlot}</span>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Location Display */}
-          <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm flex flex-col gap-1">
+          <div className="bg-white border border-border/60 rounded-xl p-3 shadow-sm flex flex-col gap-1">
             <div className="flex items-center gap-2 mb-1">
               <div className="bg-primary/10 p-1.5 rounded-full">
                 <MapPin className="size-4 text-primary" />
@@ -277,37 +339,68 @@ export default function CheckoutSidepanel({
             )}
           </div>
 
-          {/* Pricing Details */}
-          <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Package Rate</span>
-              <span className="font-medium text-foreground">
-                ₹{packagePrice.toLocaleString()}
-              </span>
+          {/* Event Display */}
+          <div className="bg-white border border-border/60 rounded-xl p-3 shadow-sm flex flex-col gap-1">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <div className="bg-primary/10 p-1.5 rounded-full">
+                  <PartyPopper className="size-4 text-primary" />
+                </div>
+                <h3 className="text-sm font-bold text-foreground">Event Details</h3>
+              </div>
+              <button 
+                onClick={() => setEventModalOpen(true)}
+                className="text-[10px] text-primary font-bold hover:underline"
+              >
+                Change
+              </button>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Platform Fee (5%)</span>
-              <span className="font-medium text-foreground">
-                ₹{(packagePrice * 0.05).toLocaleString()}
-              </span>
+            <div className="flex flex-col ml-9">
+              {event.eventFunction ? (
+                <>
+                  <span className="text-sm font-semibold text-foreground">
+                    {event.eventFunction}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground mt-0.5">
+                    {event.eventType}
+                  </span>
+                </>
+              ) : (
+                <span className="text-xs text-muted-foreground">
+                  Event not selected
+                </span>
+              )}
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Taxes (18% GST)</span>
-              <span className="font-medium text-foreground">
-                ₹{(packagePrice * 0.18).toLocaleString()}
-              </span>
-            </div>
+          </div>
 
+          {/* Pricing Details */}
+          <div className="bg-white border border-border/60 rounded-xl p-3 shadow-sm space-y-2">
+            <div className="flex justify-between text-sm items-center">
+              <span className="text-muted-foreground">Package Rate</span>
+              <div className="flex items-center gap-1.5">
+                {packagePrice > 0 && (
+                  <span className="text-xs font-semibold text-muted-foreground line-through">
+                    ₹{Math.round(packagePrice * 1.2).toLocaleString()}
+                  </span>
+                )}
+                <span className="font-medium text-foreground">
+                  ₹{packagePrice.toLocaleString()}
+                </span>
+              </div>
+            </div>
             <div className="pt-3 border-t border-border/60 flex justify-between items-end">
-              <span className="font-bold text-foreground">Total Payable</span>
+              <div className="flex flex-col gap-0.5">
+                <span className="font-bold text-foreground">Total Payable</span>
+                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">(Inclusive of all taxes)</span>
+              </div>
               <span className="text-2xl font-black text-primary">
-                ₹{(packagePrice * 1.23).toLocaleString()}
+                ₹{packagePrice.toLocaleString()}
               </span>
             </div>
           </div>
 
           {/* Security Banner */}
-          <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 flex gap-3">
+          <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3 flex gap-3">
             <ShieldCheck className="size-6 text-emerald-500 shrink-0" />
             <p className="text-xs text-emerald-800 leading-relaxed font-medium">
               <strong>Secure Payment.</strong> Your money is held in a secure
@@ -318,7 +411,7 @@ export default function CheckoutSidepanel({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-border/60 bg-white">
+        <div className="p-4 border-t border-border/60 bg-white">
           <Button
             onClick={handlePayment}
             disabled={isProcessing}
@@ -331,7 +424,7 @@ export default function CheckoutSidepanel({
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
-                Proceed to Pay ₹{(packagePrice * 1.23).toLocaleString()}
+                Proceed to Pay ₹{packagePrice.toLocaleString()}
               </span>
             )}
           </Button>
@@ -340,11 +433,15 @@ export default function CheckoutSidepanel({
           </p>
         </div>
       </div>
-      
+
       {/* Login Modal for unauthenticated users */}
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
+      <EventSelectionModal
+        isOpen={isEventModalOpen}
+        onClose={() => setEventModalOpen(false)}
       />
     </>
   );

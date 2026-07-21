@@ -1,9 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Controller } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import Turnstile from "react-turnstile";
 import Link from "next/link";
+import { auth } from "@/lib/firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
+
+declare global {
+  interface Window {
+    recaptchaVerifier: any;
+    grecaptcha: any;
+  }
+}
 
 import { Button } from "@/components/ui/button";
 import { Step1Props } from "../types";
@@ -27,6 +36,32 @@ export default function Step1Mobile({
   const [otpVerified, setOtpVerified] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Clean up any existing verifier from a previous mount (React Strict Mode fix)
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) {}
+        window.recaptchaVerifier = null;
+      }
+
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+      });
+    }
+
+    return () => {
+      if (typeof window !== "undefined" && window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) {}
+        window.recaptchaVerifier = null;
+      }
+    };
+  }, []);
 
   const handleGoogleSignIn = () => {
     setIsGoogleSigningIn(true);
@@ -56,21 +91,34 @@ export default function Step1Mobile({
       });
       const data = await res.json();
 
-      if (data.success) {
-        setOtpSent(true);
-        toast.success("Security verified! OTP sent to +91 " + watchedValues.mobile);
-      } else {
+      if (!data.success) {
         toast.error("Turnstile failed: " + (data.error || "Verification issue"));
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-          setOtpSent(true);
-          toast.success("[DEV FALLBACK] OTP simulated!");
+        if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+          setIsVerifyingTurnstile(false);
+          return;
         }
       }
-    } catch (e) {
-      toast.error("Verification endpoint error");
-      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        setOtpSent(true);
-        toast.success("[DEV FALLBACK] OTP simulated!");
+
+      const appVerifier = window.recaptchaVerifier;
+
+      const phoneNumber = `+91${watchedValues.mobile}`;
+
+      const confirmation = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+      setConfirmationResult(confirmation);
+
+      setOtpSent(true);
+      toast.success(`OTP sent successfully to ${phoneNumber}`);
+
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Failed to send OTP. Please try again.");
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.render().then((widgetId: any) => {
+          // Try to reset the widget if it exists globally
+          if (window.grecaptcha) {
+            window.grecaptcha.reset(widgetId);
+          }
+        }).catch(() => { });
       }
     } finally {
       setIsVerifyingTurnstile(false);
@@ -79,9 +127,9 @@ export default function Step1Mobile({
 
   const handleVerifyOtp = async () => {
     if (signUpMethod === "google") {
-      const isNameValid = await trigger("name");
+      const isNameValid = await trigger(["firstName", "lastName"]);
       if (!isNameValid) {
-        toast.error("Please enter a valid full name first");
+        toast.error("Please enter a valid first and last name");
         return;
       }
     }
@@ -92,60 +140,95 @@ export default function Step1Mobile({
     }
 
     setIsVerifyingOtp(true);
-    setTimeout(() => {
-      setIsVerifyingOtp(false);
-      if (watchedValues.otp === "123456") {
+    try {
+      if (confirmationResult) {
+        await confirmationResult.confirm(watchedValues.otp);
         setOtpVerified(true);
         toast.success("Mobile verification successful!");
         onOtpVerified();
       } else {
-        setError("otp", { type: "manual", message: "Invalid OTP code. Enter 123456 for testing." });
-        toast.error("Incorrect verification code");
+        toast.error("Verification session expired. Please request OTP again.");
       }
-    }, 600);
+    } catch (err: any) {
+      console.error(err);
+      setError("otp", { type: "manual", message: "Invalid OTP code." });
+      toast.error("Incorrect verification code");
+    } finally {
+      setIsVerifyingOtp(false);
+    }
   };
 
   return (
-    <div className="flex flex-col gap-5 animate-in fade-in duration-300">
+    <div className="flex flex-col gap-4 animate-in fade-in duration-300 relative">
       <div>
         <h2 className="text-lg font-bold text-[#2E2215]">
           {signUpMethod === "google" ? "Complete Registration" : "Mobile Number Verification"}
         </h2>
         <p className="text-xs text-muted-foreground mt-0.5">
-          {signUpMethod === "google" 
-            ? "Please verify your details and mobile number to begin onboarding." 
+          {signUpMethod === "google"
+            ? "Please verify your details and mobile number to begin onboarding."
             : "Please verify your contact number to begin onboarding."}
         </p>
       </div>
 
       {signUpMethod === "google" && (
-        <div className="flex flex-col gap-1.5 animate-in fade-in duration-300">
-          <label htmlFor="name" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
-            Full Name
-          </label>
-          <Controller
-            name="name"
-            control={control}
-            rules={{
-              required: "Full Name is required",
-              pattern: {
-                value: /^[A-Za-z\s]+$/,
-                message: "Only alphabetic characters and spaces are allowed",
-              }
-            }}
-            render={({ field }) => (
-              <input
-                {...field}
-                id="name"
-                type="text"
-                placeholder="Enter your name"
-                className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
-              />
+        <div className="flex gap-3 animate-in fade-in duration-300">
+          <div className="flex flex-col gap-1.5 flex-1">
+            <label htmlFor="firstName" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
+              First Name
+            </label>
+            <Controller
+              name="firstName"
+              control={control}
+              rules={{
+                required: "Required",
+                pattern: {
+                  value: /^[A-Za-z\s]+$/,
+                  message: "Invalid format",
+                }
+              }}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  id="firstName"
+                  type="text"
+                  placeholder="First name"
+                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
+                />
+              )}
+            />
+            {errors.firstName && (
+              <span className="text-xs font-medium text-destructive">{errors.firstName.message}</span>
             )}
-          />
-          {errors.name && (
-            <span className="text-xs font-medium text-destructive">{errors.name.message}</span>
-          )}
+          </div>
+          <div className="flex flex-col gap-1.5 flex-1">
+            <label htmlFor="lastName" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
+              Last Name
+            </label>
+            <Controller
+              name="lastName"
+              control={control}
+              rules={{
+                required: "Required",
+                pattern: {
+                  value: /^[A-Za-z\s]+$/,
+                  message: "Invalid format",
+                }
+              }}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  id="lastName"
+                  type="text"
+                  placeholder="Last name"
+                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
+                />
+              )}
+            />
+            {errors.lastName && (
+              <span className="text-xs font-medium text-destructive">{errors.lastName.message}</span>
+            )}
+          </div>
         </div>
       )}
 
@@ -192,7 +275,7 @@ export default function Step1Mobile({
 
       {/* Turnstile Container */}
       {!otpSent && (
-        <div className="flex flex-col gap-1.5 mt-2">
+        <div className="flex flex-col gap-1 mt-1">
           <div className="w-full overflow-hidden flex justify-center py-1 scale-[0.85] min-[375px]:scale-100 origin-center">
             <Turnstile
               sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAADpGzgKRyLobmlbi"}
@@ -209,7 +292,7 @@ export default function Step1Mobile({
 
       {/* Action buttons step 1 */}
       {!otpSent ? (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2.5">
           <Button
             type="button"
             onClick={handleSendOtp}
@@ -260,8 +343,8 @@ export default function Step1Mobile({
                 )}
                 Continue with Google
               </button>
-              
-              <div className="mt-2 text-center">
+
+              <div className="mt-1 text-center">
                 <span className="text-xs text-muted-foreground">Already registered? </span>
                 <Link href="/login" className="text-xs font-bold text-primary hover:underline">
                   Login here
@@ -278,7 +361,7 @@ export default function Step1Mobile({
               <label htmlFor="otp" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
                 Verification OTP
               </label>
-              <span className="text-[10px] text-muted-foreground">Test OTP: <strong className="text-primary font-bold">123456</strong></span>
+              <span className="text-[10px] text-muted-foreground">Sent to <strong className="text-primary font-bold">+91 {watchedValues.mobile}</strong></span>
             </div>
             <Controller
               name="otp"
@@ -338,6 +421,7 @@ export default function Step1Mobile({
           )}
         </div>
       )}
+      <div id="recaptcha-container" className="absolute bottom-0 opacity-0 pointer-events-none"></div>
     </div>
   );
 }
