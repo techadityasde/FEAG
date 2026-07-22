@@ -62,6 +62,14 @@ export default function Footer() {
                 Cancellation &amp; Refund Policy
               </Link>
             </li>
+            <li>
+              <Link
+                href="/cyber-security"
+                className="hover:text-foreground transition-colors"
+              >
+                Cyber Security
+              </Link>
+            </li>
           </ul>
         </div>
 

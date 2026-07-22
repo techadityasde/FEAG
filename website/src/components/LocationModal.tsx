@@ -76,7 +76,7 @@ export function LocationModal({ isOpen, onClose }: LocationModalProps) {
     }
 
     const toastId = toast.loading('Fetching current location...');
-    
+    console.log("Fetching current location...", navigator);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const lat = position.coords.latitude;
