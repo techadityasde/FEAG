@@ -4,7 +4,12 @@ import { Sparkles, Users } from "lucide-react";
 
 import { Step3Props } from "../types";
 
-export default function Step3Category({ control, errors, setValue, clearErrors }: Step3Props) {
+export default function Step3Category({
+  control,
+  errors,
+  setValue,
+  clearErrors,
+}: Step3Props) {
   const selectedRole = useWatch({
     control,
     name: "role",
@@ -13,8 +18,12 @@ export default function Step3Category({ control, errors, setValue, clearErrors }
   return (
     <div className="flex flex-col gap-5 animate-in fade-in duration-300">
       <div>
-        <h2 className="text-lg font-bold text-[#2E2215]">What brings you to FEAG?</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">Choose your primary account objective to proceed.</p>
+        <h2 className="text-lg font-bold text-[#2E2215]">
+          What brings you to FEAG?
+        </h2>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Choose your primary account objective to proceed.
+        </p>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -40,15 +49,22 @@ export default function Step3Category({ control, errors, setValue, clearErrors }
                     : "bg-white border-border/60 hover:border-border hover:bg-muted/50"
                 }`}
               >
-                <div className={`p-2 sm:p-2.5 rounded-full transition-colors ${
-                  selectedRole === "creator" ? "bg-primary text-white" : "bg-muted text-muted-foreground"
-                }`}>
+                <div
+                  className={`p-2 sm:p-2.5 rounded-full transition-colors ${
+                    selectedRole === "creator"
+                      ? "bg-primary text-white"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
                   <Sparkles className="size-4 sm:size-5" />
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-[#2E2215]">Join as a Creator</h3>
+                  <h3 className="text-xs sm:text-sm font-bold text-[#2E2215]">
+                    Join as a Creator
+                  </h3>
                   <p className="text-[9px] sm:text-xs text-muted-foreground mt-1 leading-normal max-w-[180px]">
-                    I want to register and offer my creative services to clients.
+                    I want to register and offer my creative services to
+                    clients.
                   </p>
                 </div>
               </button>
@@ -67,13 +83,19 @@ export default function Step3Category({ control, errors, setValue, clearErrors }
                     : "bg-white border-border/60 hover:border-border hover:bg-muted/50"
                 }`}
               >
-                <div className={`p-2 sm:p-2.5 rounded-full transition-colors ${
-                  selectedRole === "customer" ? "bg-primary text-white" : "bg-muted text-muted-foreground"
-                }`}>
+                <div
+                  className={`p-2 sm:p-2.5 rounded-full transition-colors ${
+                    selectedRole === "customer"
+                      ? "bg-primary text-white"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
                   <Users className="size-4 sm:size-5" />
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-[#2E2215]">Hire Creative Talent</h3>
+                  <h3 className="text-xs sm:text-sm font-bold text-[#2E2215]">
+                    Hire Creative Talent
+                  </h3>
                   <p className="text-[9px] sm:text-xs text-muted-foreground mt-1 leading-normal max-w-[180px]">
                     I want to search, book, and hire creative professionals.
                   </p>
@@ -83,13 +105,18 @@ export default function Step3Category({ control, errors, setValue, clearErrors }
           )}
         />
         {errors.role && (
-          <span className="text-xs font-medium text-destructive">{errors.role.message}</span>
+          <span className="text-xs font-medium text-destructive">
+            {errors.role.message}
+          </span>
         )}
       </div>
 
       {selectedRole === "creator" && (
         <div className="flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-          <label htmlFor="category" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
+          <label
+            htmlFor="category"
+            className="text-xs font-bold text-foreground/80 uppercase tracking-wide"
+          >
             Talent Category
           </label>
           <Controller
@@ -102,20 +129,25 @@ export default function Step3Category({ control, errors, setValue, clearErrors }
                 id="category"
                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-white px-3 py-2 text-sm shadow-sm outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
               >
-                <option value="" disabled>Select category option</option>
+                <option value="" disabled>
+                  Select category option
+                </option>
                 <option value="Videographer">Videographer</option>
                 <option value="Photographer">Photographer</option>
-                <option value="Cinematographer">Cinematic<span>{` (Photo + Video)`}</span></option>
+                <option value="Cinematographer">
+                  Cinematic (Photo + Video)
+                </option>
                 <option value="Singer">Singer</option>
               </select>
             )}
           />
           {errors.category && (
-            <span className="text-xs font-medium text-destructive">{errors.category.message}</span>
+            <span className="text-xs font-medium text-destructive">
+              {errors.category.message}
+            </span>
           )}
         </div>
       )}
     </div>
   );
 }
-

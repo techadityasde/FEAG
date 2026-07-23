@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar as CalendarIcon, Clock, ChevronDown, ChevronLeft, ChevronRight, MapPin, RotateCcw, PartyPopper } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, ChevronDown, ChevronLeft, ChevronRight, MapPin, RotateCcw, PartyPopper, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { LocationModal } from '../LocationModal';
@@ -13,7 +14,18 @@ const SLOTS = ['10:00 AM', '02:00 PM', '06:00 PM'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-export default function SearchFormPlan({ activeTab }: { activeTab?: string }) {
+interface SearchFormPlanProps {
+  activeTab?: string;
+  onSearch?: () => void;
+  showSearchButton?: boolean;
+}
+
+export default function SearchFormPlan({
+  activeTab,
+  onSearch,
+  showSearchButton = true,
+}: SearchFormPlanProps) {
+  const router = useRouter();
   const dispatch = useDispatch();
   const selectedDateStr = useSelector((state: any) => state.booking.selectedDate);
   const selectedSlot = useSelector((state: any) => state.booking.selectedSlot);
@@ -21,6 +33,21 @@ export default function SearchFormPlan({ activeTab }: { activeTab?: string }) {
   const event = useSelector((state: any) => state.event);
 
   const selectedDate = selectedDateStr ? new Date(selectedDateStr) : null;
+
+  // Validation: Search button disabled until both location and date selection are not null/empty
+  const isLocationSelected = Boolean(location?.address && location.address.trim() !== "");
+  const isDateSelected = Boolean(selectedDateStr);
+  const isSearchDisabled = !isLocationSelected || !isDateSelected;
+
+  const handleSearchClick = () => {
+    if (isSearchDisabled) return;
+    if (onSearch) {
+      onSearch();
+    } else {
+      const targetCategory = activeTab && activeTab !== "All" ? activeTab : "photographer";
+      router.push(`/services/${targetCategory}`);
+    }
+  };
 
   const [showCalendar, setShowCalendar] = useState(false);
   const [showSlots, setShowSlots] = useState(false);
@@ -422,6 +449,36 @@ export default function SearchFormPlan({ activeTab }: { activeTab?: string }) {
         isOpen={showEventModal}
         onClose={() => setShowEventModal(false)}
       />
+
+      {/* Search Button Container */}
+      {showSearchButton && (
+        <div className="flex flex-col items-center justify-center mt-3 sm:mt-4">
+          <button
+            type="button"
+            disabled={isSearchDisabled}
+            onClick={handleSearchClick}
+            className={cn(
+              "bg-primary text-white font-black text-xs sm:text-sm py-3 px-10 sm:px-14 rounded-full shadow-lg transition-all uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2",
+              isSearchDisabled
+                ? "opacity-50 cursor-not-allowed shadow-none hover:bg-primary"
+                : "hover:bg-primary/95 active:scale-95 hover:shadow-xl"
+            )}
+          >
+            <Search className="size-4" />
+            <span>Search</span>
+          </button>
+
+          {isSearchDisabled && (
+            <p className="text-[11px] font-semibold text-muted-foreground mt-1.5 flex items-center gap-1">
+              {!isLocationSelected && !isDateSelected
+                ? "* Please select a location and date to enable search"
+                : !isLocationSelected
+                ? "* Please select a location to enable search"
+                : "* Please select a booking date to enable search"}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

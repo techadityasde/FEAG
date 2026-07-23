@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface LoaderProps {
   onComplete?: () => void;
@@ -140,7 +141,17 @@ export default function Loader({ onComplete, fullscreen = true }: LoaderProps) {
       ` }} />
 
       <div className="feag-loader-container feag-loader-bg-glow flex flex-col items-center gap-0 w-[min(260px,72vw)] relative z-10">
-        <div className="feag-brand">FEAG</div>
+        <div className="flex flex-col items-center justify-center mb-2">
+          <Image
+            src="/logo.jpg"
+            alt="FEAG Logo"
+            width={120}
+            height={64}
+            className="h-12 sm:h-16 w-auto max-w-[120px] sm:max-w-[150px] object-contain rounded-xl shadow-xs mb-2 transition-all duration-300"
+            priority
+          />
+          <div className="feag-brand">FEAG</div>
+        </div>
 
         <div className="feag-track">
           <div className="feag-fill"></div>

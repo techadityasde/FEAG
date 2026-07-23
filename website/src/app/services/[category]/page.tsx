@@ -238,7 +238,7 @@ export default function CategoryPage({ params }: PageProps) {
       <div className="w-full max-w-[1400px] mx-auto px-3 min-[360px]:px-4 sm:px-6 lg:px-8 mt-8 flex flex-col md:flex-row gap-8">
 
         {/* Left Sidebar Filters (Responsive) */}
-        <aside className="w-full md:w-64 lg:w-72 shrink-0 md:sticky md:top-24 self-start z-10">
+        <aside className="w-full md:w-64 lg:w-72 shrink-0 md:sticky md:top-24 self-start z-100">
           <CategoryFilterBar
             filters={filters}
             onFilterChange={handleFilterChange}

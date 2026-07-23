@@ -108,11 +108,11 @@ export default function Navbar() {
   const SearchDropdown = () =>
     isSearchFocused ? (
       displayCategories.length > 0 ? (
-        <div className="absolute top-full mt-2 left-0 w-full bg-white p-2 rounded-lg border border-border shadow-xl max-h-60 overflow-y-auto z-50 ">
+        <div className="absolute top-full mt-2 left-0 w-full bg-white p-2 rounded-lg border border-border shadow-xl max-h-none overflow-y-auto z-50 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {displayCategories.map((item) => (
             <div
               key={item.category}
-              className="cursor-pointer flex items-center justify-between gap-2 text-sm min-[360px]:text-base text-muted-foreground py-3 px-3 border-b border-border/50 last:border-0 hover:bg-muted rounded-md transition-colors"
+              className="cursor-pointer flex items-center justify-between gap-2 text-sm min-[360px]:text-base text-muted-foreground py-2.5 px-3 border-b border-border/50 last:border-0 hover:bg-muted rounded-md transition-colors"
               onMouseDown={(e) => {
                 e.preventDefault();
                 router.push(`/services/${item.category}`);
@@ -149,22 +149,28 @@ export default function Navbar() {
     <>
       {/* Mobile Top Header (replaces standard header on small screens) */}
       <header className="md:hidden w-full bg-background border-b border-border p-4 sticky top-0 z-40 pb-5 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <Link href="/" className="flex items-center gap-2 text-xl font-black text-primary tracking-wider shrink-0">
+            <Image
+              src="/logo.jpg"
+              alt="FEAG Logo"
+              width={28}
+              height={28}
+              className="size-7 object-contain rounded-md"
+              priority
+            />
+            <span>FEAG</span>
+          </Link>
+
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-1.5 cursor-pointer bg-muted/40 hover:bg-muted/80 px-2.5 py-1.5 rounded-full border border-border/60 transition-colors max-w-[170px] min-[380px]:max-w-[210px] shrink"
             onClick={() => setLocationModalOpen(true)}
           >
-            <div className="bg-primary/10 rounded-full p-2 flex items-center justify-center">
-              <MapPin className="size-4 text-primary" fill="currentColor" />
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center text-xs text-muted-foreground">
-                <span className="max-w-[180px] truncate">
-                  {location.address || "Select Location"}
-                </span>
-                <ChevronDown className="size-3 ml-1" />
-              </div>
-            </div>
+            <MapPin className="size-3.5 text-primary shrink-0" fill="currentColor" />
+            <span className="text-xs font-semibold text-foreground truncate flex-1">
+              {location.address ? location.address.split(',')[0] : "Select Location"}
+            </span>
+            <ChevronDown className="size-3 text-muted-foreground shrink-0" />
           </div>
           <div className="flex items-center gap-3 relative">
             <button
@@ -298,35 +304,43 @@ export default function Navbar() {
       {/* Desktop Header */}
       <header className="hidden md:flex w-full border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-40 transition-all duration-200">
         <div className="max-w-[1400px] w-full mx-auto px-6 h-16 flex items-center justify-between gap-6">
-          <div className="flex items-center">
+          <div className="flex items-center shrink-0">
             <Link
               href="/"
-              className="text-2xl font-black tracking-wider text-primary select-none cursor-pointer mr-6"
+              className="flex items-center gap-2.5 text-2xl font-black tracking-wider text-primary select-none cursor-pointer mr-6 group"
             >
-              FEAG
+              <Image
+                src="/logo.jpg"
+                alt="FEAG Logo"
+                width={36}
+                height={36}
+                className="size-8 sm:size-9 object-contain rounded-lg shadow-2xs group-hover:scale-105 transition-transform"
+                priority
+              />
+              <span>FEAG</span>
             </Link>
           </div>
           <Link
             href="/discover"
-            className="text-sm font-semibold text-foreground hover:text-primary transition-colors"
+            className="text-sm font-semibold text-foreground hover:text-primary transition-colors shrink-0"
           >
             Discover
           </Link>
           {/* Desktop Search Center */}
-          <div className="flex items-center gap-3 w-[60%] mx-auto">
+          <div className="flex items-center gap-3 w-[65%] max-w-[720px] mx-auto">
             <button
               onClick={() => setLocationModalOpen(true)}
-              className="flex items-center w-1/2 gap-2 px-4 py-2 border border-border rounded-lg bg-muted/30 hover:bg-muted text-sm font-semibold whitespace-nowrap transition-colors"
+              className="flex items-center w-[38%] shrink-0 gap-2 px-3.5 py-2 border border-border rounded-xl bg-muted/30 hover:bg-muted text-sm font-semibold whitespace-nowrap transition-colors"
             >
               <MapPin className="size-4 text-primary shrink-0" />
-              <span className="truncate flex-1 text-left">
+              <span className="truncate flex-1 text-left text-foreground">
                 {location.address || "Select Address"}
               </span>
               <ChevronDown className="size-4 text-muted-foreground shrink-0" />
             </button>
 
-            <div className="relative w-1/2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground z-20" />
+            <div className="relative w-[62%] flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground z-20" />
               <input
                 type="text"
                 placeholder=""
@@ -340,7 +354,7 @@ export default function Navbar() {
                     setIsSearchFocused(false);
                   }, 200);
                 }}
-                className="w-full pl-9 pr-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary text-sm font-medium relative z-10"
+                className="w-full pl-9 pr-4 py-2 border border-border rounded-xl bg-background focus:outline-none focus:ring-1 focus:ring-primary text-sm font-medium relative z-10"
               />
               {!searchTerm && <AnimatedPlaceholder leftClass="left-9" />}
               <SearchDropdown />

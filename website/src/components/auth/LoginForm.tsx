@@ -44,6 +44,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && !pageLoading) {
@@ -142,6 +143,11 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
   }, [dispatch, onSuccess, router]);
 
   const handleSendOtp = async () => {
+    if (!acceptedTerms) {
+      toast.error("Please accept the Terms & Conditions and Privacy Policy to continue");
+      return;
+    }
+
     const isValidPhone = await trigger("mobile");
     if (!isValidPhone) {
       toast.error("Please enter a valid 10-digit mobile number");
@@ -248,6 +254,10 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
           gender: (matchedUser as any).gender || "",
           experience: (matchedUser as any).experience || "",
           description: (matchedUser as any).description || "",
+          dateOfBirth: (matchedUser as any).dateOfBirth || "",
+          nationality: (matchedUser as any).nationality || "",
+          state: (matchedUser as any).state || "",
+          city: (matchedUser as any).city || "",
         };
 
         dispatch(login(userData as any));
@@ -272,6 +282,11 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
   };
 
   const handleGoogleSignIn = () => {
+    if (!acceptedTerms) {
+      toast.error("Please accept the Terms & Conditions and Privacy Policy to continue");
+      return;
+    }
+
     setIsGoogleSigningIn(true);
     toast.loading("Connecting to Google...", { id: "google-login" });
     const mobile = watchedMobile || "";
@@ -355,10 +370,32 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
             </div>
           </div>
 
+          {/* Terms & Privacy Policy Checkbox */}
+          <div className="flex items-start gap-2.5 my-1 bg-muted/20 p-2.5 rounded-lg border border-border/40">
+            <input
+              type="checkbox"
+              id="login-terms"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="mt-0.5 size-4 rounded border-input text-primary focus:ring-primary cursor-pointer accent-primary"
+            />
+            <label htmlFor="login-terms" className="text-xs text-muted-foreground leading-snug cursor-pointer select-none">
+              I agree to the{" "}
+              <Link href="/terms-and-conditions" target="_blank" className="font-semibold text-primary underline hover:text-primary/80">
+                Terms & Conditions
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy-policy" target="_blank" className="font-semibold text-primary underline hover:text-primary/80">
+                Privacy Policy
+              </Link>
+              .
+            </label>
+          </div>
+
           <Button
             type="button"
             onClick={handleSendOtp}
-            disabled={isVerifyingTurnstile || !watchedMobile || watchedMobile.length !== 10 || !turnstileToken || isGoogleSigningIn}
+            disabled={!acceptedTerms || isVerifyingTurnstile || !watchedMobile || watchedMobile.length !== 10 || !turnstileToken || isGoogleSigningIn}
             className="w-full bg-primary hover:bg-primary/95 text-white font-semibold flex items-center justify-center gap-2 cursor-pointer mt-1"
           >
             {isVerifyingTurnstile && <Loader2 className="size-4 animate-spin" />}
@@ -443,7 +480,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            disabled={isGoogleSigningIn || isVerifyingTurnstile}
+            disabled={!acceptedTerms || isGoogleSigningIn || isVerifyingTurnstile}
             className="w-full flex items-center justify-center gap-2 px-3 py-2 border border-border/80 bg-white hover:bg-muted/30 rounded-lg text-xs font-semibold text-foreground transition-all duration-200 select-none cursor-pointer disabled:opacity-50"
           >
             {isGoogleSigningIn ? (
