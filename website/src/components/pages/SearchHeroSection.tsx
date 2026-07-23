@@ -80,19 +80,8 @@ export default function SearchHeroSection() {
           </div>
 
           {/* Body Content */}
-          <div className="p-3 sm:p-6 pt-3">
-            {/* Component approach: We render different components based on activeTab later */}
-            <SearchFormPlan activeTab={activeTab} />
-          </div>
-
-          {/* Search Button */}
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
-            <Button
-              onClick={() => router.push(`/services/${activeTab}`)}
-              className="bg-primary hover:bg-primary/90 text-white font-black text-sm py-3 px-10 sm:px-14 rounded-full shadow-xl transition-transform active:scale-95 uppercase tracking-wide"
-            >
-              Search
-            </Button>
+          <div className="p-3 sm:p-6 pt-3 pb-6">
+            <SearchFormPlan activeTab={activeTab} showSearchButton={true} />
           </div>
         </div>
 

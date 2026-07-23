@@ -12,7 +12,8 @@ import {
   MapPin,
   Check,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  RotateCcw
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -120,6 +121,10 @@ export default function JoinUs() {
       category: savedData.category || "",
       pincode: savedData.pincode || "",
       location: savedData.location || "",
+      landmark: savedData.landmark || "",
+      nationality: savedData.nationality || "Indian",
+      state: savedData.state || "",
+      city: savedData.city || "",
     },
     mode: "onChange",
   });
@@ -201,7 +206,7 @@ export default function JoinUs() {
       }
     } else if (activeStep === locationStepIdx) {
       // Location Details Validation
-      isValid = await trigger(["pincode", "location"]);
+      isValid = await trigger(["pincode", "location", "nationality", "state", "city"]);
     }
 
     if (isValid) {
@@ -217,6 +222,10 @@ export default function JoinUs() {
         category: watch("category"),
         pincode: watchedPincode,
         location: watch("location"),
+        landmark: watch("landmark"),
+        nationality: watch("nationality"),
+        state: watch("state"),
+        city: watch("city"),
       };
       dispatch(updateOnboardingData(currentValues));
 
@@ -252,6 +261,38 @@ export default function JoinUs() {
       setCompletedSteps([false, false, false, false]);
       setActiveStep(0);
     }
+  };
+
+  const handleResetCurrentStep = () => {
+    let fieldsToReset: (keyof FormValues)[] = [];
+
+    if (signUpMethod === "google") {
+      if (activeStep === 0) {
+        fieldsToReset = ["mobile", "otp"];
+      } else if (activeStep === 1) {
+        fieldsToReset = ["role", "category"];
+      } else if (activeStep === 2) {
+        fieldsToReset = ["nationality", "state", "city", "location", "landmark", "pincode"];
+      }
+    } else {
+      if (activeStep === 0) {
+        fieldsToReset = ["mobile", "otp"];
+      } else if (activeStep === 1) {
+        fieldsToReset = ["firstName", "lastName", "gender", "email"];
+      } else if (activeStep === 2) {
+        fieldsToReset = ["role", "category"];
+      } else if (activeStep === 3) {
+        fieldsToReset = ["nationality", "state", "city", "location", "landmark", "pincode"];
+      }
+    }
+
+    fieldsToReset.forEach((field) => {
+      const defaultVal = field === "nationality" ? "Indian" : "";
+      setValue(field, defaultVal, { shouldValidate: false });
+    });
+
+    clearErrors(fieldsToReset);
+    toast.success("Current step fields reset");
   };
 
   if (pageLoading) {
@@ -395,14 +436,24 @@ export default function JoinUs() {
               Back
             </button>
             {(activeStep > 0 || otpVerified) && (
-              <Button
-                type="button"
-                onClick={handleNextStep}
-                className="bg-primary hover:bg-primary/95 text-white font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer animate-in fade-in duration-200"
-              >
-                {activeStep === steps.length - 1 ? "Submit" : "Next Step"}
-                <ChevronRight className="size-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleResetCurrentStep}
+                  title="Reset current step"
+                  className="inline-flex items-center justify-center p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/60 border border-border/50 transition-all cursor-pointer select-none"
+                >
+                  <RotateCcw className="size-4" />
+                </button>
+                <Button
+                  type="button"
+                  onClick={handleNextStep}
+                  className="bg-primary hover:bg-primary/95 text-white font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer animate-in fade-in duration-200"
+                >
+                  {activeStep === steps.length - 1 ? "Submit" : "Next Step"}
+                  <ChevronRight className="size-4" />
+                </Button>
+              </div>
             )}
           </div>
         )}
