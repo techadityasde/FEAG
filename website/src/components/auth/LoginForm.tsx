@@ -10,7 +10,11 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { login } from "@/lib/store/authSlice";
 import { auth } from "@/lib/firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  ConfirmationResult,
+} from "firebase/auth";
 import { professionals } from "@/lib/data/professionals";
 import { customers } from "@/lib/data/customers";
 
@@ -34,7 +38,10 @@ interface LoginFormProps {
   showTitle?: boolean;
 }
 
-export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProps) {
+export default function LoginForm({
+  onSuccess,
+  showTitle = true,
+}: LoginFormProps) {
   const router = useRouter();
   const dispatch = useDispatch();
   const [pageLoading, setPageLoading] = useState(true);
@@ -43,29 +50,35 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
   const [otpSent, setOtpSent] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [confirmationResult, setConfirmationResult] =
+    useState<ConfirmationResult | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
+     console.log("env", process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
     if (typeof window !== "undefined" && !pageLoading) {
       // Clean up any existing verifier from a previous mount (React Strict Mode fix)
       if (window.recaptchaVerifier) {
         try {
           window.recaptchaVerifier.clear();
-        } catch (e) { }
+        } catch (e) {}
         window.recaptchaVerifier = null;
       }
 
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-      });
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        auth,
+        "recaptcha-container",
+        {
+          size: "invisible",
+        },
+      );
     }
 
     return () => {
       if (typeof window !== "undefined" && window.recaptchaVerifier) {
         try {
           window.recaptchaVerifier.clear();
-        } catch (e) { }
+        } catch (e) {}
         window.recaptchaVerifier = null;
       }
     };
@@ -109,12 +122,16 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
         const email = urlParams.get("email") || "";
 
         // Verify Google email against registration records
-        const matchedProfessional = professionals.find(p => p.email === email);
-        const matchedCustomer = customers.find(c => c.email === email);
+        const matchedProfessional = professionals.find(
+          (p) => p.email === email,
+        );
+        const matchedCustomer = customers.find((c) => c.email === email);
         const matchedUser = matchedProfessional || matchedCustomer;
 
         if (!matchedUser) {
-          toast.error("This Google account is not registered. Please sign up first.");
+          toast.error(
+            "This Google account is not registered. Please sign up first.",
+          );
         } else {
           const userData = {
             mobile: matchedUser.mobile,
@@ -123,14 +140,15 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
             role: matchedUser.role,
             category: (matchedUser as any).category || "",
             location: matchedUser.location,
-            profileImage: matchedUser.profileImage
+            profileImage: matchedUser.profileImage,
           };
           dispatch(login(userData as any));
           toast.success("Successfully authenticated with Google!");
           setTimeout(() => {
             if (onSuccess) onSuccess();
             else {
-              if (matchedUser.role === 'creator') router.push("/creator/dashboard");
+              if (matchedUser.role === "creator")
+                router.push("/creator/dashboard");
               else router.push("/my-account");
             }
           }, 800);
@@ -144,7 +162,9 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
 
   const handleSendOtp = async () => {
     if (!acceptedTerms) {
-      toast.error("Please accept the Terms & Conditions and Privacy Policy to continue");
+      toast.error(
+        "Please accept the Terms & Conditions and Privacy Policy to continue",
+      );
       return;
     }
 
@@ -155,12 +175,16 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
     }
 
     // Check if the mobile number is registered
-    const matchedProfessional = professionals.find(p => p.mobile === watchedMobile);
-    const matchedCustomer = customers.find(c => c.mobile === watchedMobile);
+    const matchedProfessional = professionals.find(
+      (p) => p.mobile === watchedMobile,
+    );
+    const matchedCustomer = customers.find((c) => c.mobile === watchedMobile);
     const matchedUser = matchedProfessional || matchedCustomer;
 
     if (!matchedUser) {
-      toast.error("This mobile number is not registered. Please join us first.");
+      toast.error(
+        "This mobile number is not registered. Please join us first.",
+      );
       setError("mobile", {
         type: "manual",
         message: "Mobile number is not registered",
@@ -183,8 +207,13 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
       const data = await res.json();
 
       if (!data.success) {
-        toast.error("Turnstile failed: " + (data.error || "Verification issue"));
-        if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+        toast.error(
+          "Turnstile failed: " + (data.error || "Verification issue"),
+        );
+        if (
+          window.location.hostname !== "localhost" &&
+          window.location.hostname !== "127.0.0.1"
+        ) {
           setIsVerifyingTurnstile(false);
           return;
         }
@@ -193,7 +222,11 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
       const appVerifier = window.recaptchaVerifier;
       const phoneNumber = `+91${watchedMobile}`;
 
-      const confirmation = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        appVerifier,
+      );
       setConfirmationResult(confirmation);
 
       setOtpSent(true);
@@ -202,12 +235,15 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
       console.error(e);
       toast.error(e.message || "Failed to send OTP. Please try again.");
       if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.render().then((widgetId: any) => {
-          // Try to reset the widget if it exists globally
-          if (window.grecaptcha) {
-            window.grecaptcha.reset(widgetId);
-          }
-        }).catch(() => { });
+        window.recaptchaVerifier
+          .render()
+          .then((widgetId: any) => {
+            // Try to reset the widget if it exists globally
+            if (window.grecaptcha) {
+              window.grecaptcha.reset(widgetId);
+            }
+          })
+          .catch(() => {});
       }
     } finally {
       setIsVerifyingTurnstile(false);
@@ -226,12 +262,18 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
         await confirmationResult.confirm(watchedOtp);
 
         // Re-verify registration data
-        const matchedProfessional = professionals.find(p => p.mobile === watchedMobile);
-        const matchedCustomer = customers.find(c => c.mobile === watchedMobile);
+        const matchedProfessional = professionals.find(
+          (p) => p.mobile === watchedMobile,
+        );
+        const matchedCustomer = customers.find(
+          (c) => c.mobile === watchedMobile,
+        );
         const matchedUser = matchedProfessional || matchedCustomer;
 
         if (!matchedUser) {
-          toast.error("This mobile number is not registered. Please sign up first.");
+          toast.error(
+            "This mobile number is not registered. Please sign up first.",
+          );
           setError("mobile", {
             type: "manual",
             message: "Mobile number is not registered",
@@ -265,7 +307,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
         setTimeout(() => {
           if (onSuccess) onSuccess();
           else {
-            if (matchedUser.role === 'creator') router.push("/creator/profile");
+            if (matchedUser.role === "creator") router.push("/creator/profile");
             else router.push("/my-account");
           }
         }, 800);
@@ -283,7 +325,9 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
 
   const handleGoogleSignIn = () => {
     if (!acceptedTerms) {
-      toast.error("Please accept the Terms & Conditions and Privacy Policy to continue");
+      toast.error(
+        "Please accept the Terms & Conditions and Privacy Policy to continue",
+      );
       return;
     }
 
@@ -300,7 +344,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
       </div>
     );
   }
-  console.log(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)
+ 
   return (
     <div className="flex flex-col gap-5 w-full">
       {showTitle && (
@@ -308,7 +352,9 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
           <h1 className="text-2xl font-extrabold text-[#2E2215] tracking-wide select-none mb-1">
             Welcome Back
           </h1>
-          <p className="text-xs text-muted-foreground">Sign in to your FEAG account to continue.</p>
+          <p className="text-xs text-muted-foreground">
+            Sign in to your FEAG account to continue.
+          </p>
         </div>
       )}
 
@@ -317,7 +363,10 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
         <div className="flex flex-col gap-4 animate-in fade-in duration-300">
           {/* Mobile field */}
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="mobile" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
+            <label
+              htmlFor="mobile"
+              className="text-xs font-bold text-foreground/80 uppercase tracking-wide"
+            >
               Mobile Number
             </label>
             <div className="flex items-center rounded-lg border border-input bg-transparent overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-ring focus-within:border-primary">
@@ -332,7 +381,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
                   pattern: {
                     value: /^\d{10}$/,
                     message: "Phone number must be exactly 10 digits",
-                  }
+                  },
                 }}
                 render={({ field }) => (
                   <input
@@ -351,7 +400,9 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
               />
             </div>
             {errors.mobile && (
-              <span className="text-xs font-medium text-destructive">{errors.mobile.message}</span>
+              <span className="text-xs font-medium text-destructive">
+                {errors.mobile.message}
+              </span>
             )}
           </div>
 
@@ -359,7 +410,10 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
           <div className="flex flex-col gap-1.5">
             <div className="w-full overflow-hidden flex justify-center py-1 scale-[0.85] min-[375px]:scale-100 origin-center">
               <Turnstile
-                sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAADpGzgKRyLobmlbi"}
+                sitekey={
+                  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ||
+                  "0x4AAAAAADpGzgKRyLobmlbi"
+                }
                 onVerify={(token) => {
                   setTurnstileToken(token);
                   clearErrors("mobile");
@@ -379,13 +433,24 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
               onChange={(e) => setAcceptedTerms(e.target.checked)}
               className="mt-0.5 size-4 rounded border-input text-primary focus:ring-primary cursor-pointer accent-primary"
             />
-            <label htmlFor="login-terms" className="text-xs text-muted-foreground leading-snug cursor-pointer select-none">
+            <label
+              htmlFor="login-terms"
+              className="text-xs text-muted-foreground leading-snug cursor-pointer select-none"
+            >
               I agree to the{" "}
-              <Link href="/terms-and-conditions" target="_blank" className="font-semibold text-primary underline hover:text-primary/80">
+              <Link
+                href="/terms-and-conditions"
+                target="_blank"
+                className="font-semibold text-primary underline hover:text-primary/80"
+              >
                 Terms & Conditions
               </Link>{" "}
               and{" "}
-              <Link href="/privacy-policy" target="_blank" className="font-semibold text-primary underline hover:text-primary/80">
+              <Link
+                href="/privacy-policy"
+                target="_blank"
+                className="font-semibold text-primary underline hover:text-primary/80"
+              >
                 Privacy Policy
               </Link>
               .
@@ -395,10 +460,19 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
           <Button
             type="button"
             onClick={handleSendOtp}
-            disabled={!acceptedTerms || isVerifyingTurnstile || !watchedMobile || watchedMobile.length !== 10 || !turnstileToken || isGoogleSigningIn}
+            disabled={
+              !acceptedTerms ||
+              isVerifyingTurnstile ||
+              !watchedMobile ||
+              watchedMobile.length !== 10 ||
+              !turnstileToken ||
+              isGoogleSigningIn
+            }
             className="w-full bg-primary hover:bg-primary/95 text-white font-semibold flex items-center justify-center gap-2 cursor-pointer mt-1"
           >
-            {isVerifyingTurnstile && <Loader2 className="size-4 animate-spin" />}
+            {isVerifyingTurnstile && (
+              <Loader2 className="size-4 animate-spin" />
+            )}
             Send Verification OTP
           </Button>
         </div>
@@ -407,10 +481,18 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
         <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
-              <label htmlFor="otp" className="text-xs font-bold text-foreground/80 uppercase tracking-wide">
+              <label
+                htmlFor="otp"
+                className="text-xs font-bold text-foreground/80 uppercase tracking-wide"
+              >
                 Verification OTP
               </label>
-              <span className="text-[10px] text-muted-foreground">Sent to <strong className="text-primary font-bold">+91 {watchedMobile}</strong></span>
+              <span className="text-[10px] text-muted-foreground">
+                Sent to{" "}
+                <strong className="text-primary font-bold">
+                  +91 {watchedMobile}
+                </strong>
+              </span>
             </div>
             <Controller
               name="otp"
@@ -420,7 +502,7 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
                 pattern: {
                   value: /^\d{6}$/,
                   message: "OTP must be exactly 6 digits",
-                }
+                },
               }}
               render={({ field }) => (
                 <input
@@ -438,7 +520,9 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
               )}
             />
             {errors.otp && (
-              <span className="text-xs font-medium text-destructive">{errors.otp.message}</span>
+              <span className="text-xs font-medium text-destructive">
+                {errors.otp.message}
+              </span>
             )}
           </div>
 
@@ -458,7 +542,9 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
             <Button
               type="button"
               onClick={handleVerifyOtp}
-              disabled={isVerifyingOtp || !watchedOtp || watchedOtp.length !== 6}
+              disabled={
+                isVerifyingOtp || !watchedOtp || watchedOtp.length !== 6
+              }
               className="flex-1 bg-primary hover:bg-primary/95 text-white font-semibold flex items-center justify-center gap-2 cursor-pointer"
             >
               {isVerifyingOtp && <Loader2 className="size-4 animate-spin" />}
@@ -473,14 +559,18 @@ export default function LoginForm({ onSuccess, showTitle = true }: LoginFormProp
         <>
           <div className="flex items-center gap-3 my-0.5 select-none">
             <div className="h-px bg-border/50 flex-1" />
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">or</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+              or
+            </span>
             <div className="h-px bg-border/50 flex-1" />
           </div>
 
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            disabled={!acceptedTerms || isGoogleSigningIn || isVerifyingTurnstile}
+            disabled={
+              !acceptedTerms || isGoogleSigningIn || isVerifyingTurnstile
+            }
             className="w-full flex items-center justify-center gap-2 px-3 py-2 border border-border/80 bg-white hover:bg-muted/30 rounded-lg text-xs font-semibold text-foreground transition-all duration-200 select-none cursor-pointer disabled:opacity-50"
           >
             {isGoogleSigningIn ? (
