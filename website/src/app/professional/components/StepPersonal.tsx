@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Controller } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Loader2, CheckCircle2, ArrowRight, RotateCcw } from "lucide-react";
@@ -8,6 +8,7 @@ import Turnstile from "react-turnstile";
 import { auth } from "@/lib/firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { Button } from "@/components/ui/button";
+import OtpInput from "@/components/ui/OtpInput";
 import { StepPersonalProps } from "../types";
 
 declare global {
@@ -56,15 +57,13 @@ export default function StepPersonal({
 
   const canProceed = isFormFilled && otpVerified;
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (window.recaptchaVerifier) {
-        try {
-          window.recaptchaVerifier.clear();
-        } catch (e) {}
-        window.recaptchaVerifier = null;
-      }
+  const getOrCreateRecaptcha = useCallback(() => {
+    if (typeof window === "undefined") return null;
 
+    const container = document.getElementById("recaptcha-container");
+    if (!container) return null;
+
+    if (!window.recaptchaVerifier) {
       try {
         window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
           size: "invisible",
@@ -73,7 +72,10 @@ export default function StepPersonal({
         console.error("Error initializing RecaptchaVerifier:", e);
       }
     }
+    return window.recaptchaVerifier;
+  }, []);
 
+  useEffect(() => {
     return () => {
       if (typeof window !== "undefined" && window.recaptchaVerifier) {
         try {
@@ -116,7 +118,13 @@ export default function StepPersonal({
         }
       }
 
-      const appVerifier = window.recaptchaVerifier;
+      const appVerifier = getOrCreateRecaptcha();
+      if (!appVerifier) {
+        toast.error("Security verifier error. Please refresh the page.");
+        setIsSendingOtp(false);
+        setIsVerifyingTurnstile(false);
+        return;
+      }
       const phoneNumber = `+91${watchedPhone}`;
 
       const confirmation = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
@@ -438,14 +446,12 @@ export default function StepPersonal({
                   pattern: { value: /^\d{6}$/, message: "OTP must be 6 digits" },
                 }}
                 render={({ field }) => (
-                  <input
-                    {...field}
-                    id="otp"
-                    type="text"
-                    maxLength={6}
-                    placeholder="Enter 6-digit OTP code"
-                    className={inputClass}
-                    onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ""))}
+                  <OtpInput
+                    length={6}
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={Boolean(errors.otp)}
+                    disabled={isVerifyingOtp || otpVerified}
                   />
                 )}
               />

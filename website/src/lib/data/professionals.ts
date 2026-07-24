@@ -2925,7 +2925,7 @@ export const professionals: Professional[] = [
     gender: "male",
     role: "creator",
     isProfileDone: false,
-    mobile: "9335265907",
+    mobile: "9335265900",
     email: "techaditya.sde@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/99.jpg",
     location: "New Delhi, DL",

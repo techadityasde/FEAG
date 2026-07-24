@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
@@ -17,6 +17,10 @@ import {
 } from "firebase/auth";
 import { professionals } from "@/lib/data/professionals";
 import { customers } from "@/lib/data/customers";
+import { Button } from "@/components/ui/button";
+import LoginSkeleton from "@/components/skeleton/LoginSkeleton";
+import NewUserRegistrationModal from "./NewUserRegistrationModal";
+import OtpInput from "@/components/ui/OtpInput";
 
 declare global {
   interface Window {
@@ -24,9 +28,6 @@ declare global {
     grecaptcha: any;
   }
 }
-
-import { Button } from "@/components/ui/button";
-import LoginSkeleton from "@/components/skeleton/LoginSkeleton";
 
 interface LoginFormValues {
   mobile: string;
@@ -54,26 +55,41 @@ export default function LoginForm({
     useState<ConfirmationResult | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  useEffect(() => {
-     console.log("env", process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
-    if (typeof window !== "undefined" && !pageLoading) {
-      // Clean up any existing verifier from a previous mount (React Strict Mode fix)
-      if (window.recaptchaVerifier) {
-        try {
-          window.recaptchaVerifier.clear();
-        } catch (e) {}
-        window.recaptchaVerifier = null;
+  // New user registration modal state
+  const [showNewUserModal, setShowNewUserModal] = useState(false);
+  const [newUserMobile, setNewUserMobile] = useState("");
+  const [prefilledEmail, setPrefilledEmail] = useState("");
+
+  const getOrCreateRecaptcha = useCallback(() => {
+    if (typeof window === "undefined") return null;
+
+    const container = document.getElementById("recaptcha-container");
+    if (!container) return null;
+
+    if (!window.recaptchaVerifier) {
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "invisible",
+          }
+        );
+      } catch (e) {
+        console.error("Error instantiating RecaptchaVerifier:", e);
       }
-
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-        },
-      );
     }
+    return window.recaptchaVerifier;
+  }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageLoading(false);
+    }, 750);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (typeof window !== "undefined" && window.recaptchaVerifier) {
         try {
@@ -82,7 +98,7 @@ export default function LoginForm({
         window.recaptchaVerifier = null;
       }
     };
-  }, [pageLoading]);
+  }, []);
 
   const {
     control,
@@ -104,24 +120,15 @@ export default function LoginForm({
   const watchedOtp = watch("otp");
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setPageLoading(false);
-    }, 750);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const googleLogin = urlParams.get("google_login");
 
     if (googleLogin) {
-      // Clear query params from browser URL history immediately
       window.history.replaceState({}, document.title, window.location.pathname);
 
       if (googleLogin === "success") {
         const email = urlParams.get("email") || "";
 
-        // Verify Google email against registration records
         const matchedProfessional = professionals.find(
           (p) => p.email === email,
         );
@@ -129,15 +136,14 @@ export default function LoginForm({
         const matchedUser = matchedProfessional || matchedCustomer;
 
         if (!matchedUser) {
-          toast.error(
-            "This Google account is not registered. Please sign up first.",
-          );
+          setPrefilledEmail(email);
+          setShowNewUserModal(true);
         } else {
           const userData = {
             mobile: matchedUser.mobile,
             email: matchedUser.email,
             name: (matchedUser as any).username || (matchedUser as any).name,
-            role: matchedUser.role,
+            role: matchedUser.role || "customer",
             category: (matchedUser as any).category || "",
             location: matchedUser.location,
             profileImage: matchedUser.profileImage,
@@ -174,24 +180,6 @@ export default function LoginForm({
       return;
     }
 
-    // Check if the mobile number is registered
-    const matchedProfessional = professionals.find(
-      (p) => p.mobile === watchedMobile,
-    );
-    const matchedCustomer = customers.find((c) => c.mobile === watchedMobile);
-    const matchedUser = matchedProfessional || matchedCustomer;
-
-    if (!matchedUser) {
-      toast.error(
-        "This mobile number is not registered. Please join us first.",
-      );
-      setError("mobile", {
-        type: "manual",
-        message: "Mobile number is not registered",
-      });
-      return;
-    }
-
     if (!turnstileToken) {
       toast.error("Please solve the Turnstile security challenge first");
       return;
@@ -219,7 +207,13 @@ export default function LoginForm({
         }
       }
 
-      const appVerifier = window.recaptchaVerifier;
+      const appVerifier = getOrCreateRecaptcha();
+      if (!appVerifier) {
+        toast.error("Security verifier initialization error. Please refresh.");
+        setIsVerifyingTurnstile(false);
+        return;
+      }
+
       const phoneNumber = `+91${watchedMobile}`;
 
       const confirmation = await signInWithPhoneNumber(
@@ -232,18 +226,13 @@ export default function LoginForm({
       setOtpSent(true);
       toast.success(`OTP sent successfully to ${phoneNumber}`);
     } catch (e: any) {
-      console.error(e);
+      console.error("Firebase phone auth error:", e);
       toast.error(e.message || "Failed to send OTP. Please try again.");
       if (window.recaptchaVerifier) {
-        window.recaptchaVerifier
-          .render()
-          .then((widgetId: any) => {
-            // Try to reset the widget if it exists globally
-            if (window.grecaptcha) {
-              window.grecaptcha.reset(widgetId);
-            }
-          })
-          .catch(() => {});
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (err) {}
+        window.recaptchaVerifier = null;
       }
     } finally {
       setIsVerifyingTurnstile(false);
@@ -261,7 +250,6 @@ export default function LoginForm({
       if (confirmationResult) {
         await confirmationResult.confirm(watchedOtp);
 
-        // Re-verify registration data
         const matchedProfessional = professionals.find(
           (p) => p.mobile === watchedMobile,
         );
@@ -271,13 +259,9 @@ export default function LoginForm({
         const matchedUser = matchedProfessional || matchedCustomer;
 
         if (!matchedUser) {
-          toast.error(
-            "This mobile number is not registered. Please sign up first.",
-          );
-          setError("mobile", {
-            type: "manual",
-            message: "Mobile number is not registered",
-          });
+          setNewUserMobile(watchedMobile);
+          setShowNewUserModal(true);
+          toast.success("Phone verified! Please complete your account details.");
           return;
         }
 
@@ -285,7 +269,7 @@ export default function LoginForm({
           mobile: matchedUser.mobile,
           email: matchedUser.email,
           name: (matchedUser as any).username || (matchedUser as any).name,
-          role: matchedUser.role,
+          role: matchedUser.role || "customer",
           category: (matchedUser as any).category || "",
           location: matchedUser.location,
           profileImage: matchedUser.profileImage,
@@ -344,7 +328,7 @@ export default function LoginForm({
       </div>
     );
   }
- 
+
   return (
     <div className="flex flex-col gap-5 w-full">
       {showTitle && (
@@ -505,17 +489,12 @@ export default function LoginForm({
                 },
               }}
               render={({ field }) => (
-                <input
-                  {...field}
-                  id="otp"
-                  type="text"
-                  placeholder="Enter 6-digit OTP code"
-                  maxLength={6}
-                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-ring focus:border-primary text-foreground"
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, "");
-                    field.onChange(val);
-                  }}
+                <OtpInput
+                  length={6}
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={Boolean(errors.otp)}
+                  disabled={isVerifyingOtp}
                 />
               )}
             />
@@ -604,14 +583,24 @@ export default function LoginForm({
         <p className="text-xs text-muted-foreground font-medium">
           Don&apos;t have an account?{" "}
           <Link
-            href="/join-us"
+            href="/professional"
             className="font-bold text-primary hover:text-primary/90 hover:underline transition-colors"
           >
-            Join Us
+            Join as Professional
           </Link>
         </p>
       </div>
+
       <div id="recaptcha-container"></div>
+
+      {/* Reusable New User Registration Modal */}
+      <NewUserRegistrationModal
+        isOpen={showNewUserModal}
+        onClose={() => setShowNewUserModal(false)}
+        mobile={newUserMobile || watchedMobile}
+        prefilledEmail={prefilledEmail}
+        onSuccess={onSuccess}
+      />
     </div>
   );
 }

@@ -8,7 +8,6 @@ import { removeFromWishlist } from "@/lib/store/wishlistSlice";
 import { Button } from "@/components/ui/button";
 import { Heart, MapPin, Star, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const WishlistContent = () => {
   const wishlist = useSelector((state: RootState) => state.wishlist?.items || []);
@@ -95,116 +94,116 @@ const WishlistContent = () => {
         {filteredWishlist.length > 0 && (
           <>
             {/* Desktop Table View */}
-        <div className="hidden md:block bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-muted/50 text-muted-foreground border-b border-border text-sm font-semibold">
-                <th className="py-4 px-6">Professional</th>
-                <th className="py-4 px-6">Category</th>
-                <th className="py-4 px-6">Location</th>
-                <th className="py-4 px-6">Rating</th>
-                <th className="py-4 px-6 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredWishlist.map((item: any) => (
-                <tr key={item.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-4">
-                      <div className="size-12 rounded-full overflow-hidden bg-muted shrink-0 relative">
-                        <Image src={item.profileImage} alt={item.username} fill className="object-cover" sizes="48px" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-foreground text-base">{item.username}</h3>
-                        <p className="text-xs text-muted-foreground">{item.experience}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className="capitalize px-2.5 py-1 bg-primary/10 text-primary font-semibold text-xs rounded-full">
-                      {item.category}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                      <MapPin className="size-4" />
-                      <span className="truncate max-w-[150px]">{item.location}</span>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-1.5 text-sm font-medium">
-                      <Star className="size-4 fill-amber-400 text-amber-400" />
-                      {item.rating.toFixed(1)}
-                    </div>
-                  </td>
-                  <td className="py-4 px-6 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link href={`/portfolio/${item.username.toLowerCase()}`}>
-                        <Button variant="outline" size="sm" className="font-semibold shadow-sm">
-                          View Profile
-                        </Button>
-                      </Link>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50 p-2"
-                        onClick={() => handleRemove(item.id, item.username)}
-                        title="Remove from wishlist"
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Mobile Card View */}
-        <div className="grid grid-cols-1 gap-4 md:hidden">
-          {filteredWishlist.map((item: any) => (
-            <div key={item.id} className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col gap-4 relative">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="absolute top-2 right-2 text-red-500 hover:text-red-600 hover:bg-red-50 p-2 h-auto"
-                onClick={() => handleRemove(item.id, item.username)}
-              >
-                <Heart className="size-5 fill-red-500" />
-              </Button>
-              
-              <div className="flex items-center gap-4">
-                <div className="size-16 rounded-xl overflow-hidden bg-muted shrink-0 relative shadow-sm border border-border/50">
-                  <Image src={item.profileImage} alt={item.username} fill className="object-cover" sizes="64px" />
-                </div>
-                <div className="flex-1 min-w-0 pr-8">
-                  <h3 className="font-bold text-foreground text-base truncate">{item.username}</h3>
-                  <span className="inline-block mt-0.5 capitalize px-2 py-0.5 bg-primary/10 text-primary font-semibold text-[10px] rounded-md">
-                    {item.category}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between text-sm text-muted-foreground border-t border-border/50 pt-3">
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="size-3.5 text-primary" />
-                  <span className="truncate max-w-[120px] text-xs">{item.location}</span>
-                </div>
-                <div className="flex items-center gap-1 font-medium text-foreground">
-                  <Star className="size-3.5 fill-amber-400 text-amber-400" />
-                  <span className="text-xs">{item.rating.toFixed(1)}</span>
-                </div>
-              </div>
-              
-              <Link href={`/portfolio/${item.username.toLowerCase()}`} className="w-full mt-1">
-                <Button className="w-full font-semibold text-xs shadow-sm h-9">
-                  View Profile
-                </Button>
-              </Link>
+            <div className="hidden md:block bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-muted/50 text-muted-foreground border-b border-border text-sm font-semibold">
+                    <th className="py-4 px-6">Professional</th>
+                    <th className="py-4 px-6">Category</th>
+                    <th className="py-4 px-6">Location</th>
+                    <th className="py-4 px-6">Rating</th>
+                    <th className="py-4 px-6 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredWishlist.map((item: any) => (
+                    <tr key={item.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-4">
+                          <div className="size-12 rounded-full overflow-hidden bg-muted shrink-0 relative">
+                            <Image src={item.profileImage} alt={item.username} fill className="object-cover" sizes="48px" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-foreground text-base">{item.username}</h3>
+                            <p className="text-xs text-muted-foreground">{item.experience}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="capitalize px-2.5 py-1 bg-primary/10 text-primary font-semibold text-xs rounded-full">
+                          {item.category}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                          <MapPin className="size-4" />
+                          <span className="truncate max-w-[150px]">{item.location}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-1.5 text-sm font-medium">
+                          <Star className="size-4 fill-amber-400 text-amber-400" />
+                          {item.rating.toFixed(1)}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link href={`/portfolio/${item.username.toLowerCase()}`}>
+                            <Button variant="outline" size="sm" className="font-semibold shadow-sm">
+                              View Profile
+                            </Button>
+                          </Link>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50 p-2"
+                            onClick={() => handleRemove(item.id, item.username)}
+                            title="Remove from wishlist"
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
+
+            {/* Mobile Card View */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+              {filteredWishlist.map((item: any) => (
+                <div key={item.id} className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col gap-4 relative">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-600 hover:bg-red-50 p-2 h-auto"
+                    onClick={() => handleRemove(item.id, item.username)}
+                  >
+                    <Heart className="size-5 fill-red-500" />
+                  </Button>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="size-16 rounded-xl overflow-hidden bg-muted shrink-0 relative shadow-sm border border-border/50">
+                      <Image src={item.profileImage} alt={item.username} fill className="object-cover" sizes="64px" />
+                    </div>
+                    <div className="flex-1 min-w-0 pr-8">
+                      <h3 className="font-bold text-foreground text-base truncate">{item.username}</h3>
+                      <span className="inline-block mt-0.5 capitalize px-2 py-0.5 bg-primary/10 text-primary font-semibold text-[10px] rounded-md">
+                        {item.category}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm text-muted-foreground border-t border-border/50 pt-3">
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="size-3.5 text-primary" />
+                      <span className="truncate max-w-[120px] text-xs">{item.location}</span>
+                    </div>
+                    <div className="flex items-center gap-1 font-medium text-foreground">
+                      <Star className="size-3.5 fill-amber-400 text-amber-400" />
+                      <span className="text-xs">{item.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+                  
+                  <Link href={`/portfolio/${item.username.toLowerCase()}`} className="w-full mt-1">
+                    <Button className="w-full font-semibold text-xs shadow-sm h-9">
+                      View Profile
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+            </div>
           </>
         )}
       </div>
@@ -213,9 +212,5 @@ const WishlistContent = () => {
 };
 
 export default function WishlistPage() {
-  return (
-    <ProtectedRoute allowedRoles={["customer"]}>
-      <WishlistContent />
-    </ProtectedRoute>
-  );
+  return <WishlistContent />;
 }
