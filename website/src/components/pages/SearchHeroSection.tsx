@@ -53,7 +53,7 @@ export default function SearchHeroSection() {
 
           {/* Top Tabs */}
           <div className="relative border-b border-gray-100 w-full">
-            <div className="flex items-center justify-start sm:justify-center gap-1 sm:gap-6 overflow-x-auto overflow-y-hidden no-scrollbar sm:px-6 py-2">
+            <div className="grid grid-cols-4 sm:flex sm:items-center sm:justify-center sm:gap-6 px-1 sm:px-6 py-2 w-full">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 const isActive = activeTab === cat.id;
@@ -63,12 +63,12 @@ export default function SearchHeroSection() {
                     key={cat.id}
                     onClick={() => dispatch(setActiveTab(cat.id))}
                     className={cn(
-                      "flex flex-col items-center gap-1.5 pb-3 px-3 sm:px-6 relative transition-colors whitespace-nowrap flex-shrink-0",
+                      "flex flex-col items-center gap-1 sm:gap-1.5 pb-2.5 sm:pb-3 px-1 sm:px-6 relative transition-colors whitespace-nowrap flex-shrink-0 w-full sm:w-auto",
                       isActive ? "text-primary" : "text-gray-500 hover:text-gray-700"
                     )}
                   >
                     <Icon className={cn("w-6 h-6 sm:w-7 sm:h-9", isActive ? "text-primary" : "text-gray-400")} />
-                    <span className="text-sm sm:text-[12px] font-bold">{cat.label}</span>
+                    <span className="text-[11px] min-[360px]:text-xs sm:text-[12px] font-bold">{cat.label}</span>
                     {/* Active Indicator Underline */}
                     {isActive && (
                       <div className="absolute -bottom-[1px] left-0 right-0 h-[3px] bg-primary rounded-t-md" />

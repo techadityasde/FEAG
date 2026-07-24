@@ -334,10 +334,10 @@ export default function JoinUs() {
             <div key={idx} className="relative z-10 flex flex-col items-center">
               <div
                 className={`size-8 sm:size-9 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${isCompleted
-                    ? "bg-emerald-500 border-emerald-500 text-white"
-                    : isActive
-                      ? "bg-primary border-primary text-white ring-4 ring-primary/20"
-                      : "bg-white border-border/80 text-muted-foreground"
+                  ? "bg-emerald-500 border-emerald-500 text-white"
+                  : isActive
+                    ? "bg-primary border-primary text-white ring-4 ring-primary/20"
+                    : "bg-white border-border/80 text-muted-foreground"
                   }`}
               >
                 {isCompleted ? (

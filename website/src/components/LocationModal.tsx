@@ -243,10 +243,10 @@ export function LocationModal({ isOpen, onClose }: LocationModalProps) {
   if (isMapMode) {
     return (
       <Modal isOpen={isOpen} onClose={handleClose} hideCloseButton={true} title={undefined} disableOutsideClick={true}>
-        <div className="flex flex-col h-[75vh] max-h-[600px] -m-4 sm:-m-6 relative rounded-xl overflow-hidden">
+        <div className="flex flex-col h-[75vh] max-h-[600px] -m-4 sm:-m-6 relative rounded-2xl overflow-hidden">
           <div className="absolute top-4 left-4 z-10">
-            <button onClick={() => setIsMapMode(false)} className="p-2 bg-white rounded-full shadow-md text-foreground hover:bg-muted transition-colors cursor-pointer">
-              <ArrowLeft className="size-5" />
+            <button onClick={() => setIsMapMode(false)} className="p-2.5 bg-white/95 backdrop-blur-md rounded-full shadow-md text-foreground hover:bg-white transition-all active:scale-95 cursor-pointer border border-border/40">
+              <ArrowLeft className="size-4.5" />
             </button>
           </div>
           <div className="flex-1 w-full bg-muted/20 relative">
@@ -275,13 +275,13 @@ export function LocationModal({ isOpen, onClose }: LocationModalProps) {
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground font-medium">Loading Map...</div>
+              <div className="flex items-center justify-center h-full text-muted-foreground font-medium text-sm">Loading Map...</div>
             )}
           </div>
-          <div className="p-4 sm:p-5 bg-white border-t border-border/50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
-            <div className="mb-4">
-              <p className="text-xs text-muted-foreground font-medium mb-1 uppercase tracking-wider">Selected Location</p>
-              <p className="text-[15px] font-semibold text-foreground line-clamp-2">
+          <div className="p-4 sm:p-5 bg-white/95 backdrop-blur-md border-t border-border/50 shadow-lg z-20">
+            <div className="mb-3.5">
+              <p className="text-[10px] text-muted-foreground font-extrabold uppercase tracking-wider mb-1">Selected Location</p>
+              <p className="text-sm font-bold text-foreground line-clamp-2 leading-snug">
                 {isFetchingAddress ? "Fetching address..." : (mapAddress || "Drag map to select your location")}
               </p>
             </div>
@@ -292,7 +292,7 @@ export function LocationModal({ isOpen, onClose }: LocationModalProps) {
                 }
               }}
               disabled={isFetchingAddress || !mapAddress}
-              className="w-full bg-primary text-white font-semibold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+              className="w-full bg-primary text-white font-bold py-3 rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-[0.99] cursor-pointer text-sm"
             >
               Set Location
             </button>
@@ -306,122 +306,135 @@ export function LocationModal({ isOpen, onClose }: LocationModalProps) {
     <Modal isOpen={isOpen} onClose={handleClose} hideCloseButton={true} title={undefined} disableOutsideClick={true}>
       <div className="flex flex-col gap-0 -m-4 sm:-m-6">
         {/* Search Input Area */}
-        <div className="p-4 sm:p-6 pb-2 border-b border-border/50 flex items-center gap-3">
-          <div className="relative flex items-center bg-transparent border border-border/50 rounded-xl px-3 py-2.5 shadow-sm focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all flex-1">
-            <Search className="size-5 text-muted-foreground mr-1 shrink-0" />
+        <div className="p-4 sm:p-5 pb-3 border-b border-border/40 flex items-center gap-3">
+          <div className="relative flex items-center bg-muted/40 hover:bg-muted/60 border border-border/70 rounded-2xl px-3.5 py-2.5 shadow-xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 focus-within:bg-background transition-all flex-1">
+            <Search className="size-4.5 text-muted-foreground mr-2 shrink-0" />
             <input
               type="text"
-              placeholder="Search for your location/society/apartment"
+              placeholder="Search for location, society, apartment..."
               value={value}
               onChange={(e) => {
                 setValue(e.target.value);
                 if (selectedLocation) setSelectedLocation(null);
               }}
               disabled={!ready}
-              className="flex-1 bg-transparent border-none focus:outline-none px-2 text-[15px] font-medium placeholder:font-normal placeholder:text-muted-foreground w-full"
+              className="flex-1 bg-transparent border-none focus:outline-none text-sm font-semibold placeholder:font-normal placeholder:text-muted-foreground w-full text-foreground"
               autoFocus
             />
             {value && (
-              <button onClick={() => { setValue(""); setSelectedLocation(null); }} className="p-1 ml-1 bg-muted-foreground/20 rounded-full text-foreground hover:bg-muted-foreground/30 transition-colors shrink-0">
+              <button onClick={() => { setValue(""); setSelectedLocation(null); }} className="p-1 ml-1 bg-muted-foreground/15 rounded-full text-foreground hover:bg-muted-foreground/30 transition-all shrink-0 active:scale-90">
                 <X className="size-3.5" />
               </button>
             )}
           </div>
-          <button onClick={handleClose} className="p-2 bg-muted/50 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0">
-            <X className="size-5" />
+          <button onClick={handleClose} className="p-2.5 bg-muted/60 hover:bg-muted rounded-full text-muted-foreground hover:text-foreground transition-all cursor-pointer shrink-0 active:scale-95">
+            <X className="size-4.5" />
           </button>
         </div>
 
         {/* Selected Location Preview Card */}
         {selectedLocation && (
-          <div className="p-4 sm:p-6 bg-primary/5 border-b border-primary/20 flex flex-col gap-3 animate-in fade-in duration-200">
-            <div className="flex items-start justify-between gap-2">
+          <div className="p-4 sm:p-5 bg-gradient-to-b from-primary/5 to-transparent border-b border-primary/15 flex flex-col gap-3 animate-in fade-in duration-200">
+            <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
-                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                <CheckCircle2 className="size-4.5 text-emerald-600 shrink-0" />
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-primary">
                   Fetched Location
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedLocation(null)}
-                className="text-xs text-muted-foreground hover:text-foreground underline transition-colors cursor-pointer"
+                className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors cursor-pointer"
               >
                 Change
               </button>
             </div>
 
-            <div className="flex items-start gap-2.5 bg-white p-3 rounded-xl border border-border/60 shadow-xs">
-              <MapPin className="size-5 text-primary shrink-0 mt-0.5" />
-              <p className="text-[14px] font-medium text-foreground leading-snug">
+            <div className="flex items-start gap-3 bg-white p-3.5 rounded-2xl border border-border/60 shadow-xs">
+              <div className="p-2 bg-primary/10 rounded-xl text-primary shrink-0 mt-0.5">
+                <MapPin className="size-4.5" />
+              </div>
+              <p className="text-sm font-semibold text-foreground leading-snug">
                 {selectedLocation.address}
               </p>
             </div>
 
             <button
               onClick={() => handleConfirmSetLocation()}
-              className="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/95 transition-all shadow-sm cursor-pointer"
+              className="w-full bg-primary text-white font-bold py-3 rounded-xl hover:bg-primary/95 transition-all shadow-sm active:scale-[0.99] cursor-pointer text-sm"
             >
-              Set Location
+              Confirm Location
             </button>
           </div>
         )}
 
         {/* Action Buttons (when no location is currently previewed) */}
         {!selectedLocation && (
-          <div className="p-4 sm:p-6 py-4 border-b border-border/50 flex flex-col gap-4">
+          <div className="p-4 sm:p-5 py-3 border-b border-border/40 flex flex-col gap-2.5">
             <button
               onClick={handleCurrentLocation}
               disabled={isFetchingLocation}
-              className="flex items-center gap-3 text-purple-600 font-semibold hover:text-purple-700 transition-colors w-full text-left cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-3.5 p-3 rounded-2xl bg-purple-50/60 hover:bg-purple-100/70 border border-purple-100 transition-all w-full text-left cursor-pointer disabled:opacity-50 group active:scale-[0.99]"
             >
-              {isFetchingLocation ? (
-                <RefreshCw className="size-5 animate-spin" />
-              ) : (
-                <Target className="size-5" />
-              )}
-              <span className="text-[15px]">
-                {isFetchingLocation ? "Detecting location..." : "Use current location"}
-              </span>
+              <div className="size-9 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                {isFetchingLocation ? (
+                  <RefreshCw className="size-4 animate-spin" />
+                ) : (
+                  <Target className="size-4" />
+                )}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-purple-950">
+                  {isFetchingLocation ? "Detecting location..." : "Use current location"}
+                </span>
+                <span className="text-[11px] font-medium text-purple-700/80">Using GPS / IP auto-detection</span>
+              </div>
             </button>
+
             <button
               onClick={handleOpenMap}
-              className="flex items-center gap-3 text-primary font-semibold hover:text-primary/80 transition-colors w-full text-left cursor-pointer"
+              className="flex items-center gap-3.5 p-3 rounded-2xl bg-primary/5 hover:bg-primary/10 border border-primary/15 transition-all w-full text-left cursor-pointer group active:scale-[0.99]"
             >
-              <Map className="size-5" />
-              <span className="text-[15px]">Select location via map</span>
+              <div className="size-9 rounded-xl bg-primary text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                <Map className="size-4" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-foreground">Select location via map</span>
+                <span className="text-[11px] font-medium text-muted-foreground">Pinpoint exact address visually</span>
+              </div>
             </button>
           </div>
         )}
 
         {/* Suggestions List (when no location is currently previewed) */}
         {!selectedLocation && (
-          <div className="p-4 sm:p-6 flex flex-col">
+          <div className="p-3 sm:p-4 pt-1 flex flex-col max-h-[260px] overflow-y-auto">
             {status === "OK" && data.map(({ place_id, description, structured_formatting: { main_text, secondary_text } }) => (
               <button
                 key={place_id}
                 onClick={() => handleSelectSuggestion(description)}
-                className="flex items-start gap-4 py-4 border-b border-border/20 last:border-0 hover:bg-muted/30 transition-colors text-left cursor-pointer"
+                className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-muted/50 transition-all text-left cursor-pointer group"
               >
-                <div className="mt-0.5 text-muted-foreground/70 shrink-0">
-                  <MapPin className="size-5" />
+                <div className="size-8 rounded-lg bg-muted/80 group-hover:bg-primary/10 group-hover:text-primary text-muted-foreground flex items-center justify-center shrink-0 transition-colors mt-0.5">
+                  <MapPin className="size-4" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[15px] font-semibold text-foreground truncate">{main_text}</span>
-                  <span className="text-sm text-muted-foreground truncate">{secondary_text}</span>
+                  <span className="text-sm font-bold text-foreground truncate">{main_text}</span>
+                  <span className="text-xs text-muted-foreground truncate font-medium">{secondary_text}</span>
                 </div>
               </button>
             ))}
             {status !== "OK" && value && ready && (
-              <div className="py-8 text-center text-sm text-muted-foreground">
+              <div className="py-6 text-center text-xs font-semibold text-muted-foreground">
                 No results found for "{value}"
               </div>
             )}
             
-            <div className="mt-2 flex justify-center opacity-80 pointer-events-none pb-2">
-               <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1.5">
+            <div className="mt-1 pt-1 pb-1 flex justify-center opacity-70 pointer-events-none">
+               <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1.5">
                  powered by 
-                 <span className="font-bold tracking-tighter text-[13px] font-sans">
+                 <span className="font-bold tracking-tighter text-[12px] font-sans">
                    <span style={{ color: "#4285F4" }}>G</span>
                    <span style={{ color: "#EA4335" }}>o</span>
                    <span style={{ color: "#FBBC05" }}>o</span>
