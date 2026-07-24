@@ -1,14 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import toast from 'react-hot-toast';
 import { professionals, Professional } from '@/lib/data/professionals';
 import { getDistance, cn } from '@/lib/utils';
-import { Star, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown, Check } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown, Check, Heart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 import { useFilteredProfessionals } from '@/hooks/useFilteredProfessionals';
+import { toggleWishlist } from '@/lib/store/wishlistSlice';
+import { RootState } from '@/lib/store/store';
 
 const priceOptions = [
     { value: "All", label: "Any Price" },
@@ -18,7 +21,10 @@ const priceOptions = [
 ];
 
 export default function RecomandationPage() {
+    const dispatch = useDispatch();
     const filteredData = useFilteredProfessionals();
+    const wishlistItems = useSelector((state: RootState) => state.wishlist?.items || []);
+
     const [filters, setFilters] = useState({ priceRange: "All", customMaxPrice: 5000 });
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -204,11 +210,12 @@ export default function RecomandationPage() {
                         {displayData.map((prof) => {
                             const currentPrice = prof.hourlyPricing?.oneHourPrice || 0;
                             const originalPrice = Math.round(currentPrice * 1.2);
+                            const isInWishlist = wishlistItems.some((item) => item.id === prof.id);
 
                             return (
                                 <div
                                     key={prof.id}
-                                    className="snap-start min-w-[140px] w-[140px] border border-border/20 rounded-xl p-2 bg-white shadow-sm flex flex-col gap-1.5 flex-shrink-0"
+                                    className="snap-start min-w-[140px] w-[140px] border border-border/20 rounded-xl p-2 bg-white shadow-sm flex flex-col gap-1.5 flex-shrink-0 relative group"
                                 >
                                     {/* Image */}
                                     <div className="w-full h-[90px] relative rounded-md overflow-hidden group-hover:shadow-md transition-shadow">
@@ -219,6 +226,24 @@ export default function RecomandationPage() {
                                             sizes="(max-width: 768px) 100vw, 140px"
                                             className="object-cover transition-transform duration-500 hover:scale-105"
                                         />
+                                        {/* Top-Right Heart Wishlist Button */}
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                dispatch(toggleWishlist(prof));
+                                                if (isInWishlist) {
+                                                    toast.success("Removed from Wishlist");
+                                                } else {
+                                                    toast.success("Added to Wishlist!");
+                                                }
+                                            }}
+                                            className="absolute top-1.5 right-1.5 z-20 flex size-6 items-center justify-center rounded-full bg-black/40 backdrop-blur-xs text-white hover:bg-black/60 transition-all cursor-pointer shadow-xs active:scale-90"
+                                            title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+                                        >
+                                            <Heart className={cn("size-3.5 transition-colors", isInWishlist ? "fill-red-500 text-red-500 stroke-red-500" : "text-white fill-none")} />
+                                        </button>
                                     </div>
 
                                     {/* Header (Name, Rating) */}
