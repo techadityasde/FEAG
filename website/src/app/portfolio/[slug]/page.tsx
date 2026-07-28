@@ -13,7 +13,7 @@ import { setBookingDate, setBookingSlot } from "@/lib/store/bookingSlice";
 import { toggleWishlist } from "@/lib/store/wishlistSlice";
 import { AlertTriangle } from "lucide-react";
 
-import { professionals } from "@/lib/data/professionals";
+import { professionals, generateUpcomingAvailableDates } from "@/lib/data/professionals";
 import { BookingFormValues, PortfolioItem } from "../types";
 
 // Import modular components
@@ -63,6 +63,13 @@ const mockPortfolioMedia: Record<string, PortfolioItem[]> = {
     { id: "s4", type: "video", url: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=800&auto=format&fit=crop&q=80", duration: "2:40", title: "Intimate Cafe Acoustic Live" },
     { id: "s5", type: "image", url: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&auto=format&fit=crop&q=80", title: "Live Concert Portrait" },
     { id: "s6", type: "image", url: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800&auto=format&fit=crop&q=80", title: "Stage Soundcheck Vibe" },
+  ],
+  podcast: [
+    { id: "pc1", type: "video", url: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&auto=format&fit=crop&q=80", duration: "45:00", title: "Tech Founder Studio Podcast" },
+    { id: "pc2", type: "audio", url: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80", duration: "30:00", title: "Acoustic Audio Mastering Session" },
+    { id: "pc3", type: "image", url: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80", title: "Neon Soundproof Studio Setup" },
+    { id: "pc4", type: "image", url: "https://images.unsplash.com/photo-1589903308904-1010c2294adc?w=800&auto=format&fit=crop&q=80", title: "Rodecaster Pro & Mic Suite" },
+    { id: "pc5", type: "video", url: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800&auto=format&fit=crop&q=80", duration: "60:00", title: "Live Streamed Talk Show Reel" },
   ]
 };
 
@@ -296,7 +303,7 @@ export default function ProfessionalProfile({ params }: PageProps) {
       toast.error("Please select the date and time before proceeding to checkout.");
       return;
     }
-    
+
     if (!locationState.address) {
       toast.error("Please select address before proceeding to checkout.");
       return;
@@ -377,28 +384,24 @@ export default function ProfessionalProfile({ params }: PageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
           {/* Main Info Columns */}
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-8 space-y-6 sm:space-y-8">
             <HeroSection
               professional={professional}
               wishlisted={isWishlisted}
               onWishlist={handleWishlistToggle}
               onShare={handleShare}
               onCustomRequest={handleCustomRequest}
+              selectedPackage={selectedPackage}
+              setSelectedPackage={setSelectedPackage}
             />
             <CalendarSection
               selectedDate={selectedDate}
               onSelectDate={selectCalendarDate}
               bookedDates={bookedDates}
               limitedDates={limitedDates}
-              availableDates={professional.availableDates || []}
+              availableDates={professional.availableDates && professional.availableDates.length > 0 ? professional.availableDates : generateUpcomingAvailableDates(30)}
               selectedSlot={selectedSlot}
               onSelectSlot={selectCalendarSlot}
-            />
-            <PackagesSection
-              hourlyPricing={hourlyPricing}
-              selectedPackage={selectedPackage}
-              setSelectedPackage={setSelectedPackage}
-              booking={booking}
             />
             <PortfolioSection
               category={category}
@@ -407,19 +410,11 @@ export default function ProfessionalProfile({ params }: PageProps) {
               setActiveTab={setActiveTab}
               onMediaClick={(idx) => setLightboxIndex(idx)}
             />
-
             <AboutSection
               category={category}
               description={description}
               location={location}
             />
-
-            {/* <HighlightsSection
-              category={category}
-              highlights={highlights}
-            /> */}
-
-
 
             <Modal
               isOpen={isCustomModalOpen}

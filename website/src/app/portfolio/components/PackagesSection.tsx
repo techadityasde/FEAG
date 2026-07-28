@@ -4,14 +4,15 @@ import { setCalculatedCustomPrice } from "@/lib/store/packageSlice";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PackagesSectionProps } from "../types";
-
 import { calculateFSPACustomPrice } from "@/lib/fspa";
+import { getPackageFeaturesByCategory } from "@/lib/packageFeatures";
 
 export default function PackagesSection({
   hourlyPricing,
   selectedPackage,
   setSelectedPackage,
   booking,
+  category,
 }: PackagesSectionProps) {
   const parseTime = (timeStr: string) => {
     if (!timeStr) return 0;
@@ -39,6 +40,11 @@ export default function PackagesSection({
     dispatch(setCalculatedCustomPrice(customPrice));
   }, [customPrice, dispatch]);
 
+  const basicFeatures = getPackageFeaturesByCategory(category, "basic", 1);
+  const proFeatures = getPackageFeaturesByCategory(category, "professional", 2);
+  const premiumFeatures = getPackageFeaturesByCategory(category, "premium", 3);
+  const customFeatures = getPackageFeaturesByCategory(category, "custom", customHours);
+
   return (
     <section id="packages-section" className="bg-white border border-border/50 rounded-2xl p-2 sm:p-8 shadow-sm space-y-6">
       <h2 className="text-xl font-extrabold text-foreground tracking-tight">Service Packages</h2>
@@ -63,9 +69,11 @@ export default function PackagesSection({
             </div>
 
             <ul className="text-xs text-muted-foreground font-medium space-y-2.5 mb-6">
-              <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-primary shrink-0" /> 1 Hour Service</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-primary shrink-0" /> High Resolution Files</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-primary shrink-0" /> Digital Transfer Link</li>
+              {basicFeatures.map((feat, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  <CheckCircle2 className="size-3.5 text-primary shrink-0" /> {feat}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -100,9 +108,11 @@ export default function PackagesSection({
             </div>
 
             <ul className="text-xs text-muted-foreground font-medium space-y-2.5 mb-6">
-              <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-primary shrink-0" /> 2 Hours Service</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-primary shrink-0" /> Standard Retouching</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-primary shrink-0" /> Backup Equipment</li>
+              {proFeatures.map((feat, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  <CheckCircle2 className="size-3.5 text-primary shrink-0" /> {feat}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -133,9 +143,11 @@ export default function PackagesSection({
             </div>
 
             <ul className="text-xs text-muted-foreground font-medium space-y-2.5 mb-6">
-              <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-primary shrink-0" /> 3 Hours Service</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-primary shrink-0" /> Cinematic Color Grading</li>
-              <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-primary shrink-0" /> Fast Express Delivery</li>
+              {premiumFeatures.map((feat, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  <CheckCircle2 className="size-3.5 text-primary shrink-0" /> {feat}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -171,9 +183,11 @@ export default function PackagesSection({
               </div>
 
               <ul className="text-xs text-muted-foreground font-medium space-y-2.5 mb-6">
-                <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" /> {customHours} Hours Service</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" /> Tailored to your needs</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" /> Direct Coordination</li>
+                {customFeatures.map((feat, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" /> {feat}
+                  </li>
+                ))}
               </ul>
             </div>
 

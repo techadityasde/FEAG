@@ -27,7 +27,7 @@ export default function CategoryPage({ params }: PageProps) {
   const { category } = use(params);
 
   // Validate category slug
-  const validCategories = ["photographer", "videographer", "singer", "Cinematic"];
+  const validCategories = ["photographer", "videographer", "singer", "Cinematic", "choreographer", "podcast"];
   const isCategoryValid = validCategories.includes(category);
 
   // States
@@ -121,6 +121,42 @@ export default function CategoryPage({ params }: PageProps) {
               "linear-gradient(to bottom, rgba(21, 32, 30, 0.85), rgba(21, 32, 30, 0.95)), url('/hero_music.png') center/cover no-repeat",
           },
           mockTotalCount: 512,
+        };
+      case "choreographer":
+        return {
+          label: "Choreographer",
+          title: "Find Professional Choreographers",
+          description:
+            "Book top dance choreographers for wedding sangeet performances, couple dances, corporate flashmobs, and music videos.",
+          bgStyle: {
+            background:
+              "linear-gradient(to bottom, rgba(21, 32, 30, 0.85), rgba(21, 32, 30, 0.95)), url('/choreographer.png') center/cover no-repeat",
+          },
+          mockTotalCount: 420,
+        };
+      case "podcast":
+        return {
+          label: "Podcast Studio",
+          title: "Find Podcast Studios & Audio Creators",
+          description:
+            "Book fully equipped 4K video podcast studios, soundproof recording booths, and audio engineers for your show.",
+          bgStyle: {
+            background:
+              "linear-gradient(to bottom, rgba(21, 32, 30, 0.85), rgba(21, 32, 30, 0.95)), url('/podcast.png') center/cover no-repeat",
+          },
+          mockTotalCount: 280,
+        };
+      case "Cinematic":
+        return {
+          label: "Cinematic",
+          title: "Find Cinematic & Drone Experts",
+          description:
+            "Hire top-tier cinematographers with 4K cinema cameras, aerial drones, and movie-grade color grading for your productions.",
+          bgStyle: {
+            background:
+              "linear-gradient(to bottom, rgba(21, 32, 30, 0.85), rgba(21, 32, 30, 0.95)), url('/a_modern_premium_3d_abstract_artwork_representing_online_booking_digital.png') center/cover no-repeat",
+          },
+          mockTotalCount: 360,
         };
       case "photographer":
       default:
