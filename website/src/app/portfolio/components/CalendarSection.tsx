@@ -85,24 +85,24 @@ export default function CalendarSection({
   };
 
   return (
-    <section className="bg-white border border-border/50 rounded-2xl p-6 sm:p-8 shadow-sm space-y-5">
-      <h2 className="text-xl font-extrabold text-foreground tracking-tight">Availability Calendar</h2>
+    <section id="calendar-section" className="bg-white border border-border/60 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+      <h2 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight">Availability Calendar</h2>
 
-      <div className="flex flex-col md:flex-row gap-6 items-start">
+      <div className="flex flex-col sm:flex-row gap-4 items-start">
         {/* Calendar Layout */}
-        <div className="w-full max-w-sm rounded-xl border border-border p-4 shadow-sm bg-[#FDFBF7]">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-sm font-extrabold text-[#2E2215]">
+        <div className="w-full sm:w-[290px] rounded-xl border border-border/70 p-2.5 sm:p-3 shadow-2xs bg-[#FDFBF7] shrink-0">
+          <div className="flex justify-between items-center mb-2.5">
+            <span className="text-xs font-extrabold text-[#2E2215]">
               {monthNames[currentMonthDate.getMonth()]} {currentMonthDate.getFullYear()}
             </span>
-            <div className="flex gap-1.5">
-              <Button type="button" variant="outline" size="icon-xs" onClick={prevMonth} className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground border border-border cursor-pointer"><ChevronLeft className="size-3.5" /></Button>
-              <Button type="button" variant="outline" size="icon-xs" onClick={nextMonth} className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground border border-border cursor-pointer"><ChevronRight className="size-3.5" /></Button>
+            <div className="flex gap-1">
+              <Button type="button" variant="outline" size="icon-xs" onClick={prevMonth} className="h-6 w-6 rounded hover:bg-muted text-muted-foreground hover:text-foreground border border-border/80 cursor-pointer p-0"><ChevronLeft className="size-3" /></Button>
+              <Button type="button" variant="outline" size="icon-xs" onClick={nextMonth} className="h-6 w-6 rounded hover:bg-muted text-muted-foreground hover:text-foreground border border-border/80 cursor-pointer p-0"><ChevronRight className="size-3" /></Button>
             </div>
           </div>
 
           {/* Weekday Row */}
-          <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
+          <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">
             <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
           </div>
 
@@ -110,7 +110,7 @@ export default function CalendarSection({
           <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold">
             {/* Padding columns for start of month */}
             {paddingDays.map((day, i) => (
-              <span key={`pad-${i}`} className="py-1 opacity-25">{day}</span>
+              <span key={`pad-${i}`} className="py-1 text-[10px] opacity-25">{day}</span>
             ))}
 
             {/* Active Days */}
@@ -132,10 +132,10 @@ export default function CalendarSection({
                   onClick={() => onSelectDate(dateStr)}
                   disabled={isBooked}
                   variant={isSelected ? "default" : "outline"}
-                  className={`h-auto py-1.5 rounded-md transition-all font-bold relative flex flex-col items-center justify-center ${isSelected && isCustomSlot && !isCurrentDayBooked
-                    ? "bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-700 hover:bg-emerald-800"
+                  className={`h-7 py-0 rounded-md transition-all text-xs font-extrabold relative flex items-center justify-center ${isSelected && isCustomSlot && !isCurrentDayBooked
+                    ? "bg-emerald-700 text-white shadow-xs ring-1 ring-emerald-700 hover:bg-emerald-800"
                     : isSelected
-                      ? "bg-primary text-white shadow-sm ring-1 ring-primary hover:bg-primary/90"
+                      ? "bg-primary text-white shadow-xs ring-1 ring-primary hover:bg-primary/90"
                       : isPast
                         ? "bg-gray-50 text-gray-400 cursor-not-allowed opacity-50 border-gray-100"
                         : "bg-green-50 text-green-700 hover:bg-green-100 border-green-200 cursor-pointer"
@@ -148,7 +148,7 @@ export default function CalendarSection({
           </div>
         </div>
 
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 space-y-3 w-full">
           {normalizedSelectedDate ? (
             (() => {
               const selectedDateData = availableDates?.find((d: any) => d.date === normalizedSelectedDate);
@@ -161,31 +161,31 @@ export default function CalendarSection({
               const hasCustomTimes = customStartTime !== null && customEndTime !== null && !isSelectedDateToday;
 
               return (
-                <div className="space-y-6">
+                <div className="space-y-3">
                   <div>
-                    <h3 className="text-sm font-extrabold text-foreground">Time Slot</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Select a preferred time slot for your booking on {new Date(selectedDate!).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}.
+                    <h3 className="text-xs font-extrabold text-foreground">Time Slot</h3>
+                    <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+                      Preferred time for {new Date(selectedDate!).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}.
                     </p>
 
-                    <div className="pt-4">
+                    <div className="pt-2">
                       {isCustomSlot && customStartTime && customEndTime ? (
-                        <div className="border p-4 rounded-xl shadow-sm flex flex-col items-center justify-center gap-1.5 bg-emerald-50 border-emerald-200 ring-2 ring-emerald-500/20 mb-4">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-center text-emerald-600">Custom Time Selected</span>
-                          <span className="text-lg sm:text-xl font-black text-center text-emerald-800">{customStartTime} - {customEndTime}</span>
+                        <div className="border p-2.5 rounded-lg shadow-2xs flex flex-col items-center justify-center gap-1 bg-emerald-50 border-emerald-200 ring-1 ring-emerald-500/20 mb-2.5">
+                          <span className="text-[9px] font-bold uppercase tracking-wider text-center text-emerald-600">Custom Time Selected</span>
+                          <span className="text-base font-black text-center text-emerald-800">{customStartTime} - {customEndTime}</span>
                         </div>
                       ) : selectedSlot ? (
-                        <div className="border p-4 rounded-xl shadow-sm flex flex-col items-center justify-center gap-1.5 bg-primary/5 border-primary/20 ring-2 ring-primary/20 mb-4">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-center text-primary">Standard Time Selected</span>
-                          <span className="text-lg sm:text-xl font-black text-center text-foreground">{selectedSlot}</span>
+                        <div className="border p-2.5 rounded-lg shadow-2xs flex flex-col items-center justify-center gap-1 bg-primary/5 border-primary/20 ring-1 ring-primary/20 mb-2.5">
+                          <span className="text-[9px] font-bold uppercase tracking-wider text-center text-primary">Standard Time Selected</span>
+                          <span className="text-base font-black text-center text-foreground">{selectedSlot}</span>
                         </div>
                       ) : (
-                        <div className="border border-dashed p-6 rounded-xl text-center mb-4 text-gray-500 text-sm">
+                        <div className="border border-dashed p-3.5 rounded-lg text-center mb-2.5 text-gray-500 text-xs">
                           No time slot selected yet.
                         </div>
                       )}
 
-                      <Button onClick={() => setIsModalOpen(true)} className="w-full font-bold">
+                      <Button onClick={() => setIsModalOpen(true)} className="w-full h-8 text-xs font-bold cursor-pointer">
                         {isCustomSlot || selectedSlot ? "Change Time Slot" : "Select Time Slot"}
                       </Button>
                     </div>
@@ -195,15 +195,15 @@ export default function CalendarSection({
             })()
           ) : (
             <>
-              <h3 className="text-sm font-extrabold text-foreground">Select an Available Date</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Check standard availability before scheduling booking queries. Active green/primary indicators indicate selections.
+              <h3 className="text-xs font-extrabold text-foreground">Select an Available Date</h3>
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                Click any available green date to choose or customize your time slot.
               </p>
 
-              <div className="space-y-2.5 pt-2">
-                <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
-                  <span className="size-4 rounded border border-green-200 bg-green-50" />
-                  <span>Available Day</span>
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="size-3.5 rounded border border-green-200 bg-green-50" />
+                  <span className="text-[11px] font-medium">Available Day</span>
                 </div>
               </div>
             </>

@@ -30,9 +30,9 @@ export function useFilteredProfessionals({ categoryOverride }: UseFilteredProfes
             const dateString = `${year}-${month}-${day}`;
 
             filtered = filtered.filter(prof => {
-                if (!prof.availableDates) return false;
+                if (!prof.availableDates || prof.availableDates.length === 0) return true;
                 const availableDate = prof.availableDates.find(d => d.date === dateString);
-                if (!availableDate) return false;
+                if (!availableDate) return true;
 
                 if (selectedSlot) {
                     // If the day has a custom booking, block ALL slots (both custom and standard)

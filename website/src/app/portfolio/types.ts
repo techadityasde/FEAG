@@ -40,6 +40,9 @@ export interface HeroSectionProps {
   onWishlist: () => void;
   onShare: () => void;
   onCustomRequest?: () => void;
+  selectedPackage?: "basic" | "professional" | "premium" | "custom" | null;
+  setSelectedPackage?: (pkg: "basic" | "professional" | "premium" | "custom" | null) => void;
+  booking?: any;
 }
 
 export interface PortfolioSectionProps {
@@ -66,6 +69,7 @@ export interface PackagesSectionProps {
   selectedPackage: "basic" | "professional" | "premium" | "custom" | null;
   setSelectedPackage: (pkg: "basic" | "professional" | "premium" | "custom" | null) => void;
   booking: any;
+  category?: string;
 }
 
 export interface CalendarSectionProps {

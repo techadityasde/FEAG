@@ -48,11 +48,11 @@ export default function StepPersonal({
   // Check if all step 1 fields are filled
   const isFormFilled = Boolean(
     watchedValues.category &&
-      watchedValues.firstName?.trim() &&
-      watchedValues.lastName?.trim() &&
-      watchedValues.gender &&
-      /^\d{10}$/.test(watchedValues.phone || "") &&
-      /^\S+@\S+\.\S+$/.test(watchedValues.email || "")
+    watchedValues.firstName?.trim() &&
+    watchedValues.lastName?.trim() &&
+    watchedValues.gender &&
+    /^\d{10}$/.test(watchedValues.phone || "") &&
+    /^\S+@\S+\.\S+$/.test(watchedValues.email || "")
   );
 
   const canProceed = isFormFilled && otpVerified;
@@ -80,7 +80,7 @@ export default function StepPersonal({
       if (typeof window !== "undefined" && window.recaptchaVerifier) {
         try {
           window.recaptchaVerifier.clear();
-        } catch (e) {}
+        } catch (e) { }
         window.recaptchaVerifier = null;
       }
     };
@@ -141,7 +141,7 @@ export default function StepPersonal({
               window.grecaptcha.reset(widgetId);
             }
           });
-        } catch (err) {}
+        } catch (err) { }
       }
     } finally {
       setIsSendingOtp(false);
@@ -232,6 +232,9 @@ export default function StepPersonal({
                 <option value="Photographer">Photographer</option>
                 <option value="Cinematographer">Cinematic (Photo + Video)</option>
                 <option value="Singer">Singer</option>
+                <option value="Choreographer">Choreographer</option>
+                <option value="Podcast Studio">Podcast Studio</option>
+
               </select>
             )}
           />
@@ -307,11 +310,10 @@ export default function StepPersonal({
                 {["male", "female", "other"].map((option) => (
                   <label
                     key={option}
-                    className={`flex-1 inline-flex cursor-pointer items-center justify-center gap-1 rounded-md border px-2 py-1.5 text-[11px] font-semibold capitalize transition-all select-none ${
-                      field.value === option
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-input bg-transparent text-foreground hover:bg-muted/40"
-                    }`}
+                    className={`flex-1 inline-flex cursor-pointer items-center justify-center gap-1 rounded-md border px-2 py-1.5 text-[11px] font-semibold capitalize transition-all select-none ${field.value === option
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-input bg-transparent text-foreground hover:bg-muted/40"
+                      }`}
                   >
                     <input
                       type="radio"

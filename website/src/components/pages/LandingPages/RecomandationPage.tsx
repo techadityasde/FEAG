@@ -25,7 +25,15 @@ export default function RecomandationPage() {
     const filteredData = useFilteredProfessionals();
     const wishlistItems = useSelector((state: RootState) => state.wishlist?.items || []);
 
-    const [filters, setFilters] = useState({ priceRange: "All", customMaxPrice: 5000 });
+    const [filters, setFilters] = useState<{
+        priceRange: string;
+        customMinPrice: number | string;
+        customMaxPrice: number | string;
+    }>({
+        priceRange: "All",
+        customMinPrice: 1000,
+        customMaxPrice: 5000,
+    });
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -50,10 +58,14 @@ export default function RecomandationPage() {
             if (filters.priceRange === "Under2000") return price < 2000;
             if (filters.priceRange === "2000To4000") return price >= 2000 && price <= 4000;
             if (filters.priceRange === "Above4000") return price > 4000;
-            if (filters.priceRange === "Custom") return price <= filters.customMaxPrice;
+            if (filters.priceRange === "Custom") {
+                const min = filters.customMinPrice !== '' && !isNaN(Number(filters.customMinPrice)) ? Number(filters.customMinPrice) : 0;
+                const max = filters.customMaxPrice !== '' && !isNaN(Number(filters.customMaxPrice)) && Number(filters.customMaxPrice) > 0 ? Number(filters.customMaxPrice) : Infinity;
+                return price >= min && price <= max;
+            }
             return true;
         });
-    }, [filteredData, filters.priceRange, filters.customMaxPrice]);
+    }, [filteredData, filters.priceRange, filters.customMinPrice, filters.customMaxPrice]);
 
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -84,9 +96,28 @@ export default function RecomandationPage() {
         }
     };
 
+    const formatCompactPrice = (val: number) => {
+        if (val >= 1000) {
+            const k = val / 1000;
+            return Number.isInteger(k) ? `${k}k` : `${k.toFixed(1)}k`;
+        }
+        return val.toLocaleString('en-IN');
+    };
+
     const getSelectedLabel = () => {
         if (filters.priceRange === "Custom") {
-            return `Up to ₹${filters.customMaxPrice.toLocaleString('en-IN')}`;
+            const minVal = filters.customMinPrice !== '' ? Number(filters.customMinPrice) : 0;
+            const maxVal = filters.customMaxPrice !== '' ? Number(filters.customMaxPrice) : 0;
+
+            if (minVal > 0 && maxVal > 0) {
+                return `₹${formatCompactPrice(minVal)} - ₹${formatCompactPrice(maxVal)}`;
+            } else if (minVal > 0) {
+                return `From ₹${formatCompactPrice(minVal)}`;
+            } else if (maxVal > 0) {
+                return `Up to ₹${formatCompactPrice(maxVal)}`;
+            } else {
+                return "Custom Price";
+            }
         }
         return priceOptions.find(o => o.value === filters.priceRange)?.label || "Any Price";
     };
@@ -102,18 +133,18 @@ export default function RecomandationPage() {
                         <button
                             type="button"
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border/80 bg-white hover:bg-gray-50 active:bg-gray-100 transition-all shadow-2xs group focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs font-normal text-foreground cursor-pointer"
+                            className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-border/80 bg-white hover:bg-gray-50 active:bg-gray-100 transition-all shadow-2xs group focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs font-normal text-foreground cursor-pointer whitespace-nowrap shrink-0"
                         >
                             <SlidersHorizontal className="w-3 h-3 text-primary shrink-0" />
-                            <span className="text-[11px] font-normal text-muted-foreground hidden min-[400px]:inline">Price:</span>
-                            <span className="font-semibold text-foreground text-xs">
+                            <span className="text-[11px] font-normal text-muted-foreground hidden min-[400px]:inline shrink-0">Price:</span>
+                            <span className="font-semibold text-foreground text-xs shrink-0">
                                 {getSelectedLabel()}
                             </span>
                             <ChevronDown className={cn("w-3 h-3 text-muted-foreground shrink-0 transition-transform duration-200", isDropdownOpen && "rotate-180 text-primary")} />
                         </button>
 
                         {isDropdownOpen && (
-                            <div className="absolute left-0 sm:right-0 sm:left-auto mt-1.5 w-56 bg-white rounded-xl border border-border/80 shadow-xl py-1 z-50 animate-in fade-in duration-150">
+                            <div className="absolute left-0 sm:right-0 sm:left-auto mt-1.5 w-64 bg-white rounded-xl border border-border/80 shadow-xl py-1 z-50 animate-in fade-in duration-150">
                                 <div className="px-2.5 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/40 mb-1">
                                     Filter by Price
                                 </div>
@@ -138,27 +169,68 @@ export default function RecomandationPage() {
                                     );
                                 })}
 
-                                {/* Custom Price Range Input */}
-                                <div className="border-t border-border/40 mt-1 pt-2 px-2.5 pb-1">
-                                    <div className="flex items-center justify-between text-[10px] font-semibold text-foreground mb-1">
-                                        <span>Custom Range</span>
-                                        <span className="text-primary font-bold">Max: ₹{filters.customMaxPrice.toLocaleString('en-IN')}</span>
+                                {/* Custom Price Range Input (Start & End) */}
+                                <div className="border-t border-border/40 mt-1 pt-2 px-2.5 pb-2">
+                                    <div className="flex items-center justify-between text-[10px] font-semibold text-foreground mb-1.5">
+                                        <span>Custom Range (Max ₹1,00,000)</span>
+                                        {filters.priceRange === "Custom" && (
+                                            <span className="text-[10px] text-primary font-bold">Active</span>
+                                        )}
                                     </div>
-                                    <input
-                                        type="range"
-                                        min={1000}
-                                        max={10000}
-                                        step={250}
-                                        value={filters.customMaxPrice}
-                                        onChange={(e) => {
-                                            const val = Number(e.target.value);
-                                            onFilterChange({ priceRange: "Custom", customMaxPrice: val });
-                                        }}
-                                        className="w-full accent-primary h-1.5 bg-gray-200 rounded-lg cursor-pointer"
-                                    />
-                                    <div className="flex justify-between text-[9px] text-muted-foreground mt-1">
-                                        <span>₹1,000</span>
-                                        <span>₹10,000+</span>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1">
+                                            <label className="text-[9px] text-muted-foreground block mb-0.5 font-medium">Start Price</label>
+                                            <div className="relative flex items-center">
+                                                <span className="absolute left-2 text-[10px] text-muted-foreground font-semibold">₹</span>
+                                                <input
+                                                    type="number"
+                                                    min={0}
+                                                    max={100000}
+                                                    placeholder="Min"
+                                                    value={filters.customMinPrice}
+                                                    onChange={(e) => {
+                                                        let val: number | string = e.target.value === '' ? '' : Math.max(0, Number(e.target.value));
+                                                        if (typeof val === 'number' && val > 100000) {
+                                                            val = 100000;
+                                                        }
+                                                        onFilterChange({ priceRange: "Custom", customMinPrice: val });
+                                                    }}
+                                                    onFocus={() => {
+                                                        if (filters.priceRange !== "Custom") {
+                                                            onFilterChange({ priceRange: "Custom" });
+                                                        }
+                                                    }}
+                                                    className="w-full pl-5 pr-1.5 py-1 text-xs font-semibold border border-border/80 rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-background text-foreground [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
+                                            </div>
+                                        </div>
+                                        <span className="text-muted-foreground text-xs font-medium self-end mb-1.5">-</span>
+                                        <div className="flex-1">
+                                            <label className="text-[9px] text-muted-foreground block mb-0.5 font-medium">End Price</label>
+                                            <div className="relative flex items-center">
+                                                <span className="absolute left-2 text-[10px] text-muted-foreground font-semibold">₹</span>
+                                                <input
+                                                    type="number"
+                                                    min={0}
+                                                    max={100000}
+                                                    placeholder="Max"
+                                                    value={filters.customMaxPrice}
+                                                    onChange={(e) => {
+                                                        let val: number | string = e.target.value === '' ? '' : Math.max(0, Number(e.target.value));
+                                                        if (typeof val === 'number' && val > 100000) {
+                                                            val = 100000;
+                                                        }
+                                                        onFilterChange({ priceRange: "Custom", customMaxPrice: val });
+                                                    }}
+                                                    onFocus={() => {
+                                                        if (filters.priceRange !== "Custom") {
+                                                            onFilterChange({ priceRange: "Custom" });
+                                                        }
+                                                    }}
+                                                    className="w-full pl-5 pr-1.5 py-1 text-xs font-semibold border border-border/80 rounded-md focus:outline-none focus:ring-1 focus:ring-primary bg-background text-foreground [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

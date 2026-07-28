@@ -27,16 +27,20 @@ const MaskIcon = ({ url, className, scale = 1.5 }: { url: string, className?: st
   />
 );
 
-const CinematicIcon = ({ className }: { className?: string }) => <MaskIcon url="/Cinematic.svg" className={className} />;
-const PhotographerIcon = ({ className }: { className?: string }) => <MaskIcon url="/camaraman.svg" className={className} scale={2.7} />;
-const VideographerIcon = ({ className }: { className?: string }) => <MaskIcon url="/videogharapher.svg" className={className} scale={2.2} />;
-const SingerIcon = ({ className }: { className?: string }) => <MaskIcon url="/singer.svg" className={className} scale={2.7} />;
+const CinematicIcon = ({ className }: { className?: string }) => <MaskIcon url="/Cinematic.svg" className={className} scale={1.8} />;
+const PhotographerIcon = ({ className }: { className?: string }) => <MaskIcon url="/camaraman.svg" className={className} scale={3.2} />;
+const VideographerIcon = ({ className }: { className?: string }) => <MaskIcon url="/videogharapher.svg" className={className} scale={2.5} />;
+const SingerIcon = ({ className }: { className?: string }) => <MaskIcon url="/singer.svg" className={className} scale={3.3} />;
+const ChoreographerIcon = ({ className }: { className?: string }) => <MaskIcon url="/choreographer.svg" className={cn(className, 'mt-1.5')} scale={2.2} />;
+const PodcastIcon = ({ className }: { className?: string }) => <MaskIcon url="/podcast.svg" className={cn(className, 'mt-1.5')} scale={2.3} />;
 
 const categories = [
+  { id: 'choreographer', label: 'Choreographer', icon: ChoreographerIcon },
   { id: 'Cinematic', label: 'Cinematic', icon: CinematicIcon },
   { id: 'photographer', label: 'Photographer', icon: PhotographerIcon },
   { id: 'videographer', label: 'Videographer', icon: VideographerIcon },
   { id: 'singer', label: 'Singer', icon: SingerIcon },
+  { id: 'podcast', label: 'Podcast', icon: PodcastIcon },
 ];
 
 export default function SearchHeroSection() {
@@ -53,7 +57,10 @@ export default function SearchHeroSection() {
 
           {/* Top Tabs */}
           <div className="relative border-b border-gray-100 w-full">
-            <div className="grid grid-cols-4 sm:flex sm:items-center sm:justify-center sm:gap-6 px-1 sm:px-6 py-2 w-full">
+            <div
+              className="flex items-center gap-1 sm:gap-6 px-2 sm:px-6 py-2 w-full overflow-x-auto sm:justify-center scrollbar-none"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 const isActive = activeTab === cat.id;
@@ -63,15 +70,17 @@ export default function SearchHeroSection() {
                     key={cat.id}
                     onClick={() => dispatch(setActiveTab(cat.id))}
                     className={cn(
-                      "flex flex-col items-center gap-1 sm:gap-1.5 pb-2.5 sm:pb-3 px-1 sm:px-6 relative transition-colors whitespace-nowrap flex-shrink-0 w-full sm:w-auto",
-                      isActive ? "text-primary" : "text-gray-500 hover:text-gray-700"
+                      "flex flex-col items-center justify-center gap-1 sm:gap-1.5 pt-1 pb-2.5 sm:pb-3 px-3 sm:px-5 relative transition-colors whitespace-nowrap shrink-0 cursor-pointer select-none",
+                      isActive ? "text-primary font-bold" : "text-gray-500 hover:text-gray-700 font-semibold"
                     )}
                   >
-                    <Icon className={cn("w-6 h-6 sm:w-7 sm:h-9", isActive ? "text-primary" : "text-gray-400")} />
-                    <span className="text-[11px] min-[360px]:text-xs sm:text-[12px] font-bold">{cat.label}</span>
+                    <div className="h-6 sm:h-8 flex items-center justify-center">
+                      <Icon className={cn("w-6 h-6 sm:w-7 sm:h-8 transition-colors", isActive ? "text-primary" : "text-gray-400")} />
+                    </div>
+                    <span className="text-xs sm:text-[12px]">{cat.label}</span>
                     {/* Active Indicator Underline */}
                     {isActive && (
-                      <div className="absolute -bottom-[1px] left-0 right-0 h-[3px] bg-primary rounded-t-md" />
+                      <div className="absolute bottom-0 left-2 right-2 h-[3px] bg-primary rounded-t-full" />
                     )}
                   </button>
                 );

@@ -1,5 +1,5 @@
 import React from "react";
-import { Camera, Video, Music, Clapperboard, ArrowRight, Star, Sparkles } from "lucide-react";
+import { Camera, Video, Music, Clapperboard, ArrowRight, Star, Sparkles, Mic, Flame } from "lucide-react";
 import Link from "next/link";
 
 const serviceCategories = [
@@ -47,6 +47,28 @@ const serviceCategories = [
     href: "/services/Cinematic",
     badgeBg: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
   },
+  {
+    id: "choreographer",
+    title: "Choreographer",
+    subtitle: "Bollywood sangeet, wedding couple dance, hip-hop & stage show choreography.",
+    badge: "420+ Pros",
+    rating: "4.9",
+    bgImage: "/choreographer.png",
+    icon: Flame,
+    href: "/services/choreographer",
+    badgeBg: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+  },
+  {
+    id: "podcast",
+    title: "Podcast Studio",
+    subtitle: "4K video podcast suites, Rodecaster audio, soundproof booths & live streaming.",
+    badge: "280+ Studios",
+    rating: "5.0",
+    bgImage: "/podcast.png",
+    icon: Mic,
+    href: "/services/podcast",
+    badgeBg: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
+  },
 ];
 
 export default function Services() {
@@ -63,7 +85,7 @@ export default function Services() {
             Creative Talent for Every Event
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground mt-2 max-w-xl font-medium">
-            Discover and book top-rated photographers, videographers, singers, and cinematographers in your city.
+            Discover and book top-rated photographers, videographers, singers, cinematographers, choreographers, and podcast studios in your city.
           </p>
         </div>
         <Link
@@ -75,8 +97,8 @@ export default function Services() {
         </Link>
       </div>
 
-      {/* Service Cards Grid (4 Columns) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Service Cards Grid (3 Columns) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {serviceCategories.map((service) => {
           const Icon = service.icon;
           return (

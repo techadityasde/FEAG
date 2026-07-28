@@ -32,8 +32,8 @@ const professions = [
   "Cinematographers",
   "Singers",
   "Dancers",
-  "DJs",
-  "Event Planners",
+  "Choreographers",
+  "Podcast Studios",
 ];
 
 const AnimatedPlaceholder = ({ leftClass }: { leftClass: string }) => {
