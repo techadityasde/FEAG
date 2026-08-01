@@ -1,9 +1,14 @@
 import React from "react";
-import { MapPin, BadgeCheck, Star, ArrowUpRight } from "lucide-react";
+import { MapPin, BadgeCheck, Star, ArrowUpRight, Heart } from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import CategoryPricing from "./CategoryPricing";
 import RatingDisplay from "./RatingDisplay";
 import { Professional } from "@/lib/data/professionals";
+import { toggleWishlist } from "@/lib/store/wishlistSlice";
+import { RootState } from "@/lib/store/store";
+import { cn } from "@/lib/utils";
 
 interface CategoryCardProps {
   professional: Professional;
@@ -16,6 +21,21 @@ export default function CategoryCard({
   onBook,
   onViewProfile,
 }: CategoryCardProps) {
+  const dispatch = useDispatch();
+  const wishlistItems = useSelector((state: RootState) => state.wishlist?.items || []);
+  const isInWishlist = wishlistItems.some((item) => item.id === professional.id);
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(toggleWishlist(professional));
+    if (isInWishlist) {
+      toast.success("Removed from Wishlist");
+    } else {
+      toast.success("Added to Wishlist!");
+    }
+  };
+
   const {
     id,
     username,
@@ -23,7 +43,6 @@ export default function CategoryCard({
     location,
     rating,
     totalReviews,
-    experience,
     description,
     hourlyPricing,
     isVerified,
@@ -54,20 +73,31 @@ export default function CategoryCard({
           <ArrowUpRight className="size-4" />
         </button>
 
+        {/* Wishlist Heart Button - Top Right */}
+        <button
+          type="button"
+          onClick={handleToggleWishlist}
+          className="absolute top-3 right-3 z-20 flex size-8 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-black/60 transition-all cursor-pointer border border-white/10 shadow-sm active:scale-90"
+          title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+          aria-label={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+        >
+          <Heart className={cn("size-4 transition-colors", isInWishlist ? "fill-red-500 text-red-500 stroke-red-500" : "text-white fill-none")} />
+        </button>
+
         {/* Rating Pill - Glassmorphism */}
-        <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white py-1 px-1.5 rounded-full flex items-center gap-1 border border-white/10 shadow-sm text-xs font-semibold">
-          <Star className="size-2.5 block fill-amber-400 text-amber-400 shrink-0" />
-          <span className="text-[10px] block">{rating.toFixed(1)}</span>
-          <span className="opacity-75block font-normal text-[8px]">
+        <div className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-md text-white py-1 px-2 rounded-full flex items-center gap-1 border border-white/10 shadow-sm text-xs font-semibold z-10">
+          <Star className="size-3 block fill-amber-400 text-amber-400 shrink-0" />
+          <span className="text-[11px] font-bold block">{rating.toFixed(1)}</span>
+          <span className="opacity-75 block font-normal text-[9px]">
             ({totalReviews})
           </span>
         </div>
       </div>
 
       {/* Card Details Section */}
-      <div className="p-2 flex-1 flex flex-col justify-between">
+      <div className="p-3 flex-1 flex flex-col justify-between">
         <div>
-          {/* Header row: Name & Experience Badge */}
+          {/* Header row: Name */}
           <div className="flex justify-between items-center gap-2 mb-1">
             <div className="flex items-center gap-1.5 min-w-0">
               <h3 className="font-extrabold text-foreground text-base sm:text-lg tracking-tight truncate">
@@ -80,9 +110,6 @@ export default function CategoryCard({
                 />
               )}
             </div>
-            <span className="text-sm text-xs font-semibold px-2 py-0.3 rounded-md bg-secondary text-muted-foreground whitespace-nowrap">
-              {experience}
-            </span>
           </div>
 
           {/* Location row */}
@@ -99,7 +126,7 @@ export default function CategoryCard({
           </div>
 
           {/* Short description */}
-          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
             {description}
           </p>
 
@@ -113,8 +140,7 @@ export default function CategoryCard({
         </div>
 
         {/* Action Buttons */}
-
-        <div className="grid grid-cols-1 gap-3 mt-2 border-border/30">
+        <div className="grid grid-cols-1 gap-3 mt-3 border-border/30">
           <Button
             variant="outline"
             className="w-full text-xs font-bold py-2 border-border hover:bg-primary/90 text-foreground hover:text-primary-foreground cursor-pointer h-9 rounded-lg transition-colors"

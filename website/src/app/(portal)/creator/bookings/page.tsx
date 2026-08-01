@@ -244,12 +244,14 @@ export default function CreatorBookings() {
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 bg-card border border-border p-3 rounded-xl shadow-sm">
         {/* Tabs */}
         <div className="flex overflow-x-auto w-full xl:w-auto scrollbar-hide pb-2 xl:pb-0 -mb-2 xl:mb-0 gap-2">
-          {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((tab) => (
-            <button
+          {(['all', 'pending', 'confirmed', 'completed', 'cancelled'] as const).map((tab) => (
+            <Button
               key={tab}
+              variant={activeTab === tab ? "default" : "ghost"}
+              size="sm"
               onClick={() => handleTabChange(tab as TabOption)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex items-center ${activeTab === tab
-                  ? 'bg-primary text-primary-foreground shadow-sm'
+              className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex items-center h-8 ${activeTab === tab
+                  ? 'bg-primary text-primary-foreground shadow-sm hover:bg-primary'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
             >
@@ -260,7 +262,7 @@ export default function CreatorBookings() {
                   {bookings.filter(b => b.status === tab).length}
                 </span>
               )}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -481,16 +483,18 @@ export default function CreatorBookings() {
 
                 <div className="flex items-center gap-1 mx-2">
                   {Array.from({ length: totalPages }).map((_, i) => (
-                    <button
+                    <Button
                       key={i}
+                      variant={currentPage === i + 1 ? "default" : "ghost"}
+                      size="icon-sm"
                       onClick={() => setCurrentPage(i + 1)}
-                      className={`h-8 w-8 rounded-md text-sm font-semibold flex items-center justify-center transition-colors ${currentPage === i + 1
-                          ? 'bg-primary text-primary-foreground shadow-sm'
+                      className={`size-8 rounded-md text-sm font-semibold flex items-center justify-center transition-colors ${currentPage === i + 1
+                          ? 'bg-primary text-primary-foreground shadow-sm hover:bg-primary'
                           : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                         }`}
                     >
                       {i + 1}
-                    </button>
+                    </Button>
                   ))}
                 </div>
 

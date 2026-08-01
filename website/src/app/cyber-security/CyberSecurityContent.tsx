@@ -98,10 +98,13 @@ const sections: SecuritySection[] = [
 
 export default function CyberSecurityContent() {
   const [openSection, setOpenSection] = useState<string | null>(null);
-
+  console.log("CyberSecurityContent rendered with openSection:");
   return (
     <main className="relative isolate flex-1 overflow-hidden bg-[#FFF9F2] px-3 py-10 min-[360px]:px-4 sm:px-6 sm:py-16 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+        aria-hidden="true"
+      >
         <div className="absolute -left-32 -top-40 h-[34rem] w-[34rem] rounded-full bg-[#F59E0B]/35 blur-[130px]" />
         <div className="absolute right-[-12rem] top-[18%] h-[28rem] w-[28rem] rounded-full bg-[#FFFFFF] blur-[100px]" />
         <div className="absolute -bottom-48 -right-32 h-[38rem] w-[38rem] rounded-full bg-[#E76F00]/25 blur-[150px]" />
@@ -113,10 +116,16 @@ export default function CyberSecurityContent() {
           <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#F59E0B]/15 text-[#A95300]">
             <ShieldCheck className="size-6" aria-hidden="true" />
           </div>
-          <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-[#A95300]">FEAG Legal</p>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-[#2E2215] sm:text-5xl">Cyber Security</h1>
+          <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-[#A95300]">
+            FEAG Legal
+          </p>
+          <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-[#2E2215] sm:text-5xl">
+            Cyber Security
+          </h1>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-[#6D5F52] sm:text-base">
-            Protecting the security and privacy of our users is a priority. Explore how we help customers and creative professionals connect with confidence.
+            Protecting the security and privacy of our users is a priority.
+            Explore how we help customers and creative professionals connect
+            with confidence.
           </p>
         </header>
 
@@ -141,29 +150,51 @@ export default function CyberSecurityContent() {
                   aria-controls={contentId}
                   onClick={() => setOpenSection(isOpen ? null : section.title)}
                 >
-                  <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${isOpen ? "bg-[#F59E0B]/20 text-[#A95300]" : "bg-[#6D5F52]/10 text-[#6D5F52]"}`}>
+                  <span
+                    className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${isOpen ? "bg-[#F59E0B]/20 text-[#A95300]" : "bg-[#6D5F52]/10 text-[#6D5F52]"}`}
+                  >
                     <ShieldCheck className="size-[18px]" aria-hidden="true" />
                   </span>
                   <span className="flex-1 text-[1.15rem] font-extrabold leading-tight tracking-[-0.035em] text-[#2E2215] sm:text-[1.35rem]">
                     {section.title.replace(/^\d+\.\s*/, "")}
                   </span>
-                  {isOpen ? <ChevronDown className="size-5 text-[#A95300]" aria-hidden="true" /> : <ChevronRight className="size-5 text-[#6D5F52]" aria-hidden="true" />}
+                  {isOpen ? (
+                    <ChevronDown
+                      className="size-5 text-[#A95300]"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <ChevronRight
+                      className="size-5 text-[#6D5F52]"
+                      aria-hidden="true"
+                    />
+                  )}
                 </button>
 
                 {isOpen ? (
-                  <div id={contentId} className="border-t border-[#A95300]/10 px-5 pb-6 pt-5 sm:px-6">
+                  <div
+                    id={contentId}
+                    className="border-t border-[#A95300]/10 px-5 pb-6 pt-5 sm:px-6"
+                  >
                     <div className="space-y-4 text-sm leading-relaxed text-[#5D5045] sm:text-base">
-                      {section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                      {section.paragraphs?.map((paragraph) => (
+                        <p key={paragraph}>{paragraph}</p>
+                      ))}
                       {section.intro ? <p>{section.intro}</p> : null}
                       {section.items ? (
                         <ul className="list-disc space-y-2 pl-5 marker:text-[#D97706]">
-                          {section.items.map((item) => <li key={item}>{item}</li>)}
+                          {section.items.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
                         </ul>
                       ) : null}
                       {section.contact ? (
                         <p>
-                          {section.contact.label}: {" "}
-                          <a href={`mailto:${section.contact.email}`} className="font-semibold text-[#A95300] hover:text-[#6D3600]">
+                          {section.contact.label}:{" "}
+                          <a
+                            href={`mailto:${section.contact.email}`}
+                            className="font-semibold text-[#A95300] hover:text-[#6D3600]"
+                          >
                             {section.contact.email}
                           </a>
                         </p>

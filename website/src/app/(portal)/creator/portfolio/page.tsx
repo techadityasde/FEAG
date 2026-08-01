@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
 
 interface MediaItem {
   id: string;
@@ -238,24 +239,30 @@ export default function PortfolioPage() {
             </h3>
             
             <div className="flex items-center gap-1 bg-secondary/30 p-1 rounded-lg">
-              <button
+              <Button
+                variant={activeTab === "all" ? "default" : "ghost"}
+                size="sm"
                 onClick={() => setActiveTab("all")}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${activeTab === "all" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`h-7 px-3 text-xs font-semibold rounded-md transition-all ${activeTab === "all" ? "bg-background shadow-sm text-foreground hover:bg-background" : "text-muted-foreground hover:text-foreground"}`}
               >
                 All
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={activeTab === "image" ? "default" : "ghost"}
+                size="sm"
                 onClick={() => setActiveTab("image")}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${activeTab === "image" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`h-7 px-3 text-xs font-semibold rounded-md transition-all ${activeTab === "image" ? "bg-background shadow-sm text-foreground hover:bg-background" : "text-muted-foreground hover:text-foreground"}`}
               >
                 Images
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={activeTab === "video" ? "default" : "ghost"}
+                size="sm"
                 onClick={() => setActiveTab("video")}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${activeTab === "video" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`h-7 px-3 text-xs font-semibold rounded-md transition-all ${activeTab === "video" ? "bg-background shadow-sm text-foreground hover:bg-background" : "text-muted-foreground hover:text-foreground"}`}
               >
                 Videos
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -340,13 +347,15 @@ export default function PortfolioPage() {
                         </div>
                       </td>
                       <td className="px-4 py-2 text-right">
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
                           onClick={() => removeMedia(item.id)}
-                          className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors inline-flex"
+                          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg inline-flex"
                           title="Delete file"
                         >
                           <Trash2 className="size-4" />
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -369,12 +378,14 @@ export default function PortfolioPage() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={() => setPreviewMedia(null)}
         >
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setPreviewMedia(null)}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2 bg-black/40 text-white rounded-full hover:bg-black/60 transition-colors"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 bg-black/40 text-white rounded-full hover:bg-black/60"
           >
             <X className="size-6" />
-          </button>
+          </Button>
           <div
             className="relative max-w-4xl w-full max-h-[85vh] flex items-center justify-center rounded-xl overflow-hidden animate-in zoom-in-95 duration-300"
             onClick={(e) => e.stopPropagation()}

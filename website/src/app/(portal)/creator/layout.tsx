@@ -15,12 +15,11 @@ export default function CreatorLayout({
   children: React.ReactNode;
 }) {
   const { user } = useSelector((state: RootState) => state.auth);
-  console.log("user", user?.isProfileDone)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <ProtectedRoute allowedRoles={["creator"]}>
-      <div className="flex h-screen bg-background overflow-hidden">
+      <div className="flex h-screen bg-slate-50/70 overflow-hidden font-sans">
         {/* Sidebar */}
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
@@ -30,7 +29,7 @@ export default function CreatorLayout({
           <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-6 bg-muted/20">
+          <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 bg-slate-50/50 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <div className="max-w-7xl mx-auto w-full">
               {!user?.isVerified ? (
                 <VerificationPending />

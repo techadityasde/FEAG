@@ -12,6 +12,9 @@ export interface FormValues {
   pincode: string;
   location: string;
   landmark?: string;
+  nationality?: string;
+  state?: string;
+  city?: string;
 }
 
 export interface StepProps {

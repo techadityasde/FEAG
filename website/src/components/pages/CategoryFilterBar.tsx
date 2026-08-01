@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Search, SlidersHorizontal, X, ArrowUpDown, RotateCcw } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, SlidersHorizontal, X, ArrowUpDown, RotateCcw, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface FilterState {
@@ -33,8 +33,20 @@ export default function CategoryFilterBar({
   // Keep a local copy of filters inside the drawer so user can "Apply" or "Reset"
   const [localFilters, setLocalFilters] = useState<FilterState>({ ...filters });
 
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (isMobileDrawerOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileDrawerOpen]);
+
   // Update local filters when global filters change (e.g. from reset)
-  React.useEffect(() => {
+  useEffect(() => {
     setLocalFilters({ ...filters });
   }, [filters]);
 
@@ -52,29 +64,79 @@ export default function CategoryFilterBar({
     setIsMobileDrawerOpen(false);
   };
 
+  const activeFilterCount = [
+    filters.location !== "All",
+    filters.priceRange !== "All",
+    filters.rating !== "All",
+    filters.experience !== "All",
+    filters.availability !== "All",
+    filters.sortBy !== "Recommended",
+    filters.searchQuery !== "",
+    Boolean(filters.category && filters.category !== "All"),
+  ].filter(Boolean).length;
+
   return (
     <div className="w-full">
-      {/* Mobile Filter Action Button (Visible only on Mobile < 768px) */}
-      <div className="md:hidden flex items-center justify-between gap-4 w-full mb-6">
-        {/* <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/75" />
-          <input
-            type="text"
-            placeholder="Search by name..."
-            className="w-full pl-9 pr-3 h-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-            value={filters.searchQuery}
-            onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
-          />
-        </div> */}
+      {/* Mobile Sticky Filter Action Bar (Visible only on Mobile < 768px, stays above content, below navbar) */}
+      <div className="md:hidden sticky top-[90px] min-[400px]:top-[105px] z-30 bg-background/95 backdrop-blur-md py-2.5 px-2 -mx-1 border-b border-border/50 mb-4 transition-all shadow-xs">
+        <div className="flex items-center justify-between gap-3">
+          <Button
+            onClick={() => setIsMobileDrawerOpen(true)}
+            variant="outline"
+            className="flex-1 flex items-center justify-center gap-2 text-xs font-extrabold h-10 border-border bg-card hover:bg-muted text-foreground cursor-pointer rounded-xl px-3 shadow-2xs"
+          >
+            <SlidersHorizontal className="size-4 text-primary" />
+            <span>Filters</span>
+            {activeFilterCount > 0 && (
+              <span className="ml-1 bg-primary text-white text-[10px] font-extrabold size-5 rounded-full flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
 
-        <Button
-          onClick={() => setIsMobileDrawerOpen(true)}
-          variant="outline"
-          className="flex items-center gap-2 text-sm font-bold h-10 border-border bg-card hover:bg-muted text-foreground cursor-pointer shrink-0 rounded-lg px-4"
-        >
-          <SlidersHorizontal className="size-4 text-primary" />
-          Filters
-        </Button>
+          {/* Quick Sort Dropdown on Mobile */}
+          <select
+            className="flex-1 px-3 h-10 rounded-xl border border-border bg-card text-foreground text-xs font-semibold focus:outline-none focus:border-primary cursor-pointer shadow-2xs"
+            value={filters.sortBy}
+            onChange={(e) => onFilterChange({ sortBy: e.target.value })}
+          >
+            <option value="Recommended">Sort: Recommended</option>
+            <option value="PriceLowToHigh">Price: Low to High</option>
+            <option value="PriceHighToLow">Price: High to Low</option>
+            <option value="HighestRated">Highest Rated</option>
+            <option value="MostPopular">Most Popular</option>
+          </select>
+        </div>
+
+        {/* Active Filter Badges on Mobile */}
+        {activeFilterCount > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pt-2 pb-0.5 no-scrollbar text-[11px] font-semibold">
+            {filters.location !== "All" && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full whitespace-nowrap">
+                {filters.location}
+                <X className="size-3 cursor-pointer" onClick={() => onFilterChange({ location: "All" })} />
+              </span>
+            )}
+            {filters.priceRange !== "All" && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full whitespace-nowrap">
+                {filters.priceRange === "Under2000" ? "< ₹2,000" : filters.priceRange === "2000To4000" ? "₹2k - ₹4k" : "> ₹4,000"}
+                <X className="size-3 cursor-pointer" onClick={() => onFilterChange({ priceRange: "All" })} />
+              </span>
+            )}
+            {filters.rating !== "All" && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full whitespace-nowrap">
+                {filters.rating}+ ⭐
+                <X className="size-3 cursor-pointer" onClick={() => onFilterChange({ rating: "All" })} />
+              </span>
+            )}
+            <button
+              onClick={onReset}
+              className="text-primary hover:underline text-[11px] font-bold ml-1 whitespace-nowrap"
+            >
+              Reset
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Desktop Sidebar Filters (Hidden on Mobile) */}
@@ -178,19 +240,24 @@ export default function CategoryFilterBar({
         </div>
       </div>
 
-      {/* Mobile Drawer (Bottom Sheet) Overlay */}
+      {/* Mobile Drawer Overlay - High z-index (z-[100]) to open above sticky navbar */}
       {isMobileDrawerOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 transition-opacity duration-300 md:hidden flex justify-start">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] transition-opacity duration-300 md:hidden flex justify-start">
           {/* Backdrop closer */}
           <div className="absolute inset-0" onClick={() => setIsMobileDrawerOpen(false)} />
 
           {/* Drawer Panel */}
-          <div className="relative w-[85%] max-w-sm bg-card h-full flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-300 border-r border-border">
+          <div className="relative w-[85%] max-w-sm bg-card h-full flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-300 border-r border-border z-[101]">
             {/* Header */}
             <div className="p-4 border-b border-border flex items-center justify-between bg-muted/10">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="size-5 text-primary" />
                 <h3 className="font-extrabold text-foreground text-base tracking-wide">Filters</h3>
+                {activeFilterCount > 0 && (
+                  <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-0.5 rounded-full">
+                    {activeFilterCount} active
+                  </span>
+                )}
               </div>
               <button
                 onClick={() => setIsMobileDrawerOpen(false)}

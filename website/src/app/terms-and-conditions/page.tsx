@@ -4,7 +4,7 @@ import TermsAndConditionsContent from "./TermsAndConditionsContent";
 export const metadata: Metadata = {
   title: "Terms & Conditions - FEAG",
   description:
-    "Read FEAG Terms & Conditions for using the platform, booking services, provider obligations, payments, cancellations, content, and account rules.",
+    "Read FEAG  Terms & Conditions for using the platform, booking services, provider obligations, payments, cancellations, content, and account rules.",
 };
 
 export default function TermsAndConditionsPage() {

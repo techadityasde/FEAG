@@ -26,6 +26,10 @@ export interface Professional {
   username: string;
   profileImage: string;
   location: string; // E.g., "Mumbai, MH", "New Delhi, DL", "Bangalore, KA"
+  nationality?: string;
+  city?: string;
+  state?: string;
+  dateOfBirth?: string;
   rating: number;
   totalReviews: number;
   experience: string; // E.g., "5+ Years Exp."
@@ -34,8 +38,8 @@ export interface Professional {
   hourlyPricing: HourlyPricing;
   isVerified: boolean;
   availability: 'Anytime' | 'Weekdays' | 'Weekends';
-  category: 'photographer' | 'videographer' | 'singer' | 'Cinematic';
-  feature: 'photo' | 'video' | 'photo+video' | 'singer';
+  category: 'photographer' | 'videographer' | 'singer' | 'Cinematic' | 'choreographer' | 'podcast';
+  feature: 'photo' | 'video' | 'photo+video' | 'singer' | 'dance' | 'choreographer' | 'podcast';
   availableDates?: AvailableDate[];
   lat?: number;
   lng?: number;
@@ -46,6 +50,33 @@ export interface Professional {
   orders?: any[];
   wallet?: any[];
 }
+
+export const generateUpcomingAvailableDates = (numDays: number = 30): AvailableDate[] => {
+  const dates: AvailableDate[] = [];
+  const today = new Date();
+
+  for (let i = 0; i < numDays; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const dateStr = `${year}-${month}-${day}`;
+
+    dates.push({
+      date: dateStr,
+      isSlotBooked: false,
+      slots: [
+        { id: `slot-${dateStr}-1`, startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
+        { id: `slot-${dateStr}-2`, startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
+        { id: `slot-${dateStr}-3`, startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
+      ]
+    });
+  }
+
+  return dates;
+};
 
 export const professionals: Professional[] = [
   // PHOTOGRAPHERS
@@ -60,6 +91,10 @@ export const professionals: Professional[] = [
     email: "arjun.singh@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/32.jpg",
     location: "Mumbai, MH",
+    nationality: "Indian",
+    city: "Mumbai",
+    state: "Maharashtra",
+    dateOfBirth: "1994-06-15",
     lat: 19.0737,
     lng: 72.8374,
     rating: 4.9,
@@ -172,6 +207,10 @@ export const professionals: Professional[] = [
     email: "elena.rossi@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
     location: "New Delhi, DL",
+    nationality: "Indian",
+    city: "New Delhi",
+    state: "Delhi (NCT)",
+    dateOfBirth: "1997-03-22",
     lat: 28.6213,
     lng: 77.1662,
     rating: 4.8,
@@ -284,6 +323,10 @@ export const professionals: Professional[] = [
     email: "marcus.chen@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/46.jpg",
     location: "Bangalore, KA",
+    nationality: "Indian",
+    city: "Bengaluru",
+    state: "Karnataka",
+    dateOfBirth: "1993-11-10",
     lat: 12.9605,
     lng: 77.6050,
     rating: 5.0,
@@ -396,6 +439,10 @@ export const professionals: Professional[] = [
     email: "priya.sharma@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/65.jpg",
     location: "Mumbai, MH",
+    nationality: "Indian",
+    city: "Mumbai",
+    state: "Maharashtra",
+    dateOfBirth: "1998-09-04",
     lat: 19.0395,
     lng: 72.8315,
     rating: 4.6,
@@ -508,6 +555,10 @@ export const professionals: Professional[] = [
     email: "david.k.@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/22.jpg",
     location: "Kolkata, WB",
+    nationality: "Indian",
+    city: "Kolkata",
+    state: "West Bengal",
+    dateOfBirth: "1991-01-28",
     lat: 22.5688,
     lng: 88.4097,
     rating: 4.3,
@@ -622,6 +673,10 @@ export const professionals: Professional[] = [
     email: "kabir.mehta@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/11.jpg",
     location: "Mumbai, MH",
+    nationality: "Indian",
+    city: "Mumbai",
+    state: "Maharashtra",
+    dateOfBirth: "1992-07-19",
     lat: 19.0362,
     lng: 72.8980,
     rating: 4.9,
@@ -734,6 +789,10 @@ export const professionals: Professional[] = [
     email: "sophia.lin@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/24.jpg",
     location: "Bangalore, KA",
+    nationality: "Indian",
+    city: "Bengaluru",
+    state: "Karnataka",
+    dateOfBirth: "1996-05-14",
     lat: 12.9698,
     lng: 77.6207,
     rating: 4.7,
@@ -846,6 +905,10 @@ export const professionals: Professional[] = [
     email: "david.miller@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/73.jpg",
     location: "New Delhi, DL",
+    nationality: "Indian",
+    city: "New Delhi",
+    state: "Delhi (NCT)",
+    dateOfBirth: "1995-12-03",
     lat: 28.5822,
     lng: 77.2487,
     rating: 4.5,
@@ -958,6 +1021,10 @@ export const professionals: Professional[] = [
     email: "ananya.patel@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/39.jpg",
     location: "Hyderabad, TS",
+    nationality: "Indian",
+    city: "Hyderabad",
+    state: "Telangana",
+    dateOfBirth: "1990-10-25",
     lat: 17.3922,
     lng: 78.4665,
     rating: 4.8,
@@ -1070,6 +1137,10 @@ export const professionals: Professional[] = [
     email: "alex.mercer@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/50.jpg",
     location: "Pune, MH",
+    nationality: "Indian",
+    city: "Pune",
+    state: "Maharashtra",
+    dateOfBirth: "1999-04-08",
     lat: 18.5648,
     lng: 73.8519,
     rating: 4.2,
@@ -1184,6 +1255,10 @@ export const professionals: Professional[] = [
     email: "rohan.sharma@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/82.jpg",
     location: "New Delhi, DL",
+    nationality: "Indian",
+    city: "New Delhi",
+    state: "Delhi (NCT)",
+    dateOfBirth: "1993-02-17",
     lat: 28.6281,
     lng: 77.2215,
     rating: 4.9,
@@ -1296,6 +1371,10 @@ export const professionals: Professional[] = [
     email: "aisha.khan@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/14.jpg",
     location: "Mumbai, MH",
+    nationality: "Indian",
+    city: "Mumbai",
+    state: "Maharashtra",
+    dateOfBirth: "1996-08-30",
     lat: 19.0956,
     lng: 72.9276,
     rating: 4.8,
@@ -1408,6 +1487,10 @@ export const professionals: Professional[] = [
     email: "chloe.bennett@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/68.jpg",
     location: "Bangalore, KA",
+    nationality: "Indian",
+    city: "Bengaluru",
+    state: "Karnataka",
+    dateOfBirth: "1994-09-12",
     lat: 12.9416,
     lng: 77.5708,
     rating: 4.7,
@@ -1520,6 +1603,10 @@ export const professionals: Professional[] = [
     email: "vikram.malhotra@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/91.jpg",
     location: "Chennai, TN",
+    nationality: "Indian",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    dateOfBirth: "1997-11-23",
     lat: 13.0467,
     lng: 80.2680,
     rating: 4.6,
@@ -1632,6 +1719,10 @@ export const professionals: Professional[] = [
     email: "sarah.jenkins@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/79.jpg",
     location: "Mumbai, MH",
+    nationality: "Indian",
+    city: "Mumbai",
+    state: "Maharashtra",
+    dateOfBirth: "1992-03-05",
     lat: 19.0859,
     lng: 72.8400,
     rating: 4.4,
@@ -1745,6 +1836,10 @@ export const professionals: Professional[] = [
     email: "ravi.prakash@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/15.jpg",
     location: "Gomti Nagar, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1995-05-18",
     lat: 26.8528,
     lng: 81.0029,
     rating: 4.7,
@@ -1853,6 +1948,10 @@ export const professionals: Professional[] = [
     email: "snehil.verma@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/25.jpg",
     location: "Indira Nagar, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1998-01-22",
     lat: 26.8837,
     lng: 80.9859,
     rating: 4.5,
@@ -1961,6 +2060,10 @@ export const professionals: Professional[] = [
     email: "amitabh.tiwari@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/35.jpg",
     location: "Hazratganj, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1993-09-09",
     lat: 26.8485,
     lng: 80.9419,
     rating: 4.9,
@@ -2069,6 +2172,10 @@ export const professionals: Professional[] = [
     email: "pooja.yadav@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/45.jpg",
     location: "Alambagh, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1996-12-04",
     lat: 26.8142,
     lng: 80.9016,
     rating: 4.8,
@@ -2177,6 +2284,10 @@ export const professionals: Professional[] = [
     email: "nikhil.srivastava@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/55.jpg",
     location: "Ashiyana, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1997-07-31",
     lat: 26.7821,
     lng: 80.9161,
     rating: 4.6,
@@ -2285,6 +2396,10 @@ export const professionals: Professional[] = [
     email: "sneha.kapoor@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/55.jpg",
     location: "Mahanagar, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1994-04-19",
     lat: 26.8776,
     lng: 80.9443,
     rating: 4.3,
@@ -2393,6 +2508,10 @@ export const professionals: Professional[] = [
     email: "aditya.mishra@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/65.jpg",
     location: "Aminabad, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1992-11-28",
     lat: 26.8437,
     lng: 80.9250,
     rating: 4.7,
@@ -2501,6 +2620,10 @@ export const professionals: Professional[] = [
     email: "riya.sharma@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/75.jpg",
     location: "Chowk, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1999-06-11",
     lat: 26.8665,
     lng: 80.9068,
     rating: 4.4,
@@ -2609,6 +2732,10 @@ export const professionals: Professional[] = [
     email: "aditya.srivastava@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/75.jpg",
     location: "Vikas Nagar, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1995-10-02",
     lat: 26.8925,
     lng: 80.9575,
     rating: 4.8,
@@ -2717,6 +2844,10 @@ export const professionals: Professional[] = [
     email: "shreya.gupta@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/women/85.jpg",
     location: "Omaxe City, Lucknow, UP",
+    nationality: "Indian",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    dateOfBirth: "1997-02-14",
     lat: 26.7584,
     lng: 80.9327,
     rating: 4.5,
@@ -2732,7 +2863,7 @@ export const professionals: Professional[] = [
     feature: "photo",
     availableDates: [
       {
-        date: "2026-07-17",
+        date: "2026-07-27",
         isSlotBooked: false,
         slots: [
           { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
@@ -2741,7 +2872,7 @@ export const professionals: Professional[] = [
         ]
       },
       {
-        date: "2026-07-18",
+        date: "2026-07-28",
         isSlotBooked: false,
         slots: [
           { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
@@ -2750,7 +2881,7 @@ export const professionals: Professional[] = [
         ]
       },
       {
-        date: "2026-07-19",
+        date: "2026-07-29",
         isSlotBooked: false,
         slots: [
           { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
@@ -2759,7 +2890,7 @@ export const professionals: Professional[] = [
         ]
       },
       {
-        date: "2026-07-20",
+        date: "2026-07-30",
         isSlotBooked: false,
         slots: [
           { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
@@ -2768,7 +2899,7 @@ export const professionals: Professional[] = [
         ]
       },
       {
-        date: "2026-07-21",
+        date: "2026-07-31",
         isSlotBooked: false,
         slots: [
           { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
@@ -2777,7 +2908,7 @@ export const professionals: Professional[] = [
         ]
       },
       {
-        date: "2026-07-22",
+        date: "2026-08-01",
         isSlotBooked: false,
         slots: [
           { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
@@ -2786,7 +2917,7 @@ export const professionals: Professional[] = [
         ]
       },
       {
-        date: "2026-07-23",
+        date: "2026-08-02",
         isSlotBooked: false,
         slots: [
           { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
@@ -2795,7 +2926,7 @@ export const professionals: Professional[] = [
         ]
       },
       {
-        date: "2026-07-24",
+        date: "2026-08-03",
         isSlotBooked: false,
         slots: [
           { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
@@ -2804,7 +2935,7 @@ export const professionals: Professional[] = [
         ]
       },
       {
-        date: "2026-07-25",
+        date: "2026-08-04",
         isSlotBooked: false,
         slots: [
           { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
@@ -2825,6 +2956,10 @@ export const professionals: Professional[] = [
     email: "techaditya.sde@gmail.com",
     profileImage: "https://randomuser.me/api/portraits/men/99.jpg",
     location: "New Delhi, DL",
+    nationality: "Indian",
+    city: "New Delhi",
+    state: "Delhi (NCT)",
+    dateOfBirth: "1998-03-25",
     lat: 28.6139,
     lng: 77.2090,
     rating: 5.0,
@@ -2842,88 +2977,348 @@ export const professionals: Professional[] = [
     category: "videographer",
     feature: "video",
     isSaved: false,
-    availableDates: [
-      {
-        date: "2026-07-17",
-        isSlotBooked: false,
-        slots: [
-          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
-          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
-          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
-        ]
-      },
-      {
-        date: "2026-07-18",
-        isSlotBooked: false,
-        slots: [
-          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
-          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
-          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
-        ]
-      },
-      {
-        date: "2026-07-19",
-        isSlotBooked: false,
-        slots: [
-          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
-          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
-          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
-        ]
-      },
-      {
-        date: "2026-07-20",
-        isSlotBooked: false,
-        slots: [
-          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
-          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
-          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
-        ]
-      },
-      {
-        date: "2026-07-21",
-        isSlotBooked: false,
-        slots: [
-          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
-          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
-          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
-        ]
-      },
-      {
-        date: "2026-07-22",
-        isSlotBooked: false,
-        slots: [
-          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
-          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
-          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
-        ]
-      },
-      {
-        date: "2026-07-23",
-        isSlotBooked: false,
-        slots: [
-          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
-          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
-          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
-        ]
-      },
-      {
-        date: "2026-07-24",
-        isSlotBooked: false,
-        slots: [
-          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
-          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
-          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
-        ]
-      },
-      {
-        date: "2026-07-25",
-        isSlotBooked: false,
-        slots: [
-          { id: "slot-1", startTime: "10:00 AM", endTime: "01:00 PM", isBooked: false },
-          { id: "slot-2", startTime: "02:00 PM", endTime: "05:00 PM", isBooked: false },
-          { id: "slot-3", startTime: "06:00 PM", endTime: "09:00 PM", isBooked: false }
-        ]
-      }
-    ]
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  // CHOREOGRAPHERS
+  {
+    id: "c1",
+    fullName: "Rohan Varma",
+    username: "rohan_choreography",
+    gender: "male",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9820011223",
+    email: "rohan.choreography@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop&q=80",
+    location: "Mumbai, MH",
+    nationality: "Indian",
+    city: "Mumbai",
+    state: "Maharashtra",
+    dateOfBirth: "1995-06-15",
+    lat: 19.0760,
+    lng: 72.8777,
+    rating: 4.9,
+    totalReviews: 68,
+    experience: "8+ Years Exp.",
+    experienceYears: 8,
+    description: "Celebrity & Sangeet Choreographer specializing in Bollywood, Hip-Hop, and Wedding Group Performances.",
+    hourlyPricing: {
+      oneHourPrice: 2500,
+      twoHourPrice: 4500,
+      threeHourPrice: 6500
+    },
+    isVerified: true,
+    availability: "Anytime",
+    category: "choreographer",
+    feature: "choreographer",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  {
+    id: "c2",
+    fullName: "Simran Kaur",
+    username: "simran_dance_studio",
+    gender: "female",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9871122334",
+    email: "simran.dance@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=800&auto=format&fit=crop&q=80",
+    location: "New Delhi, DL",
+    nationality: "Indian",
+    city: "New Delhi",
+    state: "Delhi (NCT)",
+    dateOfBirth: "1997-09-10",
+    lat: 28.6139,
+    lng: 77.2090,
+    rating: 4.8,
+    totalReviews: 54,
+    experience: "6+ Years Exp.",
+    experienceYears: 6,
+    description: "Expressive Semi-Classical, Contemporary, and Punjabi Wedding Sangeet Choreographer.",
+    hourlyPricing: {
+      oneHourPrice: 2000,
+      twoHourPrice: 3800,
+      threeHourPrice: 5200
+    },
+    isVerified: true,
+    availability: "Anytime",
+    category: "choreographer",
+    feature: "choreographer",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  {
+    id: "c3",
+    fullName: "Karan Malhotra",
+    username: "karan_crew_choreography",
+    gender: "male",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9945566778",
+    email: "karan.dance@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=800&auto=format&fit=crop&q=80",
+    location: "Bangalore, KA",
+    nationality: "Indian",
+    city: "Bangalore",
+    state: "Karnataka",
+    dateOfBirth: "1994-11-20",
+    lat: 12.9716,
+    lng: 77.5946,
+    rating: 4.9,
+    totalReviews: 39,
+    experience: "5+ Years Exp.",
+    experienceYears: 5,
+    description: "High-energy Corporate Event & Flashmob Dance Choreographer with custom concept tracks.",
+    hourlyPricing: {
+      oneHourPrice: 1800,
+      twoHourPrice: 3200,
+      threeHourPrice: 4500
+    },
+    isVerified: true,
+    availability: "Weekends",
+    category: "choreographer",
+    feature: "choreographer",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  {
+    id: "c4",
+    fullName: "Nisha & Aarav",
+    username: "nisha_aarav_duo",
+    gender: "female",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9819988776",
+    email: "nisha.aarav@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1535525153412-5a42439e2b0d?w=800&auto=format&fit=crop&q=80",
+    location: "Jaipur, RJ",
+    nationality: "Indian",
+    city: "Jaipur",
+    state: "Rajasthan",
+    dateOfBirth: "1993-04-12",
+    lat: 26.9124,
+    lng: 75.7873,
+    rating: 5.0,
+    totalReviews: 81,
+    experience: "10+ Years Exp.",
+    experienceYears: 10,
+    description: "Royal Destination Wedding & Couple First Dance Choreographers with custom song mixing.",
+    hourlyPricing: {
+      oneHourPrice: 3000,
+      twoHourPrice: 5500,
+      threeHourPrice: 7800
+    },
+    isVerified: true,
+    availability: "Anytime",
+    category: "choreographer",
+    feature: "choreographer",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  {
+    id: "c5",
+    fullName: "Vikram Rawat",
+    username: "vikram_dance_pro",
+    gender: "male",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9814433221",
+    email: "vikram.rawat.dance@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1545959570-a944fc1669bd?w=800&auto=format&fit=crop&q=80",
+    location: "Chandigarh, CH",
+    nationality: "Indian",
+    city: "Chandigarh",
+    state: "Chandigarh",
+    dateOfBirth: "1996-08-08",
+    lat: 30.7333,
+    lng: 76.7794,
+    rating: 4.7,
+    totalReviews: 31,
+    experience: "4+ Years Exp.",
+    experienceYears: 4,
+    description: "Bhangra & Urban Hip-Hop Choreographer for Music Videos, Stage Shows, and Festive Events.",
+    hourlyPricing: {
+      oneHourPrice: 1500,
+      twoHourPrice: 2800,
+      threeHourPrice: 4000
+    },
+    isVerified: true,
+    availability: "Anytime",
+    category: "choreographer",
+    feature: "choreographer",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  // PODCAST STUDIOS & CREATORS
+  {
+    id: "pc1",
+    fullName: "AudioWave Podcast Studio",
+    username: "audiowave_podcast_studio",
+    gender: "male",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9833445566",
+    email: "audiowave.podcast@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&auto=format&fit=crop&q=80",
+    location: "Mumbai, MH",
+    nationality: "Indian",
+    city: "Mumbai",
+    state: "Maharashtra",
+    dateOfBirth: "1992-05-18",
+    lat: 19.0760,
+    lng: 72.8777,
+    rating: 4.9,
+    totalReviews: 73,
+    experience: "6+ Years Exp.",
+    experienceYears: 6,
+    description: "State-of-the-art 4-mic 4K video podcast studio with Rodecaster Pro setup and acoustic booth.",
+    hourlyPricing: {
+      oneHourPrice: 2000,
+      twoHourPrice: 3800,
+      threeHourPrice: 5200
+    },
+    isVerified: true,
+    availability: "Anytime",
+    category: "podcast",
+    feature: "podcast",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  {
+    id: "pc2",
+    fullName: "VoxMedia Podcast Lab",
+    username: "voxmedia_podcast_lab",
+    gender: "male",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9811223344",
+    email: "voxmedia.podcast@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1589903308904-1010c2294adc?w=800&auto=format&fit=crop&q=80",
+    location: "New Delhi, DL",
+    nationality: "Indian",
+    city: "New Delhi",
+    state: "Delhi (NCT)",
+    dateOfBirth: "1994-08-22",
+    lat: 28.6139,
+    lng: 77.2090,
+    rating: 4.8,
+    totalReviews: 61,
+    experience: "5+ Years Exp.",
+    experienceYears: 5,
+    description: "Multi-camera video podcast production, live streaming setup, and automated audio mastering.",
+    hourlyPricing: {
+      oneHourPrice: 1800,
+      twoHourPrice: 3400,
+      threeHourPrice: 4800
+    },
+    isVerified: true,
+    availability: "Anytime",
+    category: "podcast",
+    feature: "podcast",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  {
+    id: "pc3",
+    fullName: "Echo Chambers Studio",
+    username: "echo_podcast_bangalore",
+    gender: "male",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9900112233",
+    email: "echo.chambers@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80",
+    location: "Bangalore, KA",
+    nationality: "Indian",
+    city: "Bangalore",
+    state: "Karnataka",
+    dateOfBirth: "1991-03-14",
+    lat: 12.9716,
+    lng: 77.5946,
+    rating: 5.0,
+    totalReviews: 48,
+    experience: "7+ Years Exp.",
+    experienceYears: 7,
+    description: "Acoustically isolated podcast hub with Shure SM7B mics, Blackmagic 4K cams & sound engineer included.",
+    hourlyPricing: {
+      oneHourPrice: 2200,
+      twoHourPrice: 4000,
+      threeHourPrice: 5800
+    },
+    isVerified: true,
+    availability: "Anytime",
+    category: "podcast",
+    feature: "podcast",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  {
+    id: "pc4",
+    fullName: "Karan Verma",
+    username: "karan_podcast_producer",
+    gender: "male",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9876543210",
+    email: "karan.podcast@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800&auto=format&fit=crop&q=80",
+    location: "Gurgaon, HR",
+    nationality: "Indian",
+    city: "Gurgaon",
+    state: "Haryana",
+    dateOfBirth: "1996-12-05",
+    lat: 28.4595,
+    lng: 77.0266,
+    rating: 4.8,
+    totalReviews: 36,
+    experience: "4+ Years Exp.",
+    experienceYears: 4,
+    description: "Mobile Podcast Recording & On-location Interview Setup with wireless lavs & portable soundboard.",
+    hourlyPricing: {
+      oneHourPrice: 1500,
+      twoHourPrice: 2800,
+      threeHourPrice: 4000
+    },
+    isVerified: true,
+    availability: "Weekends",
+    category: "podcast",
+    feature: "podcast",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
+  },
+  {
+    id: "pc5",
+    fullName: "SoundByte Studios",
+    username: "soundbyte_podcasts",
+    gender: "female",
+    role: "creator",
+    isProfileDone: true,
+    mobile: "9849012345",
+    email: "soundbyte.hyd@gmail.com",
+    profileImage: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80",
+    location: "Hyderabad, TS",
+    nationality: "Indian",
+    city: "Hyderabad",
+    state: "Telangana",
+    dateOfBirth: "1995-10-30",
+    lat: 17.3850,
+    lng: 78.4867,
+    rating: 4.7,
+    totalReviews: 29,
+    experience: "3+ Years Exp.",
+    experienceYears: 3,
+    description: "Affordable creator podcast studio with neon aesthetic backdrops, teleprompter, and fast edit turnaround.",
+    hourlyPricing: {
+      oneHourPrice: 1200,
+      twoHourPrice: 2200,
+      threeHourPrice: 3200
+    },
+    isVerified: true,
+    availability: "Anytime",
+    category: "podcast",
+    feature: "podcast",
+    isSaved: false,
+    availableDates: generateUpcomingAvailableDates(30)
   }
 ];

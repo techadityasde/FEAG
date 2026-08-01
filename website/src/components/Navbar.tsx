@@ -1,39 +1,39 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  User,
-  Menu,
-  X,
-  Heart,
-  Receipt,
-  LogOut,
-  PackageOpen,
-  MapPin,
-  Search,
-  ChevronDown,
-  Compass,
-  Star,
-  ArrowRight,
-} from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import { logout } from "@/lib/store/authSlice";
-import { cn, getDistance } from "@/lib/utils";
-import { LocationModal } from "./LocationModal";
 import { professionals } from "@/lib/data/professionals";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import {
+  Search,
+  MapPin,
+  User,
+  ChevronDown,
+  Menu,
+  X,
+  PackageOpen,
+  LogOut,
+  Receipt,
+  Heart,
+  ArrowRight,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { LocationModal } from "@/components/LocationModal";
 import { motion, AnimatePresence } from "framer-motion";
 
 const professions = [
-  "photographer...",
-  "videographer...",
-  "singer...",
-  "cinematic...",
+  "Photographers",
+  "Videographers",
+  "Cinematographers",
+  "Singers",
+  "Dancers",
+  "Choreographers",
+  "Podcast Studios",
 ];
 
 const AnimatedPlaceholder = ({ leftClass }: { leftClass: string }) => {
@@ -41,7 +41,7 @@ const AnimatedPlaceholder = ({ leftClass }: { leftClass: string }) => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % professions.length);
+      setIndex((prevIndex) => (prevIndex + 1) % professions.length);
     }, 2500);
     return () => clearInterval(timer);
   }, []);
@@ -108,23 +108,24 @@ export default function Navbar() {
   const SearchDropdown = () =>
     isSearchFocused ? (
       displayCategories.length > 0 ? (
-        <div className="absolute top-full mt-2 left-0 w-full bg-white p-2 rounded-lg border border-border shadow-xl max-h-60 overflow-y-auto z-50 ">
+        <div className="absolute top-full mt-2 left-0 w-full bg-white p-2 rounded-xl border border-border shadow-xl z-50 flex flex-col gap-1 max-h-[320px] overflow-y-auto">
           {displayCategories.map((item) => (
             <div
               key={item.category}
-              className="cursor-pointer flex items-center justify-between gap-2 text-sm min-[360px]:text-base text-muted-foreground py-3 px-3 border-b border-border/50 last:border-0 hover:bg-muted rounded-md transition-colors"
               onMouseDown={(e) => {
                 e.preventDefault();
-                router.push(`/services/${item.category}`);
-                setSearchTerm("");
                 setIsSearchFocused(false);
-                (document.activeElement as HTMLElement)?.blur();
+                setSearchTerm("");
+                router.push(`/services/${encodeURIComponent(item.category.toLowerCase())}`);
               }}
+              className="flex items-center justify-between p-2.5 hover:bg-muted/70 rounded-lg cursor-pointer transition-colors group"
             >
-              <div className="flex items-center gap-2">
-                <Search className="size-4 text-muted-foreground/70" />
-                <div className="flex flex-col ml-1">
-                  <span className="font-semibold text-sm text-foreground capitalize">
+              <div className="flex items-center gap-3">
+                <div className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                  <Search className="size-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-foreground capitalize">
                     {item.category}
                   </span>
                   <span className="text-[11px] text-muted-foreground font-medium">
@@ -148,35 +149,56 @@ export default function Navbar() {
   return (
     <>
       {/* Mobile Top Header (replaces standard header on small screens) */}
-      <header className="md:hidden w-full bg-background border-b border-border p-4 sticky top-0 z-40 pb-5 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+      <header className="md:hidden w-full bg-background/95 backdrop-blur-md border-b border-border p-3.5 sm:p-4 sticky top-0 z-40 shadow-xs">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <Link href="/" className="flex items-center gap-2 text-xl font-black text-primary tracking-wider shrink-0">
+            <Image
+              src="/logo.jpg"
+              alt="FEAG Logo"
+              width={28}
+              height={28}
+              className="size-7 object-contain rounded-lg shadow-2xs"
+              priority
+            />
+            <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">FEAG</span>
+          </Link>
+
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-1.5 cursor-pointer bg-muted/60 hover:bg-muted/90 px-3 py-1.5 rounded-full border border-border/80 transition-all max-w-[240px] min-[380px]:max-w-[280px] sm:max-w-[340px] flex-1 mx-1 shadow-2xs active:scale-[0.98]"
             onClick={() => setLocationModalOpen(true)}
           >
-            <div className="bg-primary/10 rounded-full p-2 flex items-center justify-center">
-              <MapPin className="size-4 text-primary" fill="currentColor" />
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center text-xs text-muted-foreground">
-                <span className="max-w-[180px] truncate">
-                  {location.address || "Select Location"}
-                </span>
-                <ChevronDown className="size-3 ml-1" />
-              </div>
-            </div>
+            <MapPin className="size-3.5 text-primary shrink-0" fill="currentColor" />
+            <span className="text-xs font-semibold text-foreground truncate flex-1 leading-tight">
+              {location.address ? location.address.split(',')[0] : "Select Location"}
+            </span>
+            <ChevronDown className="size-3 text-muted-foreground shrink-0" />
           </div>
-          <div className="flex items-center gap-3 relative">
+          <div className="flex items-center gap-2 relative shrink-0">
+            {/* Mobile Wishlist Heart Icon */}
+            <Link
+              href="/wishlist"
+              className="relative p-1.5 rounded-full hover:bg-muted transition-colors flex items-center justify-center"
+              title="Wishlist"
+            >
+              <Heart className="size-4.5 text-foreground/80 hover:text-foreground transition-colors" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-red-500 px-0.5 text-[9px] font-extrabold text-white shadow-sm border-2 border-background">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="flex items-center justify-center p-2 rounded-full bg-muted border border-border"
+              className="flex items-center justify-center size-8 rounded-full bg-muted/70 hover:bg-muted border border-border/80 transition-all active:scale-95 shadow-2xs"
+              aria-label="Toggle navigation menu"
             >
               {isCustomer ? (
-                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white font-bold text-[10px] uppercase">
+                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white font-bold text-[10px] uppercase shadow-xs">
                   {user?.name?.charAt(0) || <User className="size-3" />}
                 </div>
               ) : (
-                <Menu className="size-5" />
+                isMobileMenuOpen ? <X className="size-4 text-foreground" /> : <Menu className="size-4 text-foreground" />
               )}
             </button>
 
@@ -190,93 +212,109 @@ export default function Navbar() {
                 )}
 
                 <Link
-                  href="/"
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
-                >
-                  <Compass className="size-4" />
-                  Home
-                </Link>
-
-                <Link
                   href="/discover"
                   onClick={closeMobileMenu}
-                  className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                  className="px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted hover:text-primary transition-colors flex items-center gap-2"
                 >
-                  <Search className="size-4" />
                   Discover
                 </Link>
 
-                {isCustomer ? (
+                <Link
+                  href="/wishlist"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted hover:text-primary transition-colors flex items-center justify-between"
+                >
+                  <span className="flex items-center gap-2">
+                    <Heart className="size-4 text-red-500" />
+                    Wishlist
+                  </span>
+                  {wishlistCount > 0 && (
+                    <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+
+                {isCustomer && (
                   <>
-                    <Link
-                      href="/orders"
-                      onClick={closeMobileMenu}
-                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
-                    >
-                      <PackageOpen className="size-4" />
-                      Orders
-                      {activeOrdersCount > 0 && (
-                        <span className="ml-auto bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                          {activeOrdersCount}
-                        </span>
-                      )}
-                    </Link>
                     <Link
                       href="/my-account"
                       onClick={closeMobileMenu}
-                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                      className="px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted hover:text-primary transition-colors flex items-center gap-2"
                     >
                       <User className="size-4" />
                       My Account
                     </Link>
+
                     <Link
-                      href="/wishlist"
+                      href="/transactions"
                       onClick={closeMobileMenu}
-                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
+                      className="px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted hover:text-primary transition-colors flex items-center gap-2"
                     >
-                      <Heart className="size-4" />
-                      Wishlist
+                      <Receipt className="size-4" />
+                      Transactions
                     </Link>
-                    <div className="h-px bg-border my-1 mx-2" />
-                    <button
-                      onClick={() => {
-                        dispatch(logout());
-                        closeMobileMenu();
-                      }}
-                      className="px-4 py-2.5 text-sm font-bold text-destructive hover:bg-destructive/10 flex items-center gap-3 text-left w-full transition-colors"
+
+                    <Link
+                      href="/orders"
+                      onClick={closeMobileMenu}
+                      className="px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted hover:text-primary transition-colors flex items-center justify-between"
                     >
-                      <LogOut className="size-4" />
-                      Logout
-                    </button>
+                      <span className="flex items-center gap-2">
+                        <PackageOpen className="size-4" />
+                        Orders
+                      </span>
+                      {activeOrdersCount > 0 && (
+                        <span className="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                          {activeOrdersCount}
+                        </span>
+                      )}
+                    </Link>
                   </>
+                )}
+
+                <div className="h-px bg-border my-1 mx-2" />
+
+                {!isAuthenticated ? (
+                  <div className="p-2 flex flex-col gap-1.5">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs font-semibold h-8 rounded-lg"
+                      onClick={closeMobileMenu}
+                    >
+                      <Link href="/login">Login</Link>
+                    </Button>
+                    <Button
+                      asChild
+                      size="sm"
+                      className="w-full text-xs font-semibold h-8 rounded-lg"
+                      onClick={closeMobileMenu}
+                    >
+                      <Link href="/professional">Join As</Link>
+                    </Button>
+                  </div>
                 ) : (
-                  <>
-                    <div className="h-px bg-border my-1 mx-2" />
-                    <Link
-                      href="/login"
-                      onClick={closeMobileMenu}
-                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
-                    >
-                      <User className="size-4" />
-                      Login
-                    </Link>
-                    <Link
-                      href="/join-us"
-                      onClick={closeMobileMenu}
-                      className="px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-3 transition-colors"
-                    >
-                      <Star className="size-4" />
-                      Join Us
-                    </Link>
-                  </>
+                  <button
+                    onClick={() => {
+                      dispatch(logout());
+                      closeMobileMenu();
+                    }}
+                    className="px-4 py-2 text-sm font-bold text-destructive hover:bg-destructive/10 flex items-center gap-2 text-left w-full cursor-pointer transition-colors"
+                  >
+                    <LogOut className="size-4" />
+                    Logout
+                  </button>
                 )}
               </div>
             )}
           </div>
         </div>
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground z-20" />
+
+        {/* Mobile Search Bar */}
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground z-20" />
           <input
             type="text"
             placeholder=""
@@ -284,11 +322,13 @@ export default function Navbar() {
             onChange={handleSearch}
             onClick={() => setIsSearchFocused(true)}
             onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setTimeout(() => {
-              setSearchTerm("");
-              setIsSearchFocused(false);
-            }, 200)}
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted/50 border border-border text-foreground font-medium text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:bg-background transition-all relative z-10"
+            onBlur={() => {
+              setTimeout(() => {
+                setSearchTerm("");
+                setIsSearchFocused(false);
+              }, 200);
+            }}
+            className="w-full pl-9 pr-4 py-2 border border-border rounded-xl bg-background focus:outline-none focus:ring-1 focus:ring-primary text-sm font-medium relative z-10"
           />
           {!searchTerm && <AnimatedPlaceholder leftClass="left-10" />}
           <SearchDropdown />
@@ -298,35 +338,43 @@ export default function Navbar() {
       {/* Desktop Header */}
       <header className="hidden md:flex w-full border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-40 transition-all duration-200">
         <div className="max-w-[1400px] w-full mx-auto px-6 h-16 flex items-center justify-between gap-6">
-          <div className="flex items-center">
+          <div className="flex items-center shrink-0">
             <Link
               href="/"
-              className="text-2xl font-black tracking-wider text-primary select-none cursor-pointer mr-6"
+              className="flex items-center gap-2.5 text-2xl font-black tracking-wider text-primary select-none cursor-pointer mr-6 group"
             >
-              FEAG
+              <Image
+                src="/logo.jpg"
+                alt="FEAG Logo"
+                width={36}
+                height={36}
+                className="size-8 sm:size-9 object-contain rounded-lg shadow-2xs group-hover:scale-105 transition-transform"
+                priority
+              />
+              <span>FEAG</span>
             </Link>
           </div>
           <Link
             href="/discover"
-            className="text-sm font-semibold text-foreground hover:text-primary transition-colors"
+            className="text-sm font-semibold text-foreground hover:text-primary transition-colors shrink-0"
           >
             Discover
           </Link>
-          {/* Desktop Search Center */}
-          <div className="flex items-center gap-3 w-[60%] mx-auto">
+          {/* Desktop Search Center (Reduced Compact Width) */}
+          <div className="flex items-center gap-3 w-[52%] max-w-[540px] mx-auto">
             <button
               onClick={() => setLocationModalOpen(true)}
-              className="flex items-center w-1/2 gap-2 px-4 py-2 border border-border rounded-lg bg-muted/30 hover:bg-muted text-sm font-semibold whitespace-nowrap transition-colors"
+              className="flex items-center w-[40%] shrink-0 gap-2 px-3 py-2 border border-border rounded-xl bg-muted/30 hover:bg-muted text-sm font-semibold whitespace-nowrap transition-colors"
             >
               <MapPin className="size-4 text-primary shrink-0" />
-              <span className="truncate flex-1 text-left">
+              <span className="truncate flex-1 text-left text-foreground">
                 {location.address || "Select Address"}
               </span>
               <ChevronDown className="size-4 text-muted-foreground shrink-0" />
             </button>
 
-            <div className="relative w-1/2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground z-20" />
+            <div className="relative w-[60%] flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground z-20" />
               <input
                 type="text"
                 placeholder=""
@@ -340,7 +388,7 @@ export default function Navbar() {
                     setIsSearchFocused(false);
                   }, 200);
                 }}
-                className="w-full pl-9 pr-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary text-sm font-medium relative z-10"
+                className="w-full pl-9 pr-4 py-2 border border-border rounded-xl bg-background focus:outline-none focus:ring-1 focus:ring-primary text-sm font-medium relative z-10"
               />
               {!searchTerm && <AnimatedPlaceholder leftClass="left-9" />}
               <SearchDropdown />
@@ -348,12 +396,14 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Right Side */}
-          <div className="flex items-center  gap-4">
+          <div className="flex items-center gap-3">
             {isCustomer ? (
               <>
+                {/* Wishlist Icon with Badge */}
                 <Link
                   href="/wishlist"
                   className="relative p-2 rounded-full hover:bg-muted transition-colors flex items-center justify-center"
+                  title="Wishlist"
                 >
                   <Heart className="size-5 text-foreground/80 hover:text-foreground transition-colors" />
                   {wishlistCount > 0 && (
@@ -366,6 +416,7 @@ export default function Navbar() {
                 <Link
                   href="/orders"
                   className="relative p-2 rounded-full hover:bg-muted transition-colors flex items-center justify-center mr-1"
+                  title="Orders"
                 >
                   <PackageOpen className="size-5 text-foreground/80 hover:text-foreground transition-colors" />
                   {activeOrdersCount > 0 && (
@@ -414,7 +465,7 @@ export default function Navbar() {
                         href="/wishlist"
                         className="px-4 py-2 text-sm font-medium text-foreground hover:bg-muted hover:text-primary flex items-center gap-2 transition-colors"
                       >
-                        <Heart className="size-4" />
+                        <Heart className="size-4 text-red-500" />
                         Wishlist
                       </Link>
                       <Link
@@ -438,6 +489,20 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                {/* Wishlist Heart Icon Before Login Button */}
+                <Link
+                  href="/wishlist"
+                  className="relative p-2 rounded-full hover:bg-muted transition-colors flex items-center justify-center"
+                  title="Wishlist"
+                >
+                  <Heart className="size-5 text-foreground/80 hover:text-foreground transition-colors" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-extrabold text-white shadow-sm border-2 border-background">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+
                 <Button
                   asChild
                   variant="outline"
@@ -454,7 +519,7 @@ export default function Navbar() {
                   size="sm"
                   className="text-xs font-semibold py-1 h-8 text-white bg-primary hover:bg-primary/95 shadow-sm cursor-pointer rounded-full px-5"
                 >
-                  <Link href="/join-us">Join Us</Link>
+                  <Link href="/professional">Join As</Link>
                 </Button>
               </>
             )}

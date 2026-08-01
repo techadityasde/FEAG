@@ -17,6 +17,10 @@ const initialState: OnboardingState = {
   category: "",
   pincode: "",
   location: "",
+  landmark: "",
+  nationality: "Indian",
+  state: "",
+  city: "",
   isSubmitted: false,
   signUpMethod: null,
 };
