@@ -62,7 +62,7 @@ export default function PrivacyPolicyContent() {
           {section.intro ? <p className="text-sm sm:text-base leading-relaxed text-[#6D5F52]">{section.intro}</p> : null}
           {section.items ? <BulletList items={section.items} /> : null}
           {section.closing ? <p className="text-sm sm:text-base leading-relaxed text-[#6D5F52]">{section.closing}</p> : null}
-          {section.contact ? <div className="space-y-2 text-sm sm:text-base leading-relaxed text-[#6D5F52]"><p><strong className="text-[#2E2215]">FEAG</strong></p><p>Email: <a href="mailto:privacy@feag.com" className="font-semibold text-primary hover:text-[#2E2215]">privacy@feag.com</a> <span>(Replace with your official email)</span></p><p>Website: <a href="https://feag.com" className="font-semibold text-primary hover:text-[#2E2215]">https://feag.com</a> <span>(Replace with your official website)</span></p></div> : null}
+          {section.contact ? <div className="space-y-2 text-sm sm:text-base leading-relaxed text-[#6D5F52]"><p><strong className="text-[#2E2215]">FEAG</strong></p><p>Email: <a href="mailto:privacy@feag.com" className="font-semibold text-primary hover:text-[#2E2215]">privacy@feag.in</a> <span>(Replace with your official email)</span></p><p>Website: <a href="https://feag.in" className="font-semibold text-primary hover:text-[#2E2215]">https://feag.in</a> <span>(Replace with your official website)</span></p></div> : null}
         </section>)}
       </article>
     </section>
