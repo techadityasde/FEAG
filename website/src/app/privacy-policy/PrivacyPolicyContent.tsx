@@ -1,24 +1,5 @@
-"use client";
-
-import { ChevronDown, ChevronRight, ShieldCheck } from "lucide-react";
-import { useState } from "react";
-
-type ContentBlock = {
-  heading?: string;
-  intro?: string;
-  paragraphs?: string[];
-  items?: string[];
-};
-
-type PolicySection = {
-  title: string;
-  content?: ContentBlock[];
-  intro?: string;
-  paragraphs?: string[];
-  items?: string[];
-  closing?: string;
-  contact?: boolean;
-};
+type ContentBlock = { heading?: string; intro?: string; paragraphs?: string[]; items?: string[] };
+type PolicySection = { title: string; content?: ContentBlock[]; intro?: string; paragraphs?: string[]; items?: string[]; closing?: string; contact?: boolean };
 
 const sections: PolicySection[] = [
   { title: "1. Information We Collect", content: [
@@ -46,66 +27,44 @@ const sections: PolicySection[] = [
 ];
 
 function BulletList({ items }: { items: string[] }) {
-  return <ul className="list-disc space-y-2 pl-5 marker:text-[#D97706]">{items.map((item) => <li key={item}>{item}</li>)}</ul>;
+  return <ul className="list-disc space-y-2 pl-5 text-sm sm:text-base leading-relaxed text-[#6D5F52]">{items.map((item) => <li key={item}>{item}</li>)}</ul>;
 }
 
 function ContentBlockView({ block }: { block: ContentBlock }) {
-  return (
-    <div className="space-y-3">
-      {block.heading ? <h3 className="text-base font-extrabold tracking-[-0.02em] text-[#2E2215] sm:text-lg">{block.heading}</h3> : null}
-      {block.intro ? <p>{block.intro}</p> : null}
-      {block.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-      {block.items ? <BulletList items={block.items} /> : null}
-    </div>
-  );
+  return <div className="space-y-3">
+    {block.heading ? <h3 className="text-base sm:text-lg font-bold text-[#2E2215]">{block.heading}</h3> : null}
+    {block.intro ? <p className="text-sm sm:text-base leading-relaxed text-[#6D5F52]">{block.intro}</p> : null}
+    {block.paragraphs?.map((paragraph) => <p key={paragraph} className="text-sm sm:text-base leading-relaxed text-[#6D5F52]">{paragraph}</p>)}
+    {block.items ? <BulletList items={block.items} /> : null}
+  </div>;
 }
 
 export default function PrivacyPolicyContent() {
-  const [openSection, setOpenSection] = useState<string | null>(null);
-
-  return (
-    <main className="relative isolate flex-1 overflow-hidden bg-[#FFF9F2] px-3 py-10 min-[360px]:px-4 sm:px-6 sm:py-16 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        <div className="absolute -left-32 -top-40 h-[34rem] w-[34rem] rounded-full bg-[#F59E0B]/35 blur-[130px]" />
-        <div className="absolute right-[-12rem] top-[18%] h-[28rem] w-[28rem] rounded-full bg-white blur-[100px]" />
-        <div className="absolute -bottom-48 -right-32 h-[38rem] w-[38rem] rounded-full bg-[#E76F00]/25 blur-[150px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,185,77,0.22),rgba(255,255,255,0.68)_46%,rgba(230,108,0,0.17))]" />
+  return <main className="flex-1 w-full bg-[#FAF0E6]">
+    <section className="w-full max-w-[1100px] mx-auto px-3 min-[360px]:px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <div className="mb-10 border-b border-[#6D5F52]/20 pb-8">
+        <p className="text-xs font-bold uppercase tracking-wider text-primary">Legal</p>
+        <h1 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#2E2215]">Privacy Policy</h1>
+        <div className="mt-5 space-y-1 text-sm sm:text-base text-[#6D5F52]"><p><span className="font-bold text-[#2E2215]">Effective Date:</span> [Insert Date]</p><p><span className="font-bold text-[#2E2215]">Last Updated:</span> [Insert Date]</p></div>
       </div>
 
-      <section className="mx-auto max-w-4xl">
-        <header className="rounded-[2rem] border border-white/70 bg-white/55 px-6 py-10 text-center shadow-[0_20px_60px_rgba(152,82,0,0.12)] backdrop-blur-xl sm:px-12 sm:py-14">
-          <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#F59E0B]/15 text-[#A95300]"><ShieldCheck className="size-6" aria-hidden="true" /></div>
-          <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-[#A95300]">FEAG Legal</p>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-[#2E2215] sm:text-5xl">Privacy Policy</h1>
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-[#6D5F52] sm:text-base">Understand how FEAG collects, uses, and protects your information while you use our platform.</p>
-          <p className="mt-4 text-xs font-medium text-[#6D5F52]">Effective Date: [Insert Date] &nbsp;•&nbsp; Last Updated: [Insert Date]</p>
-        </header>
+      <article className="space-y-10">
+        <section className="space-y-4">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2E2215]">Privacy Policy for FEAG</h2>
+          <p className="text-sm sm:text-base leading-relaxed text-[#6D5F52]">At FEAG, we value your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website, mobile application, and related services (collectively, the &quot;Platform&quot;).</p>
+          <p className="text-sm sm:text-base leading-relaxed text-[#6D5F52]">By accessing or using FEAG, you agree to the practices described in this Privacy Policy.</p>
+        </section>
 
-        <div className="mt-6 space-y-3 sm:mt-8 sm:space-y-4">
-          {sections.map((section) => {
-            const isOpen = openSection === section.title;
-            const contentId = `privacy-section-${section.title.split(".")[0]}`;
-            return (
-              <section key={section.title} className={`overflow-hidden rounded-2xl border transition-all duration-300 ${isOpen ? "border-[#D97706]/35 bg-white/85 shadow-[0_16px_42px_rgba(160,82,0,0.15)]" : "border-white/80 bg-white/60 shadow-[0_8px_24px_rgba(96,58,18,0.07)] hover:bg-white/80"}`}>
-                <button type="button" className="flex w-full items-center gap-4 px-5 py-5 text-left sm:px-6" aria-expanded={isOpen} aria-controls={contentId} onClick={() => setOpenSection(isOpen ? null : section.title)}>
-                  <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${isOpen ? "bg-[#F59E0B]/20 text-[#A95300]" : "bg-[#6D5F52]/10 text-[#6D5F52]"}`}><ShieldCheck className="size-[18px]" aria-hidden="true" /></span>
-                  <span className="flex-1 text-[1.15rem] font-extrabold leading-tight tracking-[-0.035em] text-[#2E2215] sm:text-[1.35rem]">{section.title.replace(/^\d+\.\s*/, "")}</span>
-                  {isOpen ? <ChevronDown className="size-5 text-[#A95300]" aria-hidden="true" /> : <ChevronRight className="size-5 text-[#6D5F52]" aria-hidden="true" />}
-                </button>
-
-                {isOpen ? <div id={contentId} className="border-t border-[#A95300]/10 px-5 pb-6 pt-5 sm:px-6"><div className="space-y-4 text-sm leading-relaxed text-[#5D5045] sm:text-base">
-                  {section.content?.map((block) => <ContentBlockView key={block.heading} block={block} />)}
-                  {section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-                  {section.intro ? <p>{section.intro}</p> : null}
-                  {section.items ? <BulletList items={section.items} /> : null}
-                  {section.closing ? <p>{section.closing}</p> : null}
-                  {section.contact ? <div className="space-y-1"><p className="font-bold text-[#2E2215]">FEAG</p><p>Email: <a href="mailto:privacy@feag.com" className="font-semibold text-[#A95300] hover:text-[#6D3600]">privacy@feag.com</a> <span>(Replace with your official email)</span></p><p>Website: <a href="https://feag.com" className="font-semibold text-[#A95300] hover:text-[#6D3600]">https://feag.com</a> <span>(Replace with your official website)</span></p></div> : null}
-                </div></div> : null}
-              </section>
-            );
-          })}
-        </div>
-      </section>
-    </main>
-  );
+        {sections.map((section) => <section key={section.title} className="border-t border-[#6D5F52]/20 pt-8 space-y-4">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-[#2E2215]">{section.title}</h2>
+          {section.content?.map((block) => <ContentBlockView key={block.heading} block={block} />)}
+          {section.paragraphs?.map((paragraph) => <p key={paragraph} className="text-sm sm:text-base leading-relaxed text-[#6D5F52]">{paragraph}</p>)}
+          {section.intro ? <p className="text-sm sm:text-base leading-relaxed text-[#6D5F52]">{section.intro}</p> : null}
+          {section.items ? <BulletList items={section.items} /> : null}
+          {section.closing ? <p className="text-sm sm:text-base leading-relaxed text-[#6D5F52]">{section.closing}</p> : null}
+          {section.contact ? <div className="space-y-2 text-sm sm:text-base leading-relaxed text-[#6D5F52]"><p><strong className="text-[#2E2215]">FEAG</strong></p><p>Email: <a href="mailto:privacy@feag.com" className="font-semibold text-primary hover:text-[#2E2215]">privacy@feag.com</a> <span>(Replace with your official email)</span></p><p>Website: <a href="https://feag.com" className="font-semibold text-primary hover:text-[#2E2215]">https://feag.com</a> <span>(Replace with your official website)</span></p></div> : null}
+        </section>)}
+      </article>
+    </section>
+  </main>;
 }
