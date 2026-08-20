@@ -1,6 +1,13 @@
 "use client";
 
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import {
+  type FormEvent,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { createPortal } from "react-dom";
 import { Send, X } from "lucide-react";
 
 type Topic = {
@@ -109,10 +116,14 @@ export default function SupportChatbot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const isPortalReady = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const latestReplyRef = useRef<HTMLDivElement>(null);
   const replyTimeoutRef = useRef<number | null>(null);
   const chatbotRef = useRef<HTMLDivElement>(null);
-  console.log("env", process);
   useEffect(() => {
     return () => {
       if (replyTimeoutRef.current !== null) {
@@ -218,7 +229,6 @@ export default function SupportChatbot() {
     }
   }, [messages, isTyping]);
 
-  console.log(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
   const replyTo = (question: string) => {
     if (isTyping) return;
     const query = question.toLowerCase();
@@ -251,7 +261,7 @@ export default function SupportChatbot() {
     replyTo(question);
   };
 
-  return (
+  const chatbot = (
     <>
       <style jsx global>{`
         @keyframes feag-chat-in {
@@ -343,15 +353,25 @@ export default function SupportChatbot() {
 
       <div
         ref={chatbotRef}
-        className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-3 z-40 sm:bottom-6 sm:right-6"
+        className={`fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-3 ${
+          open ? "z-[1000]" : "z-40"
+        } sm:bottom-6 sm:right-6`}
       >
+        {open && (
+          <div
+            className="fixed inset-0 z-0 bg-[#2e2215]/25 backdrop-blur-[1px]"
+            onPointerDown={closeChat}
+            aria-hidden="true"
+          />
+        )}
+
         {!open && (
           <div
-            className="absolute bottom-[46px] right-[62px] flex items-end gap-2 sm:bottom-[56px] sm:right-[82px] max-sm:right-[60px] max-sm:bottom-[42px]"
+            className="absolute bottom-[46px] right-[62px] flex items-end gap-2 sm:bottom-[56px] sm:right-[82px] max-sm:bottom-[42px] max-sm:right-[60px] max-[359px]:bottom-[34px] max-[359px]:right-[46px]"
             role="status"
             aria-live="polite"
           >
-            <div className="relative overflow-hidden whitespace-nowrap rounded-2xl rounded-br-md border border-white/70 bg-white/75 px-4 py-2.5 text-xs font-semibold text-[#51463c] shadow-[0_12px_35px_rgba(46,34,21,.14)] backdrop-blur-xl max-sm:px-3 max-sm:py-2 max-sm:text-[11px]">
+            <div className="relative max-w-[calc(100vw-92px)] overflow-hidden whitespace-nowrap rounded-2xl rounded-br-md border border-white/70 bg-white/75 px-4 py-2.5 text-xs font-semibold text-[#51463c] shadow-[0_12px_35px_rgba(46,34,21,.14)] backdrop-blur-xl max-sm:px-3 max-sm:py-2 max-sm:text-[11px] max-[359px]:max-w-[calc(100vw-72px)] max-[359px]:px-2.5 max-[359px]:text-[10px]">
               <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent feag-shimmer" />
               <span className="relative">How may I help you?</span>
             </div>
@@ -360,7 +380,7 @@ export default function SupportChatbot() {
 
         {open && (
           <section
-            className="feag-chat-panel absolute bottom-0 right-[calc(100%+16px)] flex h-[min(455px,calc(100dvh-175px))] w-[calc(100vw-40px)] max-w-[370px] flex-col overflow-hidden rounded-[30px] border border-white/80 bg-white/82 shadow-[0_28px_80px_rgba(46,34,21,.24),0_8px_28px_rgba(226,154,38,.10)] backdrop-blur-2xl max-sm:bottom-[calc(100%+10px)] max-sm:right-0 max-sm:h-[min(430px,calc(100dvh-140px))] max-sm:w-[calc(100vw-48px)] max-sm:max-w-[330px] max-sm:rounded-[24px]"
+            className="feag-chat-panel absolute z-10 bottom-0 right-[calc(100%+16px)] flex h-[min(455px,calc(100dvh-175px))] w-[calc(100vw-40px)] max-w-[370px] flex-col overflow-hidden rounded-[30px] border border-white/80 bg-white/82 shadow-[0_28px_80px_rgba(46,34,21,.24),0_8px_28px_rgba(226,154,38,.10)] backdrop-blur-2xl max-sm:bottom-[calc(100%+10px)] max-sm:right-0 max-sm:h-[min(400px,calc(100dvh-130px))] max-sm:w-[min(20rem,calc(100vw-2rem))] max-sm:rounded-[22px] max-[359px]:h-[min(380px,calc(100dvh-120px))] max-[359px]:w-[calc(100vw-28px)]"
             aria-label="FEAG support chat"
           >
             {/* Soft glossy light behind the content */}
@@ -368,14 +388,14 @@ export default function SupportChatbot() {
             <div className="pointer-events-none absolute -left-20 bottom-20 h-44 w-44 rounded-full bg-[#f4d39c]/20 blur-3xl" />
 
             {/* Header */}
-            <div className="relative shrink-0 border-b border-white/70 bg-white/55 px-4 pb-3 pt-4 backdrop-blur-xl max-sm:px-3 max-sm:pb-2.5 max-sm:pt-3">
+            <div className="relative shrink-0 border-b border-white/70 bg-white/55 px-3 pb-2 pt-3 backdrop-blur-xl max-sm:pb-2 max-sm:pt-2.5 max-[359px]:px-2.5 max-[359px]:pt-2">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e29a26]/50 to-transparent" />
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <div className="relative">
                     <div className="absolute -inset-1.5 rounded-full bg-[#e29a26]/20 blur-md feag-glow" />
-                    <div className="relative flex h-11 w-11 overflow-hidden rounded-full border border-white/80 bg-white shadow-[0_7px_20px_rgba(46,34,21,.18)]">
+                    <div className="relative flex h-10 w-10 overflow-hidden rounded-full border border-white/80 bg-white shadow-[0_7px_20px_rgba(46,34,21,.18)]">
                       <img
                         src="/feag-support-agent-no-chat.png"
                         alt="FEAG"
@@ -387,14 +407,14 @@ export default function SupportChatbot() {
 
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-[15px] font-bold tracking-[-0.01em] text-[#2e2215]">
+                      <h2 className="text-[14px] font-bold tracking-[-0.01em] text-[#2e2215]">
                         FEAG Support
                       </h2>
                       <span className="rounded-full border border-[#e29a26]/20 bg-[#e29a26]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-[#9a6417]">
                         AI
                       </span>
                     </div>
-                    <p className="mt-0.5 text-[11px] text-[#8d8175]">
+                    <p className="mt-0.5 text-[10px] text-[#8d8175]">
                       Online · Ready to help
                     </p>
                   </div>
@@ -402,7 +422,7 @@ export default function SupportChatbot() {
 
                 <button
                   onClick={closeChat}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/70 text-[#8d8175] shadow-[0_4px_14px_rgba(46,34,21,.08)] transition duration-200 hover:-translate-y-0.5 hover:bg-white hover:text-[#51463c] focus:outline-none focus:ring-2 focus:ring-[#e29a26]/30 sm:h-9 sm:w-9"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/70 text-[#8d8175] shadow-[0_4px_14px_rgba(46,34,21,.08)] transition duration-200 hover:-translate-y-0.5 hover:bg-white hover:text-[#51463c] focus:outline-none focus:ring-2 focus:ring-[#e29a26]/30"
                   aria-label="Close chat"
                 >
                   <X size={17} />
@@ -410,17 +430,17 @@ export default function SupportChatbot() {
               </div>
 
               {/* Welcome card */}
-              <div className="relative mt-3 overflow-hidden rounded-[20px] border border-white/80 bg-gradient-to-br from-white/90 via-white/65 to-[#fff7eb]/80 px-3.5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,.9),0_8px_24px_rgba(46,34,21,.06)]">
+              <div className="relative mt-2 overflow-hidden rounded-[18px] border border-white/80 bg-gradient-to-br from-white/90 via-white/65 to-[#fff7eb]/80 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,.9),0_8px_24px_rgba(46,34,21,.06)] max-sm:rounded-[16px] max-[359px]:px-2.5">
                 <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-[#e29a26]/10 blur-2xl" />
-                <div className="relative flex gap-3">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#e29a26]/10 text-base">
+                <div className="relative flex items-center gap-2.5">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#e29a26]/10 text-sm">
                     ✨
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-[#3d2d20]">
+                    <p className="text-[13px] font-bold text-[#3d2d20]">
                       Welcome to FEAG!
                     </p>
-                    <p className="mt-1 text-[12px] leading-5 text-[#7d6e60]">
+                    <p className="hidden mt-1 text-[12px] leading-5 text-[#7d6e60]">
                       Ask me about creators, bookings, payments, accounts and
                       more.
                     </p>
@@ -430,7 +450,7 @@ export default function SupportChatbot() {
             </div>
 
             {/* Conversation */}
-            <div className="feag-scroll relative min-h-0 flex-1 touch-pan-y overscroll-contain overflow-y-auto px-4 py-3 [-webkit-overflow-scrolling:touch] max-sm:px-3 max-sm:py-2.5">
+            <div className="feag-scroll relative min-h-0 flex-1 touch-pan-y overscroll-contain overflow-y-auto px-4 py-3 [-webkit-overflow-scrolling:touch] max-sm:px-3 max-sm:py-2.5 max-[359px]:px-2.5 max-[359px]:py-2">
               <div className="flex items-center gap-2 pb-3">
                 <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#e7d9c7]" />
                 <span className="rounded-full border border-[#e7d9c7] bg-white/65 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#9a6417] backdrop-blur-md">
@@ -536,7 +556,7 @@ export default function SupportChatbot() {
         )}
 
         {/* Floating launcher */}
-        <div>
+        <div className="relative z-10">
           <button
             onClick={() => (open ? closeChat() : setOpen(true))}
             className="feag-float flex h-[58px] w-[58px] items-center justify-center rounded-full transition duration-200 hover:scale-105 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 max-[359px]:h-11 max-[359px]:w-11 sm:h-[78px] sm:w-[78px] [-webkit-tap-highlight-color:transparent]"
@@ -555,4 +575,6 @@ export default function SupportChatbot() {
       </div>
     </>
   );
+
+  return isPortalReady ? createPortal(chatbot, document.body) : null;
 }
