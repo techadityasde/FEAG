@@ -109,7 +109,7 @@ export default function SupportChatbot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const latestReplyRef = useRef<HTMLParagraphElement>(null);
+  const latestReplyRef = useRef<HTMLDivElement>(null);
   const replyTimeoutRef = useRef<number | null>(null);
   const chatbotRef = useRef<HTMLDivElement>(null);
   console.log("env", process);
@@ -468,7 +468,7 @@ export default function SupportChatbot() {
                       message.from === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
-                    <p
+                    <div
                       ref={
                         index === messages.length - 1 && message.from === "bot"
                           ? latestReplyRef
@@ -480,16 +480,16 @@ export default function SupportChatbot() {
                           : "rounded-bl-md border border-white/80 bg-white/78 text-[#49392b] backdrop-blur-md"
                       }`}
                     >
-                      {message.text}
+                      <span className="block">{message.text}</span>
                       {message.from === "bot" && message.href && (
                         <a
                           href={message.href}
-                          className="mt-1.5 inline-flex min-h-11 items-center py-1 font-semibold text-[#a96810] underline decoration-[#e29a26]/60 underline-offset-2 transition hover:text-[#75470d] sm:mt-2 sm:min-h-0 sm:py-0"
+                          className="mt-3 inline-flex min-h-9 items-center rounded-full border border-[#e29a26]/25 bg-[#fff7eb] px-3 py-1 text-[11px] font-bold text-[#9a6417] shadow-[inset_0_1px_0_rgba(255,255,255,.8)] transition hover:border-[#e29a26]/50 hover:bg-[#fff0d9] hover:text-[#75470d] sm:min-h-8"
                         >
                           Visit here
                         </a>
                       )}
-                    </p>
+                    </div>
                   </div>
                 ))}
 
