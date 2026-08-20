@@ -4,7 +4,7 @@ import AboutUs from "@/components/pages/AboutUs";
 export const metadata: Metadata = {
   title: "About Us - FEAG",
   description:
-    "Learn how FEAG connects customers with verified creative professionals for photography, videography, live music, and event services.",
+    "Discover how FEAG brings customers and talented creative professionals together for every important moment.",
 };
 
 export default function AboutPage() {

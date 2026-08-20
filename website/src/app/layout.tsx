@@ -6,6 +6,7 @@ import ConditionalLayout from "@/components/ConditionalLayout";
 import CustomToaster from "@/components/CustomToaster";
 import Providers from "@/components/Providers";
 import GoogleTranslate from "@/components/GoogleTranslate";
+import SupportChatbot from "@/components/SupportChatbot";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <CustomToaster />
+          <SupportChatbot />
           {/* <GoogleTranslate /> */}
           <ConditionalLayout>{children}</ConditionalLayout>
         </Providers>

@@ -27,7 +27,7 @@ export default function CategoryPage({ params }: PageProps) {
   const { category } = use(params);
 
   // Validate category slug
-  const validCategories = ["photographer", "videographer", "singer", "Cinematic", "choreographer", "podcast"];
+  const validCategories = ["photographer", "videographer", "singer", "Cinematic", "dancer", "choreographer", "podcast"];
   const isCategoryValid = validCategories.includes(category);
 
   // States
@@ -131,6 +131,18 @@ export default function CategoryPage({ params }: PageProps) {
           bgStyle: {
             background:
               "linear-gradient(to bottom, rgba(21, 32, 30, 0.85), rgba(21, 32, 30, 0.95)), url('/choreographer.png') center/cover no-repeat",
+          },
+          mockTotalCount: 420,
+        };
+      case "dancer":
+        return {
+          label: "Dancer",
+          title: "Find Professional Dancers",
+          description:
+            "Discover talented dancers for stage performances, weddings, music videos, and unforgettable live moments.",
+          bgStyle: {
+            background:
+              "linear-gradient(to bottom, rgba(21, 32, 30, 0.85), rgba(21, 32, 30, 0.95)), url('/about/dancers.jpg') center/cover no-repeat",
           },
           mockTotalCount: 420,
         };

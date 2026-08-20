@@ -18,7 +18,9 @@ export function useFilteredProfessionals({ categoryOverride }: UseFilteredProfes
     const filteredData = useMemo(() => {
         let filtered: Professional[] = professionals;
         if (categoryToFilter && categoryToFilter !== "All") {
-            filtered = professionals.filter(prof => prof.category === categoryToFilter);
+            filtered = categoryToFilter === "dancer"
+                ? professionals.filter(prof => prof.feature === "dance")
+                : professionals.filter(prof => prof.category === categoryToFilter);
         }
 
         // 1. Filter by Booking (Date/Slot) if needed
