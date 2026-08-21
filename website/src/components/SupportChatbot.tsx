@@ -454,7 +454,7 @@ export default function SupportChatbot() {
               <div className="flex items-center gap-2 pb-3">
                 <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#e7d9c7]" />
                 <span className="rounded-full border border-[#e7d9c7] bg-white/65 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#9a6417] backdrop-blur-md">
-                  Common Questions ✨
+                  Commonly Asked Questions 
                 </span>
                 <span className="h-px flex-1 bg-gradient-to-l from-transparent to-[#e7d9c7]" />
               </div>
