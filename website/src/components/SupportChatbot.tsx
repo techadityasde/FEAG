@@ -359,7 +359,7 @@ export default function SupportChatbot() {
       >
         {open && (
           <div
-            className="fixed inset-0 z-0 bg-[#2e2215]/25 backdrop-blur-[1px]"
+            className="fixed inset-0 z-0 bg-transparent"
             onPointerDown={closeChat}
             aria-hidden="true"
           />
