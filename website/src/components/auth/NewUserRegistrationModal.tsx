@@ -87,8 +87,9 @@ export default function NewUserRegistrationModal({
 
     if (onSuccess) {
       onSuccess();
+    } else {
+      router.push("/my-account");
     }
-    router.push("/my-account");
   };
 
   return (

@@ -8,7 +8,11 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 import { Send, X } from "lucide-react";
+import LoginForm from "@/components/auth/LoginForm";
+import type { RootState } from "@/lib/store/store";
 
 type Topic = {
   label: string;
@@ -17,12 +21,20 @@ type Topic = {
   answer: string;
   keywords: string[];
   href: string;
+  requiresAuthentication?: boolean;
 };
 
 type ChatMessage = {
   from: "bot" | "user";
   text: string;
   href?: string;
+  requiresAuthentication?: boolean;
+};
+
+type QuestionResponse = {
+  answer: string;
+  href: string;
+  requiresAuthentication?: boolean;
 };
 
 const topics: Topic[] = [
@@ -61,6 +73,7 @@ const topics: Topic[] = [
       "You can review your completed payments and transaction history from your account.",
     keywords: ["payment", "payments", "transaction", "transactions", "charged"],
     href: "/transactions",
+    requiresAuthentication: true,
   },
   {
     label: "Support",
@@ -73,7 +86,7 @@ const topics: Topic[] = [
   },
 ];
 
-const questionResponses: Record<string, { answer: string; href: string }> = {
+const questionResponses: Record<string, QuestionResponse> = {
   "How do I create an account?": {
     answer:
       "Go to the sign-in page and continue with your mobile number or Google account. If you are new to FEAG, you will be guided through registration.",
@@ -96,8 +109,9 @@ const questionResponses: Record<string, { answer: string; href: string }> = {
   },
   "How do I view my payments?": {
     answer:
-      "Your completed payments and transaction history are available from your account transactions page.",
+      "Please log in to view your completed payments and transaction history.",
     href: "/transactions",
+    requiresAuthentication: true,
   },
   "I have a problem with my booking.": {
     answer:
@@ -112,7 +126,12 @@ const questionResponses: Record<string, { answer: string; href: string }> = {
 };
 
 export default function SupportChatbot() {
+  const router = useRouter();
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
   const [open, setOpen] = useState(false);
+  const [isPaymentLoginOpen, setIsPaymentLoginOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -141,7 +160,13 @@ export default function SupportChatbot() {
     setIsTyping(false);
     setInput("");
     setMessages([]);
+    setIsPaymentLoginOpen(false);
     setOpen(false);
+  };
+
+  const handlePaymentLoginSuccess = () => {
+    closeChat();
+    router.push("/transactions");
   };
 
   const getPageUrl = (path: string) => {
@@ -241,12 +266,16 @@ export default function SupportChatbot() {
       match?.answer ??
       "I can help with bookings, creators, payments, your account and more. Choose a topic below, or try asking your question a different way.";
     const href = getPageUrl(directResponse?.href ?? match?.href ?? "/contact");
+    const requiresAuthentication =
+      directResponse?.requiresAuthentication ??
+      match?.requiresAuthentication ??
+      false;
     setMessages((current) => [...current, { from: "user", text: question }]);
     setIsTyping(true);
     replyTimeoutRef.current = window.setTimeout(() => {
       setMessages((current) => [
         ...current,
-        { from: "bot", text: answer, href },
+        { from: "bot", text: answer, href, requiresAuthentication },
       ]);
       setIsTyping(false);
       replyTimeoutRef.current = null;
@@ -365,6 +394,52 @@ export default function SupportChatbot() {
           />
         )}
 
+        {isPaymentLoginOpen && (
+          <div
+            className="fixed inset-0 z-20 bg-[#2e2215]/25 backdrop-blur-sm"
+            onPointerDown={() => setIsPaymentLoginOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {isPaymentLoginOpen && (
+          <aside
+            className="fixed z-40 left-1/2 top-1/2 w-[360px] max-h-[min(650px,calc(100dvh-48px))] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[24px] border border-white/80 bg-white/95 p-4 shadow-[0_28px_80px_rgba(46,34,21,.28)] backdrop-blur-xl max-sm:left-4 max-sm:right-4 max-sm:top-auto max-sm:bottom-[max(1rem,env(safe-area-inset-bottom))] max-sm:w-auto max-sm:max-h-[min(620px,calc(100dvh-32px))] max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-[20px] max-sm:p-3"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="payment-login-title"
+          >
+            <button
+              type="button"
+              onClick={() => setIsPaymentLoginOpen(false)}
+              className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#e8dfd3] bg-white text-[#8d8175] transition hover:bg-[#fff7eb] hover:text-[#51463c]"
+              aria-label="Close login"
+            >
+              <X size={16} />
+            </button>
+            <div className="pr-10">
+              <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#a96810]">
+                Payments
+              </p>
+              <h3
+                id="payment-login-title"
+                className="mt-1 text-lg font-extrabold text-[#2e2215]"
+              >
+                Sign in to view payments
+              </h3>
+              <p className="mt-1 text-xs leading-5 text-[#7d6e60]">
+                Log in or create your account to continue to your transactions.
+              </p>
+            </div>
+            <div className="mt-4 border-t border-[#eee4d8] pt-4">
+              <LoginForm
+                onSuccess={handlePaymentLoginSuccess}
+                showTitle={false}
+              />
+            </div>
+          </aside>
+        )}
+
         {!open && (
           <div
             className="absolute bottom-[46px] right-[62px] flex items-end gap-2 sm:bottom-[56px] sm:right-[82px] max-sm:bottom-[42px] max-sm:right-[60px] max-[359px]:bottom-[34px] max-[359px]:right-[46px]"
@@ -380,7 +455,9 @@ export default function SupportChatbot() {
 
         {open && (
           <section
-            className="feag-chat-panel absolute z-10 bottom-0 right-[calc(100%+16px)] flex h-[min(455px,calc(100dvh-175px))] w-[calc(100vw-40px)] max-w-[370px] flex-col overflow-hidden rounded-[30px] border border-white/80 bg-white/82 shadow-[0_28px_80px_rgba(46,34,21,.24),0_8px_28px_rgba(226,154,38,.10)] backdrop-blur-2xl max-sm:bottom-[calc(100%+10px)] max-sm:right-0 max-sm:h-[min(400px,calc(100dvh-130px))] max-sm:w-[min(20rem,calc(100vw-2rem))] max-sm:rounded-[22px] max-[359px]:h-[min(380px,calc(100dvh-120px))] max-[359px]:w-[calc(100vw-28px)]"
+            className={`feag-chat-panel absolute bottom-0 right-[calc(100%+16px)] flex h-[min(455px,calc(100dvh-175px))] w-[calc(100vw-40px)] max-w-[370px] flex-col overflow-hidden rounded-[30px] border border-white/80 bg-white/82 shadow-[0_28px_80px_rgba(46,34,21,.24),0_8px_28px_rgba(226,154,38,.10)] backdrop-blur-2xl max-sm:bottom-[calc(100%+10px)] max-sm:right-0 max-sm:h-[min(400px,calc(100dvh-130px))] max-sm:w-[min(20rem,calc(100vw-2rem))] max-sm:rounded-[22px] max-[359px]:h-[min(380px,calc(100dvh-120px))] max-[359px]:w-[calc(100vw-28px)] ${
+              isPaymentLoginOpen ? "z-30" : "z-10"
+            }`}
             aria-label="FEAG support chat"
           >
             {/* Soft glossy light behind the content */}
@@ -504,6 +581,15 @@ export default function SupportChatbot() {
                       {message.from === "bot" && message.href && (
                         <a
                           href={message.href}
+                          onClick={(event) => {
+                            if (
+                              message.requiresAuthentication &&
+                              !isAuthenticated
+                            ) {
+                              event.preventDefault();
+                              setIsPaymentLoginOpen(true);
+                            }
+                          }}
                           className="mt-3 inline-flex min-h-9 items-center rounded-full border border-[#e29a26]/25 bg-[#fff7eb] px-3 py-1 text-[11px] font-bold text-[#9a6417] shadow-[inset_0_1px_0_rgba(255,255,255,.8)] transition hover:border-[#e29a26]/50 hover:bg-[#fff0d9] hover:text-[#75470d] sm:min-h-8"
                         >
                           Visit here

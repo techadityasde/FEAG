@@ -201,7 +201,7 @@ export default function ContactForm() {
             inputMode="numeric"
             value={contactForm.phone}
             onChange={updateField("phone")}
-            placeholder="Ex: (+91) 4"
+            placeholder="Ex: (+91)"
             required
             // aria-invalid={Boolean(errors.phone)} 
             className="w-full bg-transparent px-3 py-2.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground outline-none"
